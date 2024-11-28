@@ -1,7 +1,7 @@
 const request = require("supertest"); // Supertest for HTTP requests
 const express = require("express");
 const mongoose = require("mongoose");
-const deliveryRoutes = require("../routes/deliveryRoutes"); // Import delivery routes
+const deliveryRoutes = require("../src/routes/deliveryRoutes"); // Import delivery routes
 
 const app = express();
 app.use(express.json());
