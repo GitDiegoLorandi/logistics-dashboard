@@ -1,20 +1,20 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const Delivery = require("../models/deliveryModel");
-const { body, validationResult } = require("express-validator");
+const authMiddleware = require("../middleware/authMiddleware");
+const roleMiddleware = require("../middleware/roleMiddleware");
 
 const router = express.Router();
 
+// Apply authMiddleware and roleMiddleware to all routes
+router.use(authMiddleware);  // Ensure that authentication is required for all routes
+
+// Public route for testing DB (no role-based check)
 router.get("/test-db", async (req, res) => {
-  try {
-    res.status(200).json({ message: "Test DB route is working" });
-  } catch (error) {
-    res.status(500).json({ message: "Database connection failed" });
-  }
+  res.status(200).json({ message: "Test DB route is working" });
 });
 
-// Get all deliveries
-router.get("/", async (req, res) => {
+// Get all deliveries (Admin only)
+router.get("/", roleMiddleware(["admin"]), async (req, res) => {
   try {
     const deliveries = await Delivery.find();
     res.status(200).json(deliveries);
@@ -23,43 +23,28 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post(
-  "/",
-  [
-    body("orderId").notEmpty().withMessage("Order ID is required"),
-    body("status").isIn(["Pending", "In Transit", "Delivered"]).withMessage("Status must be valid"),
-    body("customer").notEmpty().withMessage("Customer is required"),
-  ],
-  async (req, res) => {
-    // Handle validation errors
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
-    const { orderId, status, customer } = req.body;
-    try {
-      const newDelivery = await Delivery.create({ orderId, status, customer });
-      res.status(201).json(newDelivery);
-    } catch (error) {
-      console.error("Error creating delivery:", error);
-      res.status(500).json({ message: "Internal Server Error" });
-    }
-  }
-);
-
-// Update a delivery by ID
-router.put("/:id", async (req, res) => {
+// Create a delivery (User and Admin)
+router.post("/", roleMiddleware(["user", "admin"]), async (req, res) => {
   try {
-    // Check if the status is valid
+    const { orderId, status, customer } = req.body;
+    const newDelivery = await Delivery.create({ orderId, status, customer });
+    res.status(201).json(newDelivery);
+  } catch (error) {
+    res.status(500).json({ message: "Error creating delivery" });
+  }
+});
+
+// Update a delivery by ID (Admin only)
+router.put("/:id", roleMiddleware(["admin"]), async (req, res) => {
+  try {
     if (!["Pending", "In Transit", "Delivered"].includes(req.body.status)) {
       return res.status(400).json({ message: "Invalid status" });
     }
 
     const updatedDelivery = await Delivery.findByIdAndUpdate(
-      req.params.id,  // Find by ID from URL
-      req.body,        // New data from request body
-      { new: true }    // Return the updated document
+      req.params.id,
+      req.body,
+      { new: true }
     );
 
     if (!updatedDelivery) {
@@ -68,13 +53,12 @@ router.put("/:id", async (req, res) => {
 
     res.status(200).json(updatedDelivery);
   } catch (error) {
-    console.error("Error updating delivery:", error);
     res.status(500).json({ message: "Error updating delivery" });
   }
 });
 
-// Delete a delivery
-router.delete("/:id", async (req, res) => {
+// Delete a delivery (Admin only)
+router.delete("/:id", roleMiddleware(["admin"]), async (req, res) => {
   try {
     await Delivery.findByIdAndDelete(req.params.id);
     res.status(200).json({ message: "Delivery deleted" });
