@@ -1,7 +1,7 @@
-const request = require("supertest"); // Supertest for HTTP requests
+const request = require("supertest");
 const express = require("express");
 const mongoose = require("mongoose");
-const deliveryRoutes = require("../src/routes/deliveryRoutes"); // Import delivery routes
+const deliveryRoutes = require("../src/routes/deliveryRoutes");
 
 const app = express();
 app.use(express.json());
@@ -23,8 +23,8 @@ describe("Delivery API Tests", () => {
   // Test GET /api/deliveries (Fetch all deliveries)
   it("should fetch all deliveries", async () => {
     const res = await request(app).get("/api/deliveries");
-    expect(res.status).toBe(200); // Check for success status
-    expect(Array.isArray(res.body)).toBeTruthy(); // Check if the response is an array
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBeTruthy();
   });
 
   // Test POST /api/deliveries (Create a new delivery)
@@ -34,8 +34,8 @@ describe("Delivery API Tests", () => {
       status: "Pending",
       customer: "John Doe",
     });
-    expect(res.status).toBe(201); // Check if the status is 201 (Created)
-    expect(res.body).toHaveProperty("id"); // Ensure the response contains an ID
+    expect(res.status).toBe(201);
+    expect(res.body).toHaveProperty("id");
   });
 
   // Test POST /api/deliveries with invalid data
@@ -43,8 +43,8 @@ describe("Delivery API Tests", () => {
     const res = await request(app).post("/api/deliveries").send({
       status: "Pending", // Missing orderId and customer
     });
-    expect(res.status).toBe(400); // Expecting validation error
-    expect(res.body).toHaveProperty("errors"); // Expect validation error messages
+    expect(res.status).toBe(400);
+    expect(res.body).toHaveProperty("errors");
   });
 
   // Test PUT /api/deliveries/:id (Update delivery)
