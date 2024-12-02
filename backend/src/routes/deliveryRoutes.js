@@ -1,6 +1,7 @@
 const express = require("express");
 const { body, validationResult } = require("express-validator");
 const Delivery = require("../models/deliveryModel");
+const Deliverer = require("../models/delivererModel");
 const authMiddleware = require("../middleware/authMiddleware");
 const roleMiddleware = require("../middleware/roleMiddleware");
 
@@ -82,5 +83,42 @@ router.delete(
     }
   }
 );
+
+// Attach deliverer to delivery
+router.put("/:id/assign", async (req, res) => {
+  try {
+    const { delivererId } = req.body;
+    const deliverer = await Deliverer.findById(delivererId);
+    if (!deliverer) return res.status(404).json({ message: "Deliverer not found" });
+
+    const delivery = await Delivery.findByIdAndUpdate(req.params.id, { deliverer: delivererId }, { new: true });
+    if (!delivery) return res.status(404).json({ message: "Delivery not found" });
+
+    deliverer.deliveries.push(delivery._id);
+    await deliverer.save();
+
+    res.status(200).json(delivery);
+  } catch (error) {
+    res.status(500).json({ message: "Error assigning deliverer" });
+  }
+});
+
+// Fetch deliveries statistics
+router.get("/statistics", async (req, res) => {
+  try {
+    const totalByStatus = await Delivery.aggregate([
+      { $group: { _id: "$status", count: { $sum: 1 } } }
+    ]);
+
+    const deliveriesByDate = await Delivery.aggregate([
+      { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, count: { $sum: 1 } } },
+      { $sort: { _id: 1 } }
+    ]);
+
+    res.status(200).json({ totalByStatus, deliveriesByDate });
+  } catch (error) {
+    res.status(500).json({ message: "Error fetching statistics" });
+  }
+});
 
 module.exports = router;
