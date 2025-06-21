@@ -5,7 +5,7 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
 const deliveryRoutes = require("./routes/deliveryRoutes");
-const delivererRoutes = require("./routes/delivererRoutes");
+const statisticsRoutes = require("./routes/statisticsRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -25,7 +25,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/deliveries", deliveryRoutes);
-app.use("/api/deliverers", delivererRoutes);
+app.use("/api/statistics", statisticsRoutes);
 
 // Health check endpoint
 app.get("/api/health", (req, res) => {
@@ -35,8 +35,10 @@ app.get("/api/health", (req, res) => {
     uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'development',
     database: 'Connected'
+
   });
 });
+
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -46,6 +48,7 @@ app.use((err, req, res, next) => {
     ...(process.env.NODE_ENV === 'development' && { error: err.message })
   });
 });
+
 
 // 404 handler
 app.use('*', (req, res) => {
@@ -57,7 +60,6 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);
-  console.log(`🔑 JWT_SECRET: ${process.env.JWT_SECRET ? 'Set ✅' : 'Missing ❌'}`);
   if (process.env.NODE_ENV === 'development') {
     console.log(`📱 Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:3000'}`);
   }
