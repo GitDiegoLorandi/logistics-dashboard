@@ -3,6 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
+const userRoutes = require("./routes/userRoutes");
 const deliveryRoutes = require("./routes/deliveryRoutes");
 const statisticsRoutes = require("./routes/statisticsRoutes");
 
@@ -22,6 +23,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/users", userRoutes);
 app.use("/api/deliveries", deliveryRoutes);
 app.use("/api/statistics", statisticsRoutes);
 
@@ -33,6 +35,7 @@ app.get("/api/health", (req, res) => {
     uptime: process.uptime(),
     environment: process.env.NODE_ENV || 'development',
     database: 'Connected'
+
   });
 });
 
@@ -45,6 +48,7 @@ app.use((err, req, res, next) => {
     ...(process.env.NODE_ENV === 'development' && { error: err.message })
   });
 });
+
 
 // 404 handler
 app.use('*', (req, res) => {
