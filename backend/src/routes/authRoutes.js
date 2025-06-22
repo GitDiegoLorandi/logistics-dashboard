@@ -38,11 +38,23 @@ router.post("/register",
     body("role")
       .optional()
       .isIn(["user", "admin"])
-      .withMessage("Role must be either 'user' or 'admin'")
+      .withMessage("Role must be either 'user' or 'admin'"),
+    body("firstName")
+      .optional()
+      .isLength({ min: 2, max: 50 })
+      .withMessage("First name must be between 2 and 50 characters"),
+    body("lastName")
+      .optional()
+      .isLength({ min: 2, max: 50 })
+      .withMessage("Last name must be between 2 and 50 characters"),
+    body("phone")
+      .optional()
+      .matches(/^[\+]?[1-9][\d]{0,15}$/)
+      .withMessage("Please provide a valid phone number")
   ],
   handleValidationErrors,
   async (req, res) => {
-    const { email, password, role } = req.body;
+    const { email, password, role, firstName, lastName, phone } = req.body;
     let newUser = null;
     
     try {
@@ -58,7 +70,10 @@ router.post("/register",
       newUser = await User.create({ 
         email, 
         password, // Don't hash here - let the model do it
-        role: role || "user" 
+        role: role || "user",
+        firstName,
+        lastName,
+        phone
       });
       
       console.log("User created successfully:", newUser._id);
@@ -83,7 +98,10 @@ router.post("/register",
         user: {
           id: newUser._id,
           email: newUser.email,
-          role: newUser.role
+          role: newUser.role,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+          phone: newUser.phone
         }
       });
       
@@ -176,7 +194,10 @@ router.post("/login",
         user: {
           id: user._id,
           email: user.email,
-          role: user.role
+          role: user.role,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          phone: user.phone
         }
       });
       
