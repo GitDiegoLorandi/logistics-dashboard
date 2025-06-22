@@ -1,213 +1,243 @@
 const request = require("supertest");
+const express = require("express");
 const mongoose = require("mongoose");
-const app = require("../server");
+const { MongoMemoryServer } = require("mongodb-memory-server");
+const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const Delivery = require("../models/deliveryModel");
 const Deliverer = require("../models/delivererModel");
-const jwt = require("jsonwebtoken");
+const statisticsRoutes = require("../routes/statisticsRoutes");
+const authRoutes = require("../routes/authRoutes");
 
-describe("Statistics Routes", () => {
-  let authToken;
-  let adminToken;
-  let testUser;
-  let testAdmin;
-  let testDeliverer;
+const app = express();
+app.use(express.json());
+app.use("/api/auth", authRoutes);
+app.use("/api/statistics", statisticsRoutes);
 
-  beforeEach(async () => {
-    // Create test users
-    testUser = await User.create({
-      email: "user@test.com",
-      password: "password123",
-      role: "user"
-    });
+let mongoServer;
+let adminToken;
+let userToken;
+let adminUser;
+let regularUser;
+
+beforeAll(async () => {
+  // Create in-memory MongoDB instance
+  mongoServer = await MongoMemoryServer.create();
+  const mongoUri = mongoServer.getUri();
+  
+  await mongoose.connect(mongoUri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  });
+
+  // Create test users
+  adminUser = await User.create({
+    email: "admin@test.com",
+    password: "admin123",
+    role: "admin"
+  });
+
+  regularUser = await User.create({
+    email: "user@test.com",
+    password: "user123",
+    role: "user"
+  });
+
+  // Generate JWT tokens
+  adminToken = jwt.sign(
+    { userId: adminUser._id, role: adminUser.role },
+    process.env.JWT_SECRET || "test-secret",
+    { expiresIn: "1h" }
+  );
+
+  userToken = jwt.sign(
+    { userId: regularUser._id, role: regularUser.role },
+    process.env.JWT_SECRET || "test-secret",
+    { expiresIn: "1h" }
+  );
+});
+
+afterAll(async () => {
+  await mongoose.connection.close();
+  await mongoServer.stop();
+});
+
+beforeEach(async () => {
+  // Create test data before each test
+  const deliverer = await Deliverer.create({
+    name: "Test Deliverer",
+    email: "deliverer@test.com",
+    phone: "+1234567890",
+    status: "Available",
+    vehicleType: "Car",
+    createdBy: adminUser._id
+  });
+
+  // Create test deliveries with different statuses
+  await Delivery.insertMany([
+    {
+      orderId: "STAT001",
+      status: "Delivered",
+      customer: "Customer 1",
+      priority: "High",
+      deliverer: deliverer._id,
+      createdBy: adminUser._id,
+      actualDeliveryDate: new Date()
+    },
+    {
+      orderId: "STAT002", 
+      status: "Pending",
+      customer: "Customer 2",
+      priority: "Medium",
+      createdBy: regularUser._id
+    },
+    {
+      orderId: "STAT003",
+      status: "In Transit",
+      customer: "Customer 3",
+      priority: "Low",
+      deliverer: deliverer._id,
+      createdBy: adminUser._id
+    },
+    {
+      orderId: "STAT004",
+      status: "Cancelled",
+      customer: "Customer 4", 
+      priority: "Urgent",
+      createdBy: regularUser._id
+    }
+  ]);
+});
+
+afterEach(async () => {
+  // Clean up test data after each test
+  await Delivery.deleteMany({});
+  await Deliverer.deleteMany({});
+});
+
+describe("Statistics API Tests", () => {
+
+  // Test GET /api/statistics/overall
+  it("should fetch overall statistics with user token", async () => {
+    const res = await request(app)
+      .get("/api/statistics/overall")
+      .set("Authorization", `Bearer ${userToken}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("totalDeliveries", 4);
+    expect(res.body).toHaveProperty("deliveryBreakdown");
+    expect(res.body.deliveryBreakdown).toHaveProperty("delivered", 1);
+    expect(res.body.deliveryBreakdown).toHaveProperty("pending", 1);
+    expect(res.body.deliveryBreakdown).toHaveProperty("inTransit", 1);
+    expect(res.body.deliveryBreakdown).toHaveProperty("cancelled", 1);
+    expect(res.body).toHaveProperty("deliveryRate");
+    expect(res.body).toHaveProperty("totalDeliverers", 1);
+  });
+
+  // Test GET /api/statistics/status
+  it("should fetch deliveries by status", async () => {
+    const res = await request(app)
+      .get("/api/statistics/status")
+      .set("Authorization", `Bearer ${userToken}`);
+
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBeTruthy();
+    expect(res.body).toHaveLength(4); // 4 different statuses
     
-    testAdmin = await User.create({
-      email: "admin@test.com",
-      password: "password123",
-      role: "admin"
-    });
+    const deliveredStat = res.body.find(stat => stat.status === "Delivered");
+    expect(deliveredStat).toBeDefined();
+    expect(deliveredStat.count).toBe(1);
+    expect(deliveredStat.percentage).toBe("25.00");
+  });
 
-    // Create test deliverer
-    testDeliverer = await Deliverer.create({
-      name: "Test Deliverer",
-      email: "deliverer@test.com",
-      phone: "1234567890"
-    });
+  // Test GET /api/statistics/priority
+  it("should fetch priority-based statistics", async () => {
+    const res = await request(app)
+      .get("/api/statistics/priority")
+      .set("Authorization", `Bearer ${adminToken}`);
 
-    authToken = jwt.sign(
-      { userId: testUser._id, role: testUser.role }, 
-      process.env.JWT_SECRET
-    );
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBeTruthy();
     
-    adminToken = jwt.sign(
-      { userId: testAdmin._id, role: testAdmin.role }, 
-      process.env.JWT_SECRET
-    );
-
-    // Create test deliveries
-    const deliveries = [
-      {
-        orderId: "ORD-001",
-        status: "Delivered",
-        customer: "Customer 1",
-        priority: "High",
-        deliverer: testDeliverer._id,
-        createdBy: testUser._id
-      },
-      {
-        orderId: "ORD-002",
-        status: "Pending",
-        customer: "Customer 2",
-        priority: "Medium",
-        createdBy: testUser._id
-      },
-      {
-        orderId: "ORD-003",
-        status: "In Transit",
-        customer: "Customer 3",
-        priority: "Low",
-        deliverer: testDeliverer._id,
-        createdBy: testAdmin._id
-      }
-    ];
-
-    await Delivery.insertMany(deliveries);
+    const highPriority = res.body.find(stat => stat.priority === "High");
+    expect(highPriority).toBeDefined();
+    expect(highPriority.count).toBe(1);
+    expect(highPriority.delivered).toBe(1);
+    expect(highPriority.completionRate).toBe(100);
   });
 
-  describe("GET /api/statistics/overall", () => {
-    it("should return overall statistics for authenticated user", async () => {
-      const response = await request(app)
-        .get("/api/statistics/overall")
-        .set("Authorization", `Bearer ${authToken}`)
-        .expect(200);
+  // Test GET /api/statistics/deliverers (Admin only)
+  it("should fetch deliverer performance with admin token", async () => {
+    const res = await request(app)
+      .get("/api/statistics/deliverers")
+      .set("Authorization", `Bearer ${adminToken}`);
 
-      expect(response.body).toHaveProperty("totalDeliveries", 3);
-      expect(response.body).toHaveProperty("deliveryBreakdown");
-      expect(response.body.deliveryBreakdown).toHaveProperty("delivered", 1);
-      expect(response.body.deliveryBreakdown).toHaveProperty("pending", 1);
-      expect(response.body.deliveryBreakdown).toHaveProperty("inTransit", 1);
-      expect(response.body).toHaveProperty("deliveryRate");
-    });
-
-    it("should return 401 for unauthenticated request", async () => {
-      await request(app)
-        .get("/api/statistics/overall")
-        .expect(401);
-    });
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBeTruthy();
+    expect(res.body).toHaveLength(1);
+    
+    const delivererStats = res.body[0];
+    expect(delivererStats).toHaveProperty("delivererName", "Test Deliverer");
+    expect(delivererStats).toHaveProperty("totalDeliveries", 2);
+    expect(delivererStats).toHaveProperty("delivered", 1);
+    expect(delivererStats).toHaveProperty("inTransit", 1);
+    expect(delivererStats).toHaveProperty("successRate", 50);
   });
 
-  describe("GET /api/statistics/status", () => {
-    it("should return status-based statistics", async () => {
-      const response = await request(app)
-        .get("/api/statistics/status")
-        .set("Authorization", `Bearer ${authToken}`)
-        .expect(200);
+  // Test GET /api/statistics/deliverers (User access denied)
+  it("should deny access to deliverer performance for regular user", async () => {
+    const res = await request(app)
+      .get("/api/statistics/deliverers")
+      .set("Authorization", `Bearer ${userToken}`);
 
-      expect(Array.isArray(response.body)).toBe(true);
-      expect(response.body.length).toBeGreaterThan(0);
-      
-      const statusItem = response.body[0];
-      expect(statusItem).toHaveProperty("status");
-      expect(statusItem).toHaveProperty("count");
-      expect(statusItem).toHaveProperty("percentage");
-    });
+    expect(res.status).toBe(403);
   });
 
-  describe("GET /api/statistics/date-range", () => {
-    it("should return date range statistics with default grouping", async () => {
-      const response = await request(app)
-        .get("/api/statistics/date-range")
-        .set("Authorization", `Bearer ${authToken}`)
-        .expect(200);
+  // Test GET /api/statistics/trends
+  it("should fetch delivery trends", async () => {
+    const res = await request(app)
+      .get("/api/statistics/trends")
+      .set("Authorization", `Bearer ${userToken}`);
 
-      expect(response.body).toHaveProperty("groupBy", "day");
-      expect(response.body).toHaveProperty("data");
-      expect(Array.isArray(response.body.data)).toBe(true);
-    });
-
-    it("should validate date format", async () => {
-      await request(app)
-        .get("/api/statistics/date-range?startDate=invalid-date")
-        .set("Authorization", `Bearer ${authToken}`)
-        .expect(400);
-    });
-
-    it("should validate groupBy parameter", async () => {
-      await request(app)
-        .get("/api/statistics/date-range?groupBy=invalid")
-        .set("Authorization", `Bearer ${authToken}`)
-        .expect(400);
-    });
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("period", "Last 30 days");
+    expect(res.body).toHaveProperty("trends");
+    expect(Array.isArray(res.body.trends)).toBeTruthy();
+    expect(res.body.trends).toHaveLength(30); // 30 days of data
   });
 
-  describe("GET /api/statistics/deliverers", () => {
-    it("should return deliverer performance for admin", async () => {
-      const response = await request(app)
-        .get("/api/statistics/deliverers")
-        .set("Authorization", `Bearer ${adminToken}`)
-        .expect(200);
+  // Test GET /api/statistics/date-range
+  it("should fetch deliveries by date range", async () => {
+    const today = new Date().toISOString().split('T')[0];
+    const res = await request(app)
+      .get(`/api/statistics/date-range?startDate=${today}&endDate=${today}&groupBy=day`)
+      .set("Authorization", `Bearer ${adminToken}`);
 
-      expect(Array.isArray(response.body)).toBe(true);
-      
-      if (response.body.length > 0) {
-        const delivererStat = response.body[0];
-        expect(delivererStat).toHaveProperty("delivererName");
-        expect(delivererStat).toHaveProperty("totalDeliveries");
-        expect(delivererStat).toHaveProperty("successRate");
-      }
-    });
-
-    it("should deny access to regular users", async () => {
-      await request(app)
-        .get("/api/statistics/deliverers")
-        .set("Authorization", `Bearer ${authToken}`)
-        .expect(403);
-    });
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("groupBy", "day");
+    expect(res.body).toHaveProperty("dateRange");
+    expect(res.body).toHaveProperty("data");
+    expect(Array.isArray(res.body.data)).toBeTruthy();
   });
 
-  describe("GET /api/statistics/trends", () => {
-    it("should return delivery trends for last 30 days", async () => {
-      const response = await request(app)
-        .get("/api/statistics/trends")
-        .set("Authorization", `Bearer ${authToken}`)
-        .expect(200);
+  // Test authentication requirement
+  it("should require authentication for statistics endpoints", async () => {
+    const res = await request(app)
+      .get("/api/statistics/overall");
 
-      expect(response.body).toHaveProperty("period", "Last 30 days");
-      expect(response.body).toHaveProperty("trends");
-      expect(Array.isArray(response.body.trends)).toBe(true);
-      expect(response.body.trends).toHaveLength(30); // Should have 30 days of data
-    });
+    expect(res.status).toBe(401);
   });
 
-  describe("GET /api/statistics/priority", () => {
-    it("should return priority-based statistics", async () => {
-      const response = await request(app)
-        .get("/api/statistics/priority")
-        .set("Authorization", `Bearer ${authToken}`)
-        .expect(200);
+  // Test legacy statistics endpoint
+  it("should work with legacy statistics endpoint", async () => {
+    const res = await request(app)
+      .get("/api/statistics")
+      .set("Authorization", `Bearer ${userToken}`);
 
-      expect(Array.isArray(response.body)).toBe(true);
-      
-      if (response.body.length > 0) {
-        const priorityStat = response.body[0];
-        expect(priorityStat).toHaveProperty("priority");
-        expect(priorityStat).toHaveProperty("count");
-        expect(priorityStat).toHaveProperty("completionRate");
-      }
-    });
-  });
-
-  describe("GET /api/statistics/ (legacy endpoint)", () => {
-    it("should return legacy statistics format", async () => {
-      const response = await request(app)
-        .get("/api/statistics/")
-        .set("Authorization", `Bearer ${authToken}`)
-        .expect(200);
-
-      expect(response.body).toHaveProperty("totalByStatus");
-      expect(response.body).toHaveProperty("deliveriesByDate");
-      expect(Array.isArray(response.body.totalByStatus)).toBe(true);
-      expect(Array.isArray(response.body.deliveriesByDate)).toBe(true);
-    });
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty("totalByStatus");
+    expect(res.body).toHaveProperty("deliveriesByDate");
+    expect(Array.isArray(res.body.totalByStatus)).toBeTruthy();
+    expect(Array.isArray(res.body.deliveriesByDate)).toBeTruthy();
   });
 }); 

@@ -1,9 +1,17 @@
 const express = require("express");
 const { body, param, validationResult } = require("express-validator");
-const bcrypt = require("bcrypt");
-const User = require("../models/userModel");
 const authMiddleware = require("../middleware/authMiddleware");
 const roleMiddleware = require("../middleware/roleMiddleware");
+const {
+  getAllUsers,
+  getUserProfile,
+  getUserById,
+  updateUserProfile,
+  updateUserRole,
+  changePassword,
+  deactivateUser,
+  deleteUser
+} = require("../controllers/userController");
 
 const router = express.Router();
 
@@ -23,48 +31,13 @@ const handleValidationErrors = (req, res, next) => {
 router.get("/", 
   authMiddleware,
   roleMiddleware(["admin"]),
-  async (req, res) => {
-    try {
-      const { page = 1, limit = 10, role, search } = req.query;
-
-      const filter = {};
-      if (role) filter.role = role;
-      if (search) {
-        filter.email = { $regex: search, $options: 'i' };
-      }
-
-      const options = {
-        page: parseInt(page),
-        limit: parseInt(limit),
-        sort: { createdAt: -1 },
-        select: '-password' // Exclude password field
-      };
-
-      const users = await User.paginate(filter, options);
-      res.status(200).json(users);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-      res.status(500).json({ message: "Error fetching users" });
-    }
-  }
+  getAllUsers
 );
 
 // Get Current User Profile
 router.get("/profile", 
   authMiddleware,
-  async (req, res) => {
-    try {
-      const user = await User.findById(req.user.userId).select('-password');
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      
-      res.status(200).json(user);
-    } catch (error) {
-      console.error("Error fetching user profile:", error);
-      res.status(500).json({ message: "Error fetching user profile" });
-    }
-  }
+  getUserProfile
 );
 
 // Get Single User (Admin Only)
@@ -75,19 +48,7 @@ router.get("/:id",
     param("id").isMongoId().withMessage("Invalid user ID")
   ],
   handleValidationErrors,
-  async (req, res) => {
-    try {
-      const user = await User.findById(req.params.id).select('-password');
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-      
-      res.status(200).json(user);
-    } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Error fetching user" });
-    }
-  }
+  getUserById
 );
 
 // Update User Profile (Self or Admin)
@@ -104,7 +65,7 @@ router.put("/profile",
       .withMessage("Last name must be between 2 and 50 characters"),
     body("phone")
       .optional()
-      .isMobilePhone()
+      .matches(/^[\+]?[1-9][\d]{0,15}$/)
       .withMessage("Please provide a valid phone number"),
     body("email")
       .optional()
@@ -113,47 +74,7 @@ router.put("/profile",
       .normalizeEmail()
   ],
   handleValidationErrors,
-  async (req, res) => {
-    try {
-      const allowedUpdates = ['firstName', 'lastName', 'phone', 'email'];
-      const updates = {};
-      
-      allowedUpdates.forEach(field => {
-        if (req.body[field] !== undefined) {
-          updates[field] = req.body[field];
-        }
-      });
-
-      if (Object.keys(updates).length === 0) {
-        return res.status(400).json({ message: "No valid fields to update" });
-      }
-
-      // Check if email is already taken
-      if (updates.email) {
-        const existingUser = await User.findOne({ 
-          email: updates.email, 
-          _id: { $ne: req.user.userId } 
-        });
-        if (existingUser) {
-          return res.status(400).json({ message: "Email already in use" });
-        }
-      }
-
-      const updatedUser = await User.findByIdAndUpdate(
-        req.user.userId,
-        updates,
-        { new: true, runValidators: true }
-      ).select('-password');
-
-      res.status(200).json({
-        message: "Profile updated successfully",
-        user: updatedUser
-      });
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      res.status(500).json({ message: "Error updating profile" });
-    }
-  }
+  updateUserProfile
 );
 
 // Update User Role (Admin Only)
@@ -167,32 +88,7 @@ router.put("/:id/role",
       .withMessage("Role must be either 'user' or 'admin'")
   ],
   handleValidationErrors,
-  async (req, res) => {
-    try {
-      // Prevent admin from demoting themselves
-      if (req.params.id === req.user.userId && req.body.role !== 'admin') {
-        return res.status(400).json({ message: "Cannot change your own admin role" });
-      }
-
-      const updatedUser = await User.findByIdAndUpdate(
-        req.params.id,
-        { role: req.body.role },
-        { new: true, runValidators: true }
-      ).select('-password');
-
-      if (!updatedUser) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      res.status(200).json({
-        message: "User role updated successfully",
-        user: updatedUser
-      });
-    } catch (error) {
-      console.error("Error updating user role:", error);
-      res.status(500).json({ message: "Error updating user role" });
-    }
-  }
+  updateUserRole
 );
 
 // Change Password
@@ -214,34 +110,7 @@ router.put("/change-password",
       })
   ],
   handleValidationErrors,
-  async (req, res) => {
-    try {
-      const { currentPassword, newPassword } = req.body;
-      
-      const user = await User.findById(req.user.userId);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      // Verify current password
-      const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
-      if (!isCurrentPasswordValid) {
-        return res.status(400).json({ message: "Current password is incorrect" });
-      }
-
-      // Hash new password
-      const saltRounds = 12;
-      const hashedNewPassword = await bcrypt.hash(newPassword, saltRounds);
-
-      // Update password
-      await User.findByIdAndUpdate(req.user.userId, { password: hashedNewPassword });
-
-      res.status(200).json({ message: "Password changed successfully" });
-    } catch (error) {
-      console.error("Error changing password:", error);
-      res.status(500).json({ message: "Error changing password" });
-    }
-  }
+  changePassword
 );
 
 // Deactivate User (Admin Only)
@@ -252,32 +121,7 @@ router.put("/:id/deactivate",
     param("id").isMongoId().withMessage("Invalid user ID")
   ],
   handleValidationErrors,
-  async (req, res) => {
-    try {
-      // Prevent admin from deactivating themselves
-      if (req.params.id === req.user.userId) {
-        return res.status(400).json({ message: "Cannot deactivate your own account" });
-      }
-
-      const updatedUser = await User.findByIdAndUpdate(
-        req.params.id,
-        { isActive: false },
-        { new: true }
-      ).select('-password');
-
-      if (!updatedUser) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      res.status(200).json({
-        message: "User deactivated successfully",
-        user: updatedUser
-      });
-    } catch (error) {
-      console.error("Error deactivating user:", error);
-      res.status(500).json({ message: "Error deactivating user" });
-    }
-  }
+  deactivateUser
 );
 
 // Delete User (Admin Only) - Soft delete
@@ -288,31 +132,7 @@ router.delete("/:id",
     param("id").isMongoId().withMessage("Invalid user ID")
   ],
   handleValidationErrors,
-  async (req, res) => {
-    try {
-      // Prevent admin from deleting themselves
-      if (req.params.id === req.user.userId) {
-        return res.status(400).json({ message: "Cannot delete your own account" });
-      }
-
-      const user = await User.findById(req.params.id);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
-
-      // Soft delete - mark as deleted instead of removing
-      await User.findByIdAndUpdate(req.params.id, { 
-        isActive: false,
-        deletedAt: new Date(),
-        email: `deleted_${Date.now()}_${user.email}` // Prevent email conflicts
-      });
-
-      res.status(200).json({ message: "User deleted successfully" });
-    } catch (error) {
-      console.error("Error deleting user:", error);
-      res.status(500).json({ message: "Error deleting user" });
-    }
-  }
+  deleteUser
 );
 
 module.exports = router; 

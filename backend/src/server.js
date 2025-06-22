@@ -4,6 +4,7 @@ const cors = require("cors");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const userRoutes = require("./routes/userRoutes");
+const delivererRoutes = require("./routes/delivererRoutes");
 const deliveryRoutes = require("./routes/deliveryRoutes");
 const statisticsRoutes = require("./routes/statisticsRoutes");
 
@@ -24,6 +25,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/deliverers", delivererRoutes);
 app.use("/api/deliveries", deliveryRoutes);
 app.use("/api/statistics", statisticsRoutes);
 
