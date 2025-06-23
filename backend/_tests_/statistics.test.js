@@ -3,11 +3,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const jwt = require('jsonwebtoken');
-const User = require('../models/userModel');
-const Delivery = require('../models/deliveryModel');
-const Deliverer = require('../models/delivererModel');
-const statisticsRoutes = require('../routes/statisticsRoutes');
-const authRoutes = require('../routes/authRoutes');
+const User = require('../src/models/userModel');
+const Delivery = require('../src/models/deliveryModel');
+const Deliverer = require('../src/models/delivererModel');
+const statisticsRoutes = require('../src/routes/statisticsRoutes');
+const authRoutes = require('../src/routes/authRoutes');
 
 const app = express();
 app.use(express.json());
