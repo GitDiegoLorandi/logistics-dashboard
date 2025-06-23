@@ -55,4 +55,7 @@ yarn.lock
 
 # Markdown that shouldn't be formatted
 CHANGELOG.md
-LICENSE 
+LICENSE
+
+# SpecStory auto-generated files
+.specstory/ 

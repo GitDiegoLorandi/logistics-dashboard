@@ -32,6 +32,13 @@ const envSchema = Joi.object({
   RATE_LIMIT_WINDOW_MS: Joi.number().positive().default(900000), // 15 minutes
 
   RATE_LIMIT_MAX_REQUESTS: Joi.number().positive().default(100),
+
+  // Phase 2 - Real-time Features
+  SOCKET_IO_CORS_ORIGIN: Joi.string().uri().default('http://localhost:3000'),
+
+  // Phase 2 - API Documentation
+  API_DOCS_ENABLED: Joi.boolean().default(true),
+  API_DOCS_PATH: Joi.string().default('/api-docs'),
 })
   .unknown() // Allow other environment variables
   .required();
