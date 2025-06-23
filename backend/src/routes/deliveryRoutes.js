@@ -1,7 +1,7 @@
-const express = require("express");
-const { body, param, validationResult } = require("express-validator");
-const authMiddleware = require("../middleware/authMiddleware");
-const roleMiddleware = require("../middleware/roleMiddleware");
+const express = require('express');
+const { body, param, validationResult } = require('express-validator');
+const authMiddleware = require('../middleware/authMiddleware');
+const roleMiddleware = require('../middleware/roleMiddleware');
 const {
   createDelivery,
   getAllDeliveries,
@@ -9,8 +9,8 @@ const {
   updateDelivery,
   deleteDelivery,
   assignDeliverer,
-  unassignDeliverer
-} = require("../controllers/deliveryController");
+  unassignDeliverer,
+} = require('../controllers/deliveryController');
 
 const router = express.Router();
 
@@ -19,8 +19,8 @@ const handleValidationErrors = (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(400).json({
-      message: "Validation failed",
-      errors: errors.array()
+      message: 'Validation failed',
+      errors: errors.array(),
     });
   }
   next();
@@ -28,95 +28,89 @@ const handleValidationErrors = (req, res, next) => {
 
 // Create Delivery
 router.post(
-  "/",
+  '/',
   authMiddleware,
-  roleMiddleware(["user", "admin"]),
+  roleMiddleware(['user', 'admin']),
   [
-    body("orderId")
+    body('orderId')
       .notEmpty()
-      .withMessage("Order ID is required")
+      .withMessage('Order ID is required')
       .isLength({ min: 3, max: 50 })
-      .withMessage("Order ID must be between 3 and 50 characters"),
-    body("status")
+      .withMessage('Order ID must be between 3 and 50 characters'),
+    body('status')
       .optional()
-      .isIn(["Pending", "In Transit", "Delivered", "Cancelled"])
-      .withMessage("Invalid status"),
-    body("customer")
+      .isIn(['Pending', 'In Transit', 'Delivered', 'Cancelled'])
+      .withMessage('Invalid status'),
+    body('customer')
       .notEmpty()
-      .withMessage("Customer is required")
+      .withMessage('Customer is required')
       .isLength({ min: 2, max: 100 })
-      .withMessage("Customer name must be between 2 and 100 characters"),
-    body("priority")
+      .withMessage('Customer name must be between 2 and 100 characters'),
+    body('priority')
       .optional()
-      .isIn(["Low", "Medium", "High", "Urgent"])
-      .withMessage("Invalid priority level"),
-    body("deliveryAddress")
+      .isIn(['Low', 'Medium', 'High', 'Urgent'])
+      .withMessage('Invalid priority level'),
+    body('deliveryAddress')
       .optional()
       .isLength({ max: 200 })
-      .withMessage("Delivery address must not exceed 200 characters"),
-    body("estimatedDeliveryDate")
+      .withMessage('Delivery address must not exceed 200 characters'),
+    body('estimatedDeliveryDate')
       .optional()
       .isISO8601()
-      .withMessage("Estimated delivery date must be in ISO 8601 format"),
-    body("notes")
+      .withMessage('Estimated delivery date must be in ISO 8601 format'),
+    body('notes')
       .optional()
       .isLength({ max: 500 })
-      .withMessage("Notes must not exceed 500 characters")
+      .withMessage('Notes must not exceed 500 characters'),
   ],
   handleValidationErrors,
   createDelivery
 );
 
 // Get All Deliveries with pagination and filtering
-router.get("/", 
-  authMiddleware, 
-  roleMiddleware(["admin"]), 
-  getAllDeliveries
-);
+router.get('/', authMiddleware, roleMiddleware(['admin']), getAllDeliveries);
 
 // Get single delivery by ID
 router.get(
-  "/:id",
+  '/:id',
   authMiddleware,
-  roleMiddleware(["user", "admin"]),
-  [
-    param("id").isMongoId().withMessage("Invalid delivery ID")
-  ],
+  roleMiddleware(['user', 'admin']),
+  [param('id').isMongoId().withMessage('Invalid delivery ID')],
   handleValidationErrors,
   getDeliveryById
 );
 
 // Update a Delivery by ID (Admin Only)
 router.put(
-  "/:id",
+  '/:id',
   authMiddleware,
-  roleMiddleware(["admin"]),
+  roleMiddleware(['admin']),
   [
-    param("id").isMongoId().withMessage("Invalid delivery ID"),
-    body("status")
+    param('id').isMongoId().withMessage('Invalid delivery ID'),
+    body('status')
       .optional()
-      .isIn(["Pending", "In Transit", "Delivered", "Cancelled"])
-      .withMessage("Status must be valid"),
-    body("priority")
+      .isIn(['Pending', 'In Transit', 'Delivered', 'Cancelled'])
+      .withMessage('Status must be valid'),
+    body('priority')
       .optional()
-      .isIn(["Low", "Medium", "High", "Urgent"])
-      .withMessage("Invalid priority level"),
-    body("deliveryAddress")
+      .isIn(['Low', 'Medium', 'High', 'Urgent'])
+      .withMessage('Invalid priority level'),
+    body('deliveryAddress')
       .optional()
       .isLength({ max: 200 })
-      .withMessage("Delivery address must not exceed 200 characters"),
-    body("estimatedDeliveryDate")
+      .withMessage('Delivery address must not exceed 200 characters'),
+    body('estimatedDeliveryDate')
       .optional()
       .isISO8601()
-      .withMessage("Estimated delivery date must be in ISO 8601 format"),
-    body("actualDeliveryDate")
+      .withMessage('Estimated delivery date must be in ISO 8601 format'),
+    body('actualDeliveryDate')
       .optional()
       .isISO8601()
-      .withMessage("Actual delivery date must be in ISO 8601 format"),
-    body("notes")
+      .withMessage('Actual delivery date must be in ISO 8601 format'),
+    body('notes')
       .optional()
       .isLength({ max: 500 })
-      .withMessage("Notes must not exceed 500 characters")
+      .withMessage('Notes must not exceed 500 characters'),
   ],
   handleValidationErrors,
   updateDelivery
@@ -124,24 +118,22 @@ router.put(
 
 // Delete a Delivery by ID (Admin Only)
 router.delete(
-  "/:id",
+  '/:id',
   authMiddleware,
-  roleMiddleware(["admin"]),
-  [
-    param("id").isMongoId().withMessage("Invalid delivery ID")
-  ],
+  roleMiddleware(['admin']),
+  [param('id').isMongoId().withMessage('Invalid delivery ID')],
   handleValidationErrors,
   deleteDelivery
 );
 
 // Assign deliverer to delivery
 router.put(
-  "/:id/assign",
+  '/:id/assign',
   authMiddleware,
-  roleMiddleware(["admin"]),
+  roleMiddleware(['admin']),
   [
-    param("id").isMongoId().withMessage("Invalid delivery ID"),
-    body("delivererId").isMongoId().withMessage("Invalid deliverer ID")
+    param('id').isMongoId().withMessage('Invalid delivery ID'),
+    body('delivererId').isMongoId().withMessage('Invalid deliverer ID'),
   ],
   handleValidationErrors,
   assignDeliverer
@@ -149,12 +141,10 @@ router.put(
 
 // Remove deliverer from delivery
 router.put(
-  "/:id/unassign",
+  '/:id/unassign',
   authMiddleware,
-  roleMiddleware(["admin"]),
-  [
-    param("id").isMongoId().withMessage("Invalid delivery ID")
-  ],
+  roleMiddleware(['admin']),
+  [param('id').isMongoId().withMessage('Invalid delivery ID')],
   handleValidationErrors,
   unassignDeliverer
 );
