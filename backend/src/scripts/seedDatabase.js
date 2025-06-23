@@ -1,6 +1,6 @@
 require('dotenv').config();
 const mongoose = require('mongoose');
-const bcrypt = require('bcrypt');
+// const bcrypt = require('bcrypt'); // Password hashing is handled by User model pre-save hook
 const User = require('../models/userModel');
 const Deliverer = require('../models/delivererModel');
 const Delivery = require('../models/deliveryModel');
@@ -8,7 +8,7 @@ const Delivery = require('../models/deliveryModel');
 const seedDatabase = async () => {
   try {
     console.log('🌱 Starting database seeding...');
-    
+
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
@@ -26,7 +26,7 @@ const seedDatabase = async () => {
     const adminUser = await User.create({
       email: 'admin@logistics.com',
       password: 'admin123',
-      role: 'admin'
+      role: 'admin',
     });
     console.log('👤 Admin user created');
 
@@ -34,7 +34,7 @@ const seedDatabase = async () => {
     const regularUser = await User.create({
       email: 'user@logistics.com',
       password: 'user123',
-      role: 'user'
+      role: 'user',
     });
     console.log('👤 Regular user created');
 
@@ -43,18 +43,18 @@ const seedDatabase = async () => {
       {
         name: 'John Smith',
         email: 'john.smith@logistics.com',
-        phone: '+1-555-0101'
+        phone: '+1-555-0101',
       },
       {
         name: 'Maria Garcia',
         email: 'maria.garcia@logistics.com',
-        phone: '+1-555-0102'
+        phone: '+1-555-0102',
       },
       {
         name: 'David Johnson',
         email: 'david.johnson@logistics.com',
-        phone: '+1-555-0103'
-      }
+        phone: '+1-555-0103',
+      },
     ]);
     console.log('🚚 Deliverers created');
 
@@ -69,7 +69,7 @@ const seedDatabase = async () => {
         deliverer: deliverers[0]._id,
         createdBy: adminUser._id,
         actualDeliveryDate: new Date(),
-        notes: 'Delivered to reception'
+        notes: 'Delivered to reception',
       },
       {
         orderId: 'ORD-002',
@@ -79,7 +79,7 @@ const seedDatabase = async () => {
         deliveryAddress: '456 Tech Ave, San Francisco, CA 94105',
         deliverer: deliverers[1]._id,
         createdBy: regularUser._id,
-        estimatedDeliveryDate: new Date(Date.now() + 24 * 60 * 60 * 1000)
+        estimatedDeliveryDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
       },
       {
         orderId: 'ORD-003',
@@ -88,7 +88,7 @@ const seedDatabase = async () => {
         priority: 'Low',
         deliveryAddress: '789 Enterprise Blvd, Chicago, IL 60601',
         createdBy: adminUser._id,
-        estimatedDeliveryDate: new Date(Date.now() + 48 * 60 * 60 * 1000)
+        estimatedDeliveryDate: new Date(Date.now() + 48 * 60 * 60 * 1000),
       },
       {
         orderId: 'ORD-004',
@@ -99,7 +99,7 @@ const seedDatabase = async () => {
         deliverer: deliverers[2]._id,
         createdBy: regularUser._id,
         actualDeliveryDate: new Date(Date.now() - 24 * 60 * 60 * 1000),
-        notes: 'Express delivery completed'
+        notes: 'Express delivery completed',
       },
       {
         orderId: 'ORD-005',
@@ -108,17 +108,18 @@ const seedDatabase = async () => {
         priority: 'Medium',
         deliveryAddress: '654 Legacy Rd, Miami, FL 33101',
         createdBy: adminUser._id,
-        notes: 'Customer requested cancellation'
-      }
+        notes: 'Customer requested cancellation',
+      },
     ]);
     console.log('📦 Sample deliveries created');
 
     // Update deliverers with their deliveries
     for (let i = 0; i < deliverers.length; i++) {
-      const delivererDeliveries = deliveries.filter(d => 
-        d.deliverer && d.deliverer.toString() === deliverers[i]._id.toString()
+      const delivererDeliveries = deliveries.filter(
+        d =>
+          d.deliverer && d.deliverer.toString() === deliverers[i]._id.toString()
       );
-      
+
       if (delivererDeliveries.length > 0) {
         deliverers[i].deliveries = delivererDeliveries.map(d => d._id);
         await deliverers[i].save();
@@ -137,11 +138,10 @@ const seedDatabase = async () => {
     console.log('   User:  user@logistics.com / user123');
 
     await mongoose.disconnect();
-    
   } catch (error) {
     console.error('❌ Seeding failed:', error);
     process.exit(1);
   }
 };
 
-seedDatabase(); 
+seedDatabase();
