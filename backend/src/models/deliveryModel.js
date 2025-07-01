@@ -22,6 +22,7 @@ const deliverySchema = new mongoose.Schema(
     actualDeliveryDate: { type: Date },
     notes: { type: String },
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    reminderSent: { type: Boolean, default: false },
   },
   {
     timestamps: true, // This adds createdAt and updatedAt automatically
