@@ -1,0 +1,34 @@
+{
+  "timestamp": "2025-07-01T11:00:00.396Z",
+  "status": "unhealthy",
+  "checks": {
+    "database": {
+      "healthy": true,
+      "responseTime": 4,
+      "connectionState": 1
+    },
+    "memory": {
+      "healthy": false,
+      "error": "High memory usage: 92.1%",
+      "heapUsedMB": 35,
+      "heapTotalMB": 38,
+      "heapUsagePercent": 92.10526315789474
+    },
+    "disk": {
+      "healthy": true,
+      "canWrite": true
+    },
+    "application": {
+      "healthy": true,
+      "responseTime": 5,
+      "deliveryCount": 3
+    },
+    "backgroundJobs": {
+      "healthy": true,
+      "isRunning": true,
+      "totalJobs": 5,
+      "runningJobs": 0
+    }
+  },
+  "issues": ["High memory usage: 92.1%"]
+}

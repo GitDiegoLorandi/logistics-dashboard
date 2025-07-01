@@ -1,0 +1,118 @@
+[
+  {
+    "timestamp": "2025-07-01T10:45:00.984Z",
+    "system": {
+      "uptime": 770.3760507,
+      "memoryUsage": {
+        "rss": 78.26,
+        "heapTotal": 36.64,
+        "heapUsed": 34.36,
+        "used": 34.36,
+        "external": 18.56
+      },
+      "cpuUsage": {
+        "user": 1281000,
+        "system": 484000
+      },
+      "loadAverage": [0, 0, 0],
+      "platform": "win32",
+      "nodeVersion": "v18.17.0",
+      "pid": 16592
+    },
+    "database": {
+      "connectionState": "connected",
+      "isConnected": true,
+      "activeConnections": 1,
+      "collections": 3,
+      "dataSize": 0,
+      "storageSize": 0.11,
+      "indexSize": 0.56,
+      "documents": 16,
+      "indexes": 16,
+      "avgObjSize": 327.19
+    },
+    "application": {
+      "queryPerformance": {
+        "totalTime": 48,
+        "deliveryQuery": 8,
+        "userQuery": 7,
+        "delivererQuery": 7,
+        "avgQueryTime": 7
+      },
+      "counts": {
+        "totalDeliveries": 3,
+        "totalUsers": 9,
+        "totalDeliverers": 4,
+        "recentDeliveries": 0,
+        "pendingDeliveries": 2,
+        "inTransitDeliveries": 1,
+        "deliveredDeliveries": 0
+      },
+      "ratios": {
+        "deliveryCompletionRate": 0,
+        "pendingRatio": 66.67
+      }
+    },
+    "errors": [],
+    "alerts": [],
+    "jobExecutionTime": 56
+  },
+  {
+    "timestamp": "2025-07-01T11:00:00.395Z",
+    "system": {
+      "uptime": 1669.7872189,
+      "memoryUsage": {
+        "rss": 79.66,
+        "heapTotal": 37.64,
+        "heapUsed": 35.01,
+        "used": 35.01,
+        "external": 18.74
+      },
+      "cpuUsage": {
+        "user": 1546000,
+        "system": 531000
+      },
+      "loadAverage": [0, 0, 0],
+      "platform": "win32",
+      "nodeVersion": "v18.17.0",
+      "pid": 16592
+    },
+    "database": {
+      "connectionState": "connected",
+      "isConnected": true,
+      "activeConnections": 1,
+      "collections": 3,
+      "dataSize": 0,
+      "storageSize": 0.11,
+      "indexSize": 0.56,
+      "documents": 16,
+      "indexes": 16,
+      "avgObjSize": 327.19
+    },
+    "application": {
+      "queryPerformance": {
+        "totalTime": 67,
+        "deliveryQuery": 22,
+        "userQuery": 8,
+        "delivererQuery": 6,
+        "avgQueryTime": 12
+      },
+      "counts": {
+        "totalDeliveries": 3,
+        "totalUsers": 9,
+        "totalDeliverers": 4,
+        "recentDeliveries": 0,
+        "pendingDeliveries": 2,
+        "inTransitDeliveries": 1,
+        "deliveredDeliveries": 0
+      },
+      "ratios": {
+        "deliveryCompletionRate": 0,
+        "pendingRatio": 66.67
+      }
+    },
+    "errors": [],
+    "alerts": [],
+    "jobExecutionTime": 78
+  }
+]
