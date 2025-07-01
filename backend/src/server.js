@@ -13,6 +13,7 @@ const userRoutes = require('./routes/userRoutes');
 const delivererRoutes = require('./routes/delivererRoutes');
 const deliveryRoutes = require('./routes/deliveryRoutes');
 const statisticsRoutes = require('./routes/statisticsRoutes');
+const backgroundJobRoutes = require('./routes/backgroundJobRoutes');
 
 console.log('✅ Environment validation passed');
 
@@ -67,6 +68,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/deliverers', delivererRoutes);
 app.use('/api/deliveries', deliveryRoutes);
 app.use('/api/statistics', statisticsRoutes);
+app.use('/api/jobs', backgroundJobRoutes);
 
 // Phase 2: API Documentation
 setupSwagger(app, config);
@@ -114,7 +116,7 @@ app.use('*', (req, res) => {
 });
 
 // Start server
-server.listen(PORT, () => {
+server.listen(PORT, async () => {
   console.log(`🚀 Server running on port ${PORT}`);
   console.log(`🔗 Health check: http://localhost:${PORT}/api/health`);
   if (config.API_DOCS_ENABLED) {
@@ -135,4 +137,70 @@ server.listen(PORT, () => {
       '🛠️  Development mode: Error details will be shown in responses'
     );
   }
+
+  // Start background jobs
+  try {
+    const { jobManager } = require('./jobs');
+    console.log('\n⏰ Initializing background jobs...');
+    await jobManager.startAllJobs();
+    console.log(
+      '🔧 Background jobs management available at: http://localhost:' +
+        PORT +
+        '/api/jobs/dashboard'
+    );
+  } catch (error) {
+    console.error('❌ Failed to start background jobs:', error);
+    console.error('⚠️  Server will continue running without background jobs');
+  }
+});
+
+// Graceful shutdown handling
+const gracefulShutdown = signal => {
+  console.log(`\n🛑 Received ${signal}, shutting down gracefully...`);
+
+  server.close(() => {
+    console.log('🔌 HTTP server closed');
+
+    // Stop background jobs
+    try {
+      const { jobManager } = require('./jobs');
+      if (jobManager.isRunning) {
+        jobManager.stopAllJobs();
+        console.log('⏰ Background jobs stopped');
+      }
+    } catch (error) {
+      console.error('⚠️  Error stopping background jobs:', error);
+    }
+
+    // Close database connection
+    require('mongoose').connection.close(() => {
+      console.log('📦 Database connection closed');
+      console.log('✅ Graceful shutdown complete');
+      process.exit(0);
+    });
+  });
+
+  // Force close after 10 seconds
+  setTimeout(() => {
+    console.error(
+      '❌ Could not close connections in time, forcefully shutting down'
+    );
+    process.exit(1);
+  }, 10000);
+};
+
+// Listen for termination signals
+process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Handle uncaught exceptions
+process.on('uncaughtException', error => {
+  console.error('💥 Uncaught Exception:', error);
+  gracefulShutdown('uncaughtException');
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('💥 Unhandled Rejection at:', promise, 'reason:', reason);
+  gracefulShutdown('unhandledRejection');
 });
