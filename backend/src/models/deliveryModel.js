@@ -3,7 +3,20 @@ const mongoosePaginate = require('mongoose-paginate-v2');
 
 const deliverySchema = new mongoose.Schema(
   {
-    orderId: { type: String, required: true, unique: true },
+    orderId: {
+      type: String,
+      required: true,
+      unique: true,
+      minlength: [3, 'Order ID must be at least 3 characters'],
+      maxlength: [50, 'Order ID cannot exceed 50 characters'],
+      validate: {
+        validator: function (_v) {
+          // Allow the backend to generate the Order ID
+          return true;
+        },
+        message: props => `${props.value} is not a valid Order ID format`,
+      },
+    },
     status: {
       type: String,
       required: true,
@@ -17,7 +30,13 @@ const deliverySchema = new mongoose.Schema(
       enum: ['Low', 'Medium', 'High', 'Urgent'],
       default: 'Medium',
     },
-    deliveryAddress: { type: String },
+    deliveryAddress: {
+      type: String,
+      required: function () {
+        // Make deliveryAddress required only if status is not 'Cancelled'
+        return this.status !== 'Cancelled';
+      },
+    },
     estimatedDeliveryDate: { type: Date },
     actualDeliveryDate: { type: Date },
     notes: { type: String },
