@@ -10,6 +10,7 @@ const {
   updateDeliverer,
   deleteDeliverer,
   getDelivererStats,
+  assignDeliveryToDeliverer,
 } = require('../controllers/delivererController');
 
 const router = express.Router();
@@ -58,16 +59,11 @@ router.post(
   createDeliverer
 );
 
-// Get All Deliverers with Pagination (Admin Only)
-router.get('/', authMiddleware, roleMiddleware(['admin']), getAllDeliverers);
+// Get All Deliverers with Pagination (Admin and Users)
+router.get('/', authMiddleware, getAllDeliverers);
 
 // Get Available Deliverers (for assignment)
-router.get(
-  '/available',
-  authMiddleware,
-  roleMiddleware(['admin']),
-  getAvailableDeliverers
-);
+router.get('/available', authMiddleware, getAvailableDeliverers);
 
 // Get Single Deliverer
 router.get(
@@ -130,6 +126,18 @@ router.get(
   [param('id').isMongoId().withMessage('Invalid deliverer ID')],
   handleValidationErrors,
   getDelivererStats
+);
+
+// Assign Delivery to Deliverer (Admin and Users)
+router.patch(
+  '/:id/assign',
+  authMiddleware,
+  [
+    param('id').isMongoId().withMessage('Invalid deliverer ID'),
+    body('deliveryId').isMongoId().withMessage('Invalid delivery ID'),
+  ],
+  handleValidationErrors,
+  assignDeliveryToDeliverer
 );
 
 module.exports = router;
