@@ -10,6 +10,8 @@ const {
   deleteDelivery,
   assignDeliverer,
   unassignDeliverer,
+  updateDeliveryStatus,
+  getAvailableDeliveries,
 } = require('../controllers/deliveryController');
 
 const router = express.Router();
@@ -68,7 +70,15 @@ router.post(
 );
 
 // Get All Deliveries with pagination and filtering
-router.get('/', authMiddleware, roleMiddleware(['admin']), getAllDeliveries);
+router.get(
+  '/',
+  authMiddleware,
+  roleMiddleware(['user', 'admin']),
+  getAllDeliveries
+);
+
+// Get available (unassigned) deliveries
+router.get('/available', authMiddleware, getAvailableDeliveries);
 
 // Get single delivery by ID
 router.get(
@@ -147,6 +157,23 @@ router.put(
   [param('id').isMongoId().withMessage('Invalid delivery ID')],
   handleValidationErrors,
   unassignDeliverer
+);
+
+// Update delivery status (accessible to both users and admins)
+router.patch(
+  '/:id/status',
+  authMiddleware,
+  roleMiddleware(['user', 'admin']),
+  [
+    param('id').isMongoId().withMessage('Invalid delivery ID'),
+    body('status')
+      .notEmpty()
+      .withMessage('Status is required')
+      .isIn(['Pending', 'In Transit', 'Delivered', 'Cancelled'])
+      .withMessage('Invalid status value'),
+  ],
+  handleValidationErrors,
+  updateDeliveryStatus
 );
 
 module.exports = router;

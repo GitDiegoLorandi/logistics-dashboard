@@ -1,18 +1,18 @@
 {
-  "timestamp": "2025-07-01T11:00:00.396Z",
+  "timestamp": "2025-07-04T20:58:00.791Z",
   "status": "unhealthy",
   "checks": {
     "database": {
       "healthy": true,
-      "responseTime": 4,
+      "responseTime": 5,
       "connectionState": 1
     },
     "memory": {
       "healthy": false,
-      "error": "High memory usage: 92.1%",
-      "heapUsedMB": 35,
-      "heapTotalMB": 38,
-      "heapUsagePercent": 92.10526315789474
+      "error": "High memory usage: 92.7%",
+      "heapUsedMB": 38,
+      "heapTotalMB": 41,
+      "heapUsagePercent": 92.6829268292683
     },
     "disk": {
       "healthy": true,
@@ -20,8 +20,8 @@
     },
     "application": {
       "healthy": true,
-      "responseTime": 5,
-      "deliveryCount": 3
+      "responseTime": 7,
+      "deliveryCount": 5
     },
     "backgroundJobs": {
       "healthy": true,
@@ -30,5 +30,5 @@
       "runningJobs": 0
     }
   },
-  "issues": ["High memory usage: 92.1%"]
+  "issues": ["High memory usage: 92.7%"]
 }
