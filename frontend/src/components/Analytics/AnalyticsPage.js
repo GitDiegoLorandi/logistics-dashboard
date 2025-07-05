@@ -31,7 +31,14 @@ import {
 } from 'lucide-react';
 import { statisticsAPI } from '../../services/api';
 import { toast } from 'react-toastify';
-import './AnalyticsPage.css';
+import { Button } from '../UI/button';
+import { Input } from '../UI/input';
+import { Select } from '../UI/select';
+import { Card, CardContent } from '../UI/card';
+import { Badge } from '../UI/badge';
+import { Grid, GridItem } from '../UI/grid';
+import { cn } from '../../lib/utils';
+import { Table, THead, TBody, TR, TH, TD } from '../UI/table';
 
 const AnalyticsPage = () => {
   const [loading, setLoading] = useState(true);
@@ -186,102 +193,147 @@ const AnalyticsPage = () => {
 
   if (loading) {
     return (
-      <div className='analytics-page'>
-        <div className='analytics-loading'>
-          <div className='loading-spinner'></div>
-          <p>Loading analytics data...</p>
+      <div className='px-4 py-6 max-w-7xl mx-auto flex items-center justify-center min-h-[50vh]'>
+        <div className='text-center'>
+          <div className='h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4'></div>
+          <p className='text-muted-foreground'>Loading analytics data...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className='analytics-page'>
-      <div className='analytics-header'>
-        <div className='analytics-title'>
-          <h1>Analytics Dashboard</h1>
-          <p>Comprehensive delivery and performance analytics</p>
+    <div className='px-4 py-6 max-w-7xl mx-auto'>
+      <div className='flex flex-col gap-6 md:flex-row md:items-start md:justify-between mb-8 bg-card p-6 rounded-xl shadow'>
+        <div>
+          <h1 className='flex items-center gap-2 text-2xl font-bold'>
+            <TrendingUp className='h-6 w-6 text-primary' />
+            Analytics Dashboard
+          </h1>
+          <p className='text-muted-foreground'>
+            Comprehensive delivery and performance analytics
+          </p>
         </div>
-        <div className='analytics-actions'>
-          <button
+        <div className='flex gap-2'>
+          <Button
+            variant='outline'
+            size='sm'
             onClick={handleRefresh}
-            className='refresh-btn'
             disabled={refreshing}
+            className='flex items-center gap-2'
           >
-            <RefreshCw className={refreshing ? 'spinning' : ''} />
+            <RefreshCw
+              className={refreshing ? 'animate-spin h-4 w-4' : 'h-4 w-4'}
+            />
             {refreshing ? 'Refreshing...' : 'Refresh'}
-          </button>
-          <button onClick={handleExport} className='export-btn'>
-            <Download />
+          </Button>
+          <Button
+            onClick={handleExport}
+            size='sm'
+            className='flex items-center gap-2'
+          >
+            <Download className='h-4 w-4' />
             Export Data
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* KPI Cards */}
-      <div className='kpi-grid'>
-        <div className='kpi-card'>
-          <div className='kpi-icon delivered'>
-            <Package />
-          </div>
-          <div className='kpi-content'>
-            <h3>{overallStats.totalDeliveries || 0}</h3>
-            <p>Total Deliveries</p>
-            <span className='kpi-change positive'>
-              +{overallStats.deliveryBreakdown?.delivered || 0} delivered
-            </span>
-          </div>
-        </div>
+      <Grid className='gap-6 mb-8'>
+        <GridItem colSpan='col-span-12 sm:col-span-6 lg:col-span-3'>
+          <Card>
+            <CardContent className='pt-6'>
+              <div className='flex justify-between items-start mb-4'>
+                <div className='p-2 rounded-lg bg-blue-50 text-blue-700 border border-blue-200'>
+                  <Package className='h-5 w-5' />
+                </div>
+                <Badge variant='success' className='text-xs'>
+                  +{overallStats.deliveryBreakdown?.delivered || 0}
+                </Badge>
+              </div>
+              <h3 className='text-3xl font-bold'>
+                {overallStats.totalDeliveries || 0}
+              </h3>
+              <p className='text-sm text-muted-foreground'>Total Deliveries</p>
+            </CardContent>
+          </Card>
+        </GridItem>
 
-        <div className='kpi-card'>
-          <div className='kpi-icon success'>
-            <CheckCircle />
-          </div>
-          <div className='kpi-content'>
-            <h3>{overallStats.deliveryRate || 0}%</h3>
-            <p>Delivery Success Rate</p>
-            <span className='kpi-change positive'>
-              {overallStats.deliveryBreakdown?.delivered || 0} successful
-            </span>
-          </div>
-        </div>
+        <GridItem colSpan='col-span-12 sm:col-span-6 lg:col-span-3'>
+          <Card>
+            <CardContent className='pt-6'>
+              <div className='flex justify-between items-start mb-4'>
+                <div className='p-2 rounded-lg bg-green-50 text-green-700 border border-green-200'>
+                  <CheckCircle className='h-5 w-5' />
+                </div>
+                <Badge variant='success' className='text-xs'>
+                  {overallStats.deliveryBreakdown?.delivered || 0} successful
+                </Badge>
+              </div>
+              <h3 className='text-3xl font-bold'>
+                {overallStats.deliveryRate || 0}%
+              </h3>
+              <p className='text-sm text-muted-foreground'>
+                Delivery Success Rate
+              </p>
+            </CardContent>
+          </Card>
+        </GridItem>
 
-        <div className='kpi-card'>
-          <div className='kpi-icon active'>
-            <Users />
-          </div>
-          <div className='kpi-content'>
-            <h3>{overallStats.activeDeliverers || 0}</h3>
-            <p>Active Deliverers</p>
-            <span className='kpi-change'>
-              of {overallStats.totalDeliverers || 0} total
-            </span>
-          </div>
-        </div>
+        <GridItem colSpan='col-span-12 sm:col-span-6 lg:col-span-3'>
+          <Card>
+            <CardContent className='pt-6'>
+              <div className='flex justify-between items-start mb-4'>
+                <div className='p-2 rounded-lg bg-purple-50 text-purple-700 border border-purple-200'>
+                  <Users className='h-5 w-5' />
+                </div>
+                <Badge variant='outline' className='text-xs'>
+                  of {overallStats.totalDeliverers || 0} total
+                </Badge>
+              </div>
+              <h3 className='text-3xl font-bold'>
+                {overallStats.activeDeliverers || 0}
+              </h3>
+              <p className='text-sm text-muted-foreground'>Active Deliverers</p>
+            </CardContent>
+          </Card>
+        </GridItem>
 
-        <div className='kpi-card'>
-          <div className='kpi-icon pending'>
-            <Clock />
-          </div>
-          <div className='kpi-content'>
-            <h3>{overallStats.deliveryBreakdown?.pending || 0}</h3>
-            <p>Pending Deliveries</p>
-            <span className='kpi-change'>
-              {overallStats.deliveryBreakdown?.inTransit || 0} in transit
-            </span>
-          </div>
-        </div>
-      </div>
+        <GridItem colSpan='col-span-12 sm:col-span-6 lg:col-span-3'>
+          <Card>
+            <CardContent className='pt-6'>
+              <div className='flex justify-between items-start mb-4'>
+                <div className='p-2 rounded-lg bg-amber-50 text-amber-700 border border-amber-200'>
+                  <Clock className='h-5 w-5' />
+                </div>
+                <Badge variant='outline' className='text-xs'>
+                  {overallStats.deliveryBreakdown?.inTransit || 0} in transit
+                </Badge>
+              </div>
+              <h3 className='text-3xl font-bold'>
+                {overallStats.deliveryBreakdown?.pending || 0}
+              </h3>
+              <p className='text-sm text-muted-foreground'>
+                Pending Deliveries
+              </p>
+            </CardContent>
+          </Card>
+        </GridItem>
+      </Grid>
 
       {/* Charts Grid */}
-      <div className='charts-grid'>
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8'>
         {/* Delivery Status Distribution */}
-        <div className='chart-card'>
-          <div className='chart-header'>
-            <h3>Delivery Status Distribution</h3>
-            <p>Current breakdown of all deliveries</p>
+        <Card className='overflow-hidden'>
+          <div className='p-6 pb-2'>
+            <h3 className='text-lg font-medium'>
+              Delivery Status Distribution
+            </h3>
+            <p className='text-sm text-muted-foreground'>
+              Current breakdown of all deliveries
+            </p>
           </div>
-          <div className='chart-content'>
+          <div className='p-4'>
             <ResponsiveContainer width='100%' height={300}>
               <PieChart>
                 <Pie
@@ -305,15 +357,17 @@ const AnalyticsPage = () => {
               </PieChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </Card>
 
         {/* Delivery Trends */}
-        <div className='chart-card chart-card-large'>
-          <div className='chart-header'>
-            <h3>Delivery Trends</h3>
-            <p>{deliveryTrends.period}</p>
+        <Card className='overflow-hidden col-span-1 lg:col-span-2'>
+          <div className='p-6 pb-2'>
+            <h3 className='text-lg font-medium'>Delivery Trends</h3>
+            <p className='text-sm text-muted-foreground'>
+              {deliveryTrends.period}
+            </p>
           </div>
-          <div className='chart-content'>
+          <div className='p-4'>
             <ResponsiveContainer width='100%' height={300}>
               <AreaChart data={formatTrendData(deliveryTrends)}>
                 <CartesianGrid strokeDasharray='3 3' />
@@ -352,15 +406,17 @@ const AnalyticsPage = () => {
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </Card>
 
         {/* Priority Statistics */}
-        <div className='chart-card'>
-          <div className='chart-header'>
-            <h3>Priority Statistics</h3>
-            <p>Delivery completion by priority</p>
+        <Card className='overflow-hidden'>
+          <div className='p-6 pb-2'>
+            <h3 className='text-lg font-medium'>Priority Statistics</h3>
+            <p className='text-sm text-muted-foreground'>
+              Delivery completion by priority
+            </p>
           </div>
-          <div className='chart-content'>
+          <div className='p-4'>
             <ResponsiveContainer width='100%' height={300}>
               <BarChart data={preparePriorityBarData()}>
                 <CartesianGrid strokeDasharray='3 3' />
@@ -375,19 +431,21 @@ const AnalyticsPage = () => {
               </BarChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </Card>
 
         {/* Date Range Filter */}
-        <div className='chart-card'>
-          <div className='chart-header'>
-            <h3>Custom Date Range</h3>
-            <p>Filter deliveries by date range</p>
+        <Card className='overflow-hidden'>
+          <div className='p-6 pb-2'>
+            <h3 className='text-lg font-medium'>Custom Date Range</h3>
+            <p className='text-sm text-muted-foreground'>
+              Filter deliveries by date range
+            </p>
           </div>
-          <div className='chart-content'>
-            <div className='date-range-form'>
-              <div className='form-group'>
-                <label>Start Date:</label>
-                <input
+          <div className='p-6'>
+            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4'>
+              <div className='space-y-2'>
+                <label className='text-sm font-medium'>Start Date:</label>
+                <Input
                   type='date'
                   value={dateRange.startDate}
                   onChange={e =>
@@ -395,9 +453,9 @@ const AnalyticsPage = () => {
                   }
                 />
               </div>
-              <div className='form-group'>
-                <label>End Date:</label>
-                <input
+              <div className='space-y-2'>
+                <label className='text-sm font-medium'>End Date:</label>
+                <Input
                   type='date'
                   value={dateRange.endDate}
                   onChange={e =>
@@ -405,9 +463,9 @@ const AnalyticsPage = () => {
                   }
                 />
               </div>
-              <div className='form-group'>
-                <label>Group by:</label>
-                <select
+              <div className='space-y-2'>
+                <label className='text-sm font-medium'>Group by:</label>
+                <Select
                   value={dateRange.groupBy}
                   onChange={e =>
                     setDateRange({ ...dateRange, groupBy: e.target.value })
@@ -416,17 +474,22 @@ const AnalyticsPage = () => {
                   <option value='day'>Day</option>
                   <option value='week'>Week</option>
                   <option value='month'>Month</option>
-                </select>
+                </Select>
               </div>
-              <button onClick={fetchDateRangeData} className='filter-btn'>
-                <Filter />
-                Apply Filter
-              </button>
+              <div className='flex items-end'>
+                <Button
+                  onClick={fetchDateRangeData}
+                  className='flex items-center gap-2 w-full'
+                >
+                  <Filter className='h-4 w-4' />
+                  Apply Filter
+                </Button>
+              </div>
             </div>
 
             {dateRangeStats.data && (
-              <div className='date-range-results'>
-                <h4>
+              <div className='mt-6 pt-6 border-t'>
+                <h4 className='text-base font-medium mb-4'>
                   Results for {dateRangeStats.dateRange?.startDate} to{' '}
                   {dateRangeStats.dateRange?.endDate}
                 </h4>
@@ -448,81 +511,87 @@ const AnalyticsPage = () => {
               </div>
             )}
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* Deliverer Performance Table */}
-      <div className='performance-section'>
-        <div className='section-header'>
-          <h3>Deliverer Performance</h3>
-          <p>Top performing deliverers ranked by total deliveries</p>
+      <Card className='mb-8'>
+        <div className='p-6 pb-2'>
+          <h3 className='text-lg font-medium'>Deliverer Performance</h3>
+          <p className='text-sm text-muted-foreground'>
+            Top performing deliverers ranked by total deliveries
+          </p>
         </div>
-        <div className='performance-table-container'>
-          <table className='performance-table'>
-            <thead>
-              <tr>
-                <th>Rank</th>
-                <th>Deliverer</th>
-                <th>Total Deliveries</th>
-                <th>Success Rate</th>
-                <th>Delivered</th>
-                <th>Pending</th>
-                <th>In Transit</th>
-                <th>Cancelled</th>
-              </tr>
-            </thead>
-            <tbody>
-              {delivererPerformance.slice(0, 10).map((deliverer, index) => (
-                <tr key={deliverer.delivererId}>
-                  <td>
-                    <span
-                      className={`rank rank-${index < 3 ? index + 1 : 'other'}`}
-                    >
-                      #{index + 1}
+        <Table>
+          <THead>
+            <TR className='bg-muted/50'>
+              <TH>Rank</TH>
+              <TH>Deliverer</TH>
+              <TH>Total Deliveries</TH>
+              <TH>Success Rate</TH>
+              <TH>Delivered</TH>
+              <TH>Pending</TH>
+              <TH>In Transit</TH>
+              <TH>Cancelled</TH>
+            </TR>
+          </THead>
+          <TBody>
+            {delivererPerformance.slice(0, 10).map((deliverer, index) => (
+              <TR key={deliverer.delivererId}>
+                <TD>
+                  <Badge
+                    variant={index < 3 ? 'default' : 'outline'}
+                    className={cn(
+                      'font-bold',
+                      index === 0 && 'bg-yellow-500',
+                      index === 1 && 'bg-slate-400',
+                      index === 2 && 'bg-amber-700'
+                    )}
+                  >
+                    #{index + 1}
+                  </Badge>
+                </TD>
+                <TD>
+                  <div className='flex flex-col'>
+                    <span className='font-medium'>
+                      {deliverer.delivererName}
                     </span>
-                  </td>
-                  <td>
-                    <div className='deliverer-info'>
-                      <strong>{deliverer.delivererName}</strong>
-                      <span>{deliverer.delivererEmail}</span>
-                    </div>
-                  </td>
-                  <td>
-                    <strong>{deliverer.totalDeliveries}</strong>
-                  </td>
-                  <td>
-                    <span
-                      className={`success-rate ${deliverer.successRate >= 90 ? 'excellent' : deliverer.successRate >= 70 ? 'good' : 'needs-improvement'}`}
-                    >
-                      {deliverer.successRate}%
+                    <span className='text-xs text-muted-foreground'>
+                      {deliverer.delivererEmail}
                     </span>
-                  </td>
-                  <td>
-                    <span className='status-badge delivered'>
-                      {deliverer.delivered}
-                    </span>
-                  </td>
-                  <td>
-                    <span className='status-badge pending'>
-                      {deliverer.pending}
-                    </span>
-                  </td>
-                  <td>
-                    <span className='status-badge in-transit'>
-                      {deliverer.inTransit}
-                    </span>
-                  </td>
-                  <td>
-                    <span className='status-badge cancelled'>
-                      {deliverer.cancelled}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+                  </div>
+                </TD>
+                <TD className='font-medium'>{deliverer.totalDeliveries}</TD>
+                <TD>
+                  <Badge
+                    variant={
+                      deliverer.successRate >= 90
+                        ? 'success'
+                        : deliverer.successRate >= 70
+                          ? 'warning'
+                          : 'destructive'
+                    }
+                  >
+                    {deliverer.successRate}%
+                  </Badge>
+                </TD>
+                <TD>
+                  <Badge variant='success'>{deliverer.delivered}</Badge>
+                </TD>
+                <TD>
+                  <Badge variant='warning'>{deliverer.pending}</Badge>
+                </TD>
+                <TD>
+                  <Badge variant='info'>{deliverer.inTransit}</Badge>
+                </TD>
+                <TD>
+                  <Badge variant='destructive'>{deliverer.cancelled}</Badge>
+                </TD>
+              </TR>
+            ))}
+          </TBody>
+        </Table>
+      </Card>
     </div>
   );
 };

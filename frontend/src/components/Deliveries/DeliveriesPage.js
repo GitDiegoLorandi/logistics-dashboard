@@ -4,12 +4,6 @@ import {
   Plus,
   Filter,
   Edit3,
-  Trash2,
-  Eye,
-  UserCheck,
-  Calendar,
-  Package,
-  MapPin,
   Clock,
   RefreshCw,
   X,
@@ -19,13 +13,19 @@ import {
   CheckCircle,
   Truck,
   XCircle,
+  Package,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { deliveryAPI, delivererAPI } from '../../services/api';
 import LoadingSpinner from '../UI/LoadingSpinner';
 import ErrorMessage from '../UI/ErrorMessage';
 import AddressAutocomplete from '../UI/AddressAutocomplete';
-import './DeliveriesPage.css';
+import { Badge } from '../UI/badge';
+import { DeliveriesTable } from './DeliveriesTable';
+import { Button } from '../UI/button';
+import { Input } from '../UI/input';
+import { Select } from '../UI/select';
+import { Card, CardContent } from '../UI/card';
 
 const DeliveriesPage = () => {
   // State Management
@@ -428,65 +428,25 @@ const DeliveriesPage = () => {
 
   // Status Badge Component
   const StatusBadge = ({ status }) => {
-    const getStatusConfig = status => {
-      switch (status) {
-        case 'Delivered':
-          return {
-            icon: CheckCircle,
-            className: 'status-delivered',
-            color: '#10b981',
-          };
-        case 'In Transit':
-          return { icon: Truck, className: 'status-transit', color: '#3b82f6' };
-        case 'Pending':
-          return { icon: Clock, className: 'status-pending', color: '#f59e0b' };
-        case 'Cancelled':
-          return {
-            icon: XCircle,
-            className: 'status-cancelled',
-            color: '#ef4444',
-          };
-        default:
-          return {
-            icon: AlertTriangle,
-            className: 'status-default',
-            color: '#6b7280',
-          };
-      }
+    const variantMap = {
+      Delivered: 'success',
+      'In Transit': 'info',
+      Pending: 'outline',
+      Cancelled: 'destructive',
     };
-
-    const config = getStatusConfig(status);
-    const Icon = config.icon;
-
-    return (
-      <span className={`status-badge ${config.className}`}>
-        <Icon size={14} color={config.color} />
-        {status}
-      </span>
-    );
+    return <Badge variant={variantMap[status] || 'outline'}>{status}</Badge>;
   };
 
   // Priority Badge Component
   const PriorityBadge = ({ priority }) => {
-    const getPriorityClass = priority => {
-      switch (priority) {
-        case 'Urgent':
-          return 'priority-urgent';
-        case 'High':
-          return 'priority-high';
-        case 'Medium':
-          return 'priority-medium';
-        case 'Low':
-          return 'priority-low';
-        default:
-          return 'priority-medium';
-      }
+    const variantMap = {
+      Urgent: 'destructive',
+      High: 'warning',
+      Medium: 'secondary',
+      Low: 'outline',
     };
-
     return (
-      <span className={`priority-badge ${getPriorityClass(priority)}`}>
-        {priority}
-      </span>
+      <Badge variant={variantMap[priority] || 'secondary'}>{priority}</Badge>
     );
   };
 
@@ -501,69 +461,85 @@ const DeliveriesPage = () => {
   }
 
   return (
-    <div className='deliveries-page'>
+    <div className='deliveries-page px-4 py-6 max-w-7xl mx-auto'>
       {/* Header */}
-      <div className='deliveries-header'>
+      <div className='deliveries-header flex flex-col gap-6 md:flex-row md:items-start md:justify-between mb-8 bg-card p-6 rounded-xl shadow'>
         <div className='header-left'>
-          <h1 className='page-title'>
-            <Package className='title-icon' />
+          <h1 className='page-title flex items-center gap-2 text-2xl font-bold'>
+            <Package className='h-6 w-6 text-primary' />
             Deliveries Management
           </h1>
-          <p className='page-subtitle'>Manage and track all delivery orders</p>
+          <p className='text-muted-foreground'>
+            Manage and track all delivery orders
+          </p>
         </div>
-        <div className='header-actions'>
-          <button
-            className='btn-refresh'
+        <div className='header-actions flex gap-2'>
+          <Button
+            variant='outline'
+            size='sm'
             onClick={fetchDeliveries}
             disabled={loading}
+            className='flex items-center gap-2'
           >
-            <RefreshCw className={loading ? 'spinning' : ''} size={18} />
+            <RefreshCw
+              className={loading ? 'animate-spin h-4 w-4' : 'h-4 w-4'}
+            />
             Refresh
-          </button>
-          <button className='btn-primary' onClick={openCreateModal}>
-            <Plus size={18} />
-            New Delivery
-          </button>
+          </Button>
+          <Button
+            onClick={openCreateModal}
+            size='sm'
+            className='flex items-center gap-2'
+          >
+            <Plus className='h-4 w-4' /> New Delivery
+          </Button>
         </div>
       </div>
 
       {/* Search and Filters */}
-      <div className='search-filters-section'>
-        <div className='search-box'>
-          <Search className='search-icon' size={20} />
-          <input
+      <div className='flex flex-col md:flex-row gap-4 items-start md:items-center justify-between mb-6'>
+        <div className='relative w-full md:max-w-md'>
+          <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4' />
+          <Input
             type='text'
             placeholder='Search by Order ID, Customer, or Address...'
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
-            className='search-input'
+            className='pl-10'
           />
         </div>
 
-        <div className='filter-controls'>
-          <button
-            className={`filter-toggle ${showFilters ? 'active' : ''}`}
+        <div className='flex gap-2 items-center'>
+          <Button
+            variant={showFilters ? 'default' : 'outline'}
+            size='sm'
+            className='flex items-center gap-2'
             onClick={() => setShowFilters(!showFilters)}
           >
-            <Filter size={18} />
+            <Filter className='h-4 w-4' />
             Filters
-          </button>
+          </Button>
 
           {(statusFilter || priorityFilter || delivererFilter) && (
-            <button className='clear-filters' onClick={clearFilters}>
-              <X size={16} />
-              Clear Filters
-            </button>
+            <Button
+              variant='destructive'
+              size='sm'
+              className='flex items-center gap-2'
+              onClick={clearFilters}
+            >
+              <X className='h-4 w-4' />
+              Clear
+            </Button>
           )}
         </div>
       </div>
 
       {/* Filter Panel */}
       {showFilters && (
-        <div className='filters-panel'>
-          <div className='filter-group'>
-            <label>Status</label>
-            <select
+        <div className='grid grid-cols-1 md:grid-cols-3 gap-6 p-6 mb-6 bg-card rounded-xl shadow'>
+          <div className='space-y-2'>
+            <label className='text-sm font-medium'>Status</label>
+            <Select
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value)}
             >
@@ -572,12 +548,12 @@ const DeliveriesPage = () => {
               <option value='In Transit'>In Transit</option>
               <option value='Delivered'>Delivered</option>
               <option value='Cancelled'>Cancelled</option>
-            </select>
+            </Select>
           </div>
 
-          <div className='filter-group'>
-            <label>Priority</label>
-            <select
+          <div className='space-y-2'>
+            <label className='text-sm font-medium'>Priority</label>
+            <Select
               value={priorityFilter}
               onChange={e => setPriorityFilter(e.target.value)}
             >
@@ -586,12 +562,12 @@ const DeliveriesPage = () => {
               <option value='Medium'>Medium</option>
               <option value='High'>High</option>
               <option value='Urgent'>Urgent</option>
-            </select>
+            </Select>
           </div>
 
-          <div className='filter-group'>
-            <label>Deliverer</label>
-            <select
+          <div className='space-y-2'>
+            <label className='text-sm font-medium'>Deliverer</label>
+            <Select
               value={delivererFilter}
               onChange={e => setDelivererFilter(e.target.value)}
             >
@@ -601,172 +577,87 @@ const DeliveriesPage = () => {
                   {deliverer.name}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
         </div>
       )}
 
       {/* Stats Cards */}
-      <div className='stats-cards'>
-        <div className='stat-card'>
-          <div className='stat-value'>{totalDocs}</div>
-          <div className='stat-label'>Total Deliveries</div>
-        </div>
-        <div className='stat-card'>
-          <div className='stat-value'>
-            {filteredDeliveries.filter(d => d.status === 'Pending').length}
-          </div>
-          <div className='stat-label'>Pending</div>
-        </div>
-        <div className='stat-card'>
-          <div className='stat-value'>
-            {filteredDeliveries.filter(d => d.status === 'In Transit').length}
-          </div>
-          <div className='stat-label'>In Transit</div>
-        </div>
-        <div className='stat-card'>
-          <div className='stat-value'>
-            {filteredDeliveries.filter(d => d.status === 'Delivered').length}
-          </div>
-          <div className='stat-label'>Delivered</div>
-        </div>
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6'>
+        <Card>
+          <CardContent className='pt-6 flex flex-col items-center justify-center'>
+            <span className='text-3xl font-bold'>{totalDocs}</span>
+            <span className='text-sm text-muted-foreground'>
+              Total Deliveries
+            </span>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className='pt-6 flex flex-col items-center justify-center'>
+            <span className='text-3xl font-bold'>
+              {filteredDeliveries.filter(d => d.status === 'Pending').length}
+            </span>
+            <span className='text-sm text-muted-foreground'>Pending</span>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className='pt-6 flex flex-col items-center justify-center'>
+            <span className='text-3xl font-bold'>
+              {filteredDeliveries.filter(d => d.status === 'In Transit').length}
+            </span>
+            <span className='text-sm text-muted-foreground'>In Transit</span>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className='pt-6 flex flex-col items-center justify-center'>
+            <span className='text-3xl font-bold'>
+              {filteredDeliveries.filter(d => d.status === 'Delivered').length}
+            </span>
+            <span className='text-sm text-muted-foreground'>Delivered</span>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Deliveries Table */}
-      <div className='deliveries-table-container'>
-        {loading && (
-          <div className='table-loading'>
-            <LoadingSpinner size='small' />
-          </div>
-        )}
-
-        <table className='deliveries-table'>
-          <thead>
-            <tr>
-              <th>Order ID</th>
-              <th>Customer</th>
-              <th>Status</th>
-              <th>Priority</th>
-              <th>Deliverer</th>
-              <th>Estimated Date</th>
-              <th>Address</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredDeliveries.length > 0 ? (
-              filteredDeliveries.map(delivery => (
-                <tr key={delivery._id} className='delivery-row'>
-                  <td className='order-id'>
-                    <strong>{delivery.orderId}</strong>
-                  </td>
-                  <td className='customer'>{delivery.customer}</td>
-                  <td>
-                    <StatusBadge status={delivery.status} />
-                  </td>
-                  <td>
-                    <PriorityBadge priority={delivery.priority} />
-                  </td>
-                  <td className='deliverer'>
-                    {delivery.deliverer ? (
-                      <div className='deliverer-info'>
-                        <UserCheck size={16} />
-                        <span>{delivery.deliverer.name}</span>
-                      </div>
-                    ) : (
-                      <span className='unassigned'>Unassigned</span>
-                    )}
-                  </td>
-                  <td className='date'>
-                    {delivery.estimatedDeliveryDate ? (
-                      <div className='date-info'>
-                        <Calendar size={16} />
-                        {new Date(
-                          delivery.estimatedDeliveryDate
-                        ).toLocaleDateString()}
-                      </div>
-                    ) : (
-                      <span className='no-date'>Not set</span>
-                    )}
-                  </td>
-                  <td className='address'>
-                    <div className='address-info'>
-                      <MapPin size={16} />
-                      <span>{delivery.deliveryAddress || 'No address'}</span>
-                    </div>
-                  </td>
-                  <td className='actions'>
-                    <div className='action-buttons'>
-                      <button
-                        className='btn-action view'
-                        onClick={() => openViewModal(delivery)}
-                        title='View Details'
-                      >
-                        <Eye size={16} />
-                      </button>
-                      <button
-                        className='btn-action edit'
-                        onClick={() => openEditModal(delivery)}
-                        title='Edit Delivery'
-                      >
-                        <Edit3 size={16} />
-                      </button>
-                      <button
-                        className='btn-action delete'
-                        onClick={() => handleDelete(delivery._id)}
-                        title='Delete Delivery'
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan='8' className='no-data'>
-                  <div className='no-data-message'>
-                    <Package size={48} />
-                    <h3>No deliveries found</h3>
-                    <p>There are no deliveries matching your criteria.</p>
-                    <button className='btn-primary' onClick={openCreateModal}>
-                      <Plus size={18} />
-                      Create First Delivery
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+      <DeliveriesTable
+        deliveries={filteredDeliveries}
+        loading={loading}
+        onView={openViewModal}
+        onEdit={openEditModal}
+        onDelete={handleDelete}
+        onCreate={openCreateModal}
+      />
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className='pagination'>
-          <button
-            className='pagination-btn'
+        <div className='flex items-center justify-between py-4 mb-6'>
+          <Button
+            variant='outline'
+            size='sm'
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
+            className='flex items-center gap-1'
           >
-            <ChevronLeft size={18} />
+            <ChevronLeft className='h-4 w-4' />
             Previous
-          </button>
+          </Button>
 
-          <div className='pagination-info'>
+          <div className='text-sm text-muted-foreground'>
             Page {currentPage} of {totalPages} ({totalDocs} total)
           </div>
 
-          <button
-            className='pagination-btn'
+          <Button
+            variant='outline'
+            size='sm'
             onClick={() =>
               setCurrentPage(prev => Math.min(prev + 1, totalPages))
             }
             disabled={currentPage === totalPages}
+            className='flex items-center gap-1'
           >
             Next
-            <ChevronRight size={18} />
-          </button>
+            <ChevronRight className='h-4 w-4' />
+          </Button>
         </div>
       )}
 

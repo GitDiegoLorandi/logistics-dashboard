@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { MapPin } from 'lucide-react';
-import './AddressAutocomplete.css';
+import { cn } from '../../lib/utils';
 
 const AddressAutocomplete = ({
   value,
@@ -66,10 +66,34 @@ const AddressAutocomplete = ({
 
       // Add the MapPin icon
       const iconElement = document.createElement('div');
-      iconElement.className = 'address-icon-container';
+      iconElement.className =
+        'absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none';
       iconElement.innerHTML =
         '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>';
       containerRef.current.appendChild(iconElement);
+
+      // Apply Tailwind-compatible styling to the Google element
+      const styleElement = document.createElement('style');
+      styleElement.textContent = `
+        gmpx-place-autocomplete {
+          width: 100%;
+          --gmpx-font-family: inherit;
+          --gmpx-color-surface: white;
+          --gmpx-color-on-surface: #1f2937;
+          --gmpx-color-on-surface-variant: #4b5563;
+          --gmpx-color-primary: hsl(var(--primary));
+          --gmpx-border-radius: 0.5rem;
+          --gmpx-border-width: 1px;
+          --gmpx-border-color: hsl(var(--border));
+          --gmpx-hover-border-color: hsl(var(--muted-foreground));
+          --gmpx-focus-border-color: hsl(var(--primary));
+          --gmpx-focus-outline-color: hsl(var(--ring) / 0.1);
+          --gmpx-input-text-size: 0.875rem;
+          --gmpx-input-text-line-height: 1.5;
+          --gmpx-input-text-padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+        }
+      `;
+      document.head.appendChild(styleElement);
 
       setUseNativeInput(false);
       setIsLoaded(true);
@@ -84,14 +108,20 @@ const AddressAutocomplete = ({
   // If using native input (fallback or initial state)
   if (useNativeInput) {
     return (
-      <div className='address-autocomplete-wrapper'>
-        <MapPin className='address-icon' size={18} />
+      <div className='relative w-full'>
+        <MapPin
+          className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground pointer-events-none'
+          size={18}
+        />
         <input
           type='text'
           value={value}
           onChange={e => onChange(e.target.value)}
           placeholder={placeholder || 'Enter an address'}
-          className={`address-input ${className || ''}`}
+          className={cn(
+            'w-full py-3 pl-10 pr-3 border border-input rounded-md text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:border-primary disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed h-11',
+            className
+          )}
           disabled={disabled}
         />
       </div>
@@ -100,10 +130,10 @@ const AddressAutocomplete = ({
 
   // Return the container for the PlaceAutocompleteElement
   return (
-    <div className='address-autocomplete-wrapper'>
+    <div className='relative w-full'>
       <div
         ref={containerRef}
-        className='place-autocomplete-container'
+        className='relative w-full min-h-[44px]'
         data-value={value} // Store value as data attribute for debugging
       />
     </div>
