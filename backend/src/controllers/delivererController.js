@@ -296,6 +296,73 @@ const getDelivererStats = async (req, res) => {
   }
 };
 
+// Assign Delivery to Deliverer
+const assignDeliveryToDeliverer = async (req, res) => {
+  try {
+    const { id: delivererId } = req.params;
+    const { deliveryId } = req.body;
+
+    if (!deliveryId) {
+      return res.status(400).json({ message: 'Delivery ID is required' });
+    }
+
+    // Check if deliverer exists and is available
+    const deliverer = await Deliverer.findOne({
+      _id: delivererId,
+      isActive: true,
+    });
+
+    if (!deliverer) {
+      return res.status(404).json({ message: 'Deliverer not found' });
+    }
+
+    if (deliverer.status !== 'Available') {
+      return res.status(400).json({
+        message: `Deliverer is ${deliverer.status.toLowerCase()}, not available for assignment`,
+      });
+    }
+
+    // Check if delivery exists and is unassigned
+    const delivery = await Delivery.findOne({
+      _id: deliveryId,
+      status: 'Pending',
+    });
+
+    if (!delivery) {
+      return res.status(404).json({
+        message: 'Delivery not found or not in pending status',
+      });
+    }
+
+    if (delivery.deliverer) {
+      return res.status(400).json({
+        message: 'Delivery is already assigned to a deliverer',
+      });
+    }
+
+    // Update delivery with deliverer
+    delivery.deliverer = delivererId;
+    await delivery.save();
+
+    // Update deliverer status to Busy
+    deliverer.status = 'Busy';
+    await deliverer.save();
+
+    res.status(200).json({
+      message: 'Delivery assigned successfully',
+      deliverer: deliverer.name,
+      deliveryId: delivery._id,
+      orderId: delivery.orderId,
+    });
+  } catch (error) {
+    console.error('Error assigning delivery to deliverer:', error);
+    res.status(500).json({
+      message: 'Error assigning delivery to deliverer',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    });
+  }
+};
+
 module.exports = {
   createDeliverer,
   getAllDeliverers,
@@ -304,4 +371,5 @@ module.exports = {
   updateDeliverer,
   deleteDeliverer,
   getDelivererStats,
+  assignDeliveryToDeliverer,
 };

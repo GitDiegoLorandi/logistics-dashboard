@@ -37,10 +37,17 @@ securityMiddleware.forEach(middleware => {
 // CORS Configuration
 app.use(
   cors({
-    origin: config.FRONTEND_URL,
+    origin: [
+      config.FRONTEND_URL,
+      'http://localhost:3000',
+      'http://localhost:3001',
+      /localhost:\d+$/, // Allow any localhost port
+    ],
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['Content-Range', 'X-Total-Count'],
+    maxAge: 86400, // 24 hours
   })
 );
 
@@ -52,7 +59,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 const rateLimit = require('express-rate-limit');
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 attempts per IP
+  max: 10, // Increased from 5 to 10 attempts per IP
   message: {
     error: 'Too many authentication attempts',
     message: 'Please try again after 15 minutes',

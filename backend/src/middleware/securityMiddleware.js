@@ -33,15 +33,20 @@ const configureSecurityMiddleware = config => {
           fontSrc: ["'self'", 'https://fonts.gstatic.com'],
           imgSrc: ["'self'", 'data:', 'https:'],
           scriptSrc: ["'self'"],
-          connectSrc: ["'self'", config.FRONTEND_URL],
+          connectSrc: [
+            "'self'",
+            config.FRONTEND_URL,
+            'http://localhost:3000',
+            'http://localhost:3001',
+          ],
         },
       },
       crossOriginEmbedderPolicy: false, // For Swagger UI
     })
   );
 
-  // 3. Rate limiting
-  const limiter = rateLimit({
+  // 3. Role-based Rate limiting
+  const standardLimiter = rateLimit({
     windowMs: config.RATE_LIMIT_WINDOW_MS,
     max: config.RATE_LIMIT_MAX_REQUESTS,
     message: {
@@ -51,10 +56,32 @@ const configureSecurityMiddleware = config => {
     },
     standardHeaders: true,
     legacyHeaders: false,
-    // Skip rate limiting for health checks
-    skip: req => req.path === '/api/health',
+    // Skip rate limiting for health checks and admin users
+    skip: req => {
+      // Skip for health checks
+      if (req.path === '/api/health') return true;
+
+      // Skip for admin users - extract token and check role
+      try {
+        const authHeader = req.headers.authorization;
+        if (authHeader && authHeader.startsWith('Bearer ')) {
+          const token = authHeader.split(' ')[1];
+          const decoded = require('jsonwebtoken').verify(
+            token,
+            config.JWT_SECRET
+          );
+          if (decoded && decoded.role === 'admin') {
+            return true; // Skip rate limiting for admins
+          }
+        }
+      } catch (err) {
+        // If token verification fails, apply rate limiting
+      }
+
+      return false;
+    },
   });
-  middleware.push(limiter);
+  middleware.push(standardLimiter);
 
   // 4. Auth-specific rate limiting is configured in server.js
   // Note: Stricter rate limiting for auth endpoints is applied directly in server.js
@@ -96,7 +123,11 @@ const configureSecurityMiddleware = config => {
 const configureSocketSecurity = config => {
   return {
     cors: {
-      origin: config.SOCKET_IO_CORS_ORIGIN,
+      origin: [
+        config.SOCKET_IO_CORS_ORIGIN,
+        'http://localhost:3000',
+        'http://localhost:3001',
+      ],
       methods: ['GET', 'POST'],
       credentials: true,
     },
