@@ -21,7 +21,6 @@ import JobsPage from './components/Jobs/JobsPage';
 import SettingsPage from './components/Settings/SettingsPage';
 
 // Styles
-import './App.css';
 
 function App() {
   return (
