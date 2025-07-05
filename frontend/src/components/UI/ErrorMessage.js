@@ -1,6 +1,6 @@
 import React from 'react';
 import { AlertCircle, RefreshCw } from 'lucide-react';
-import './ErrorMessage.css';
+import { Button } from './button';
 
 const ErrorMessage = ({
   message = 'Something went wrong',
@@ -8,16 +8,18 @@ const ErrorMessage = ({
   showRetry = true,
 }) => {
   return (
-    <div className='error-message-container'>
-      <div className='error-content'>
-        <AlertCircle size={48} className='error-icon' />
-        <h3 className='error-title'>Oops! Something went wrong</h3>
-        <p className='error-description'>{message}</p>
+    <div className='flex items-center justify-center p-8 min-h-[200px]'>
+      <div className='text-center max-w-md'>
+        <AlertCircle size={48} className='mx-auto mb-4 text-destructive' />
+        <h3 className='text-xl font-semibold text-foreground mb-2'>
+          Oops! Something went wrong
+        </h3>
+        <p className='text-sm text-muted-foreground mb-6'>{message}</p>
         {showRetry && onRetry && (
-          <button className='retry-button' onClick={onRetry}>
+          <Button onClick={onRetry} className='inline-flex items-center gap-2'>
             <RefreshCw size={16} />
             Try Again
-          </button>
+          </Button>
         )}
       </div>
     </div>

@@ -27,7 +27,14 @@ import { toast } from 'react-toastify';
 import { delivererAPI } from '../../services/api';
 import LoadingSpinner from '../UI/LoadingSpinner';
 import ErrorMessage from '../UI/ErrorMessage';
-import './DeliverersPage.css';
+import { Button } from '../UI/button';
+import { Input } from '../UI/input';
+import { Select } from '../UI/select';
+import { Card, CardContent } from '../UI/card';
+import { Badge } from '../UI/badge';
+import { Table, THead, TBody, TR, TH, TD } from '../UI/table';
+import { Dialog } from '../UI/dialog';
+import { cn } from '../../lib/utils';
 
 const DeliverersPage = () => {
   // State Management
@@ -318,9 +325,15 @@ const DeliverersPage = () => {
       case 'Available':
         return <CheckCircle size={16} className='text-green-500' />;
       case 'Busy':
-        return <Clock size={16} className='text-yellow-500' />;
+        return <Clock size={16} className='text-amber-500' />;
       case 'Offline':
-        return <UserX size={16} className='text-red-500' />;
+        return <UserX size={16} className='text-slate-400' />;
+      case 'On Delivery':
+        return <Package size={16} className='text-amber-500' />;
+      case 'Off Duty':
+        return <UserX size={16} className='text-slate-400' />;
+      case 'On Break':
+        return <Clock size={16} className='text-blue-500' />;
       default:
         return <AlertTriangle size={16} className='text-gray-500' />;
     }
@@ -330,9 +343,11 @@ const DeliverersPage = () => {
   const getVehicleIcon = vehicleType => {
     switch (vehicleType) {
       case 'Car':
-      case 'Van':
-      case 'Truck':
         return <Car size={16} className='text-blue-500' />;
+      case 'Van':
+        return <Car size={16} className='text-indigo-500' />;
+      case 'Truck':
+        return <Car size={16} className='text-purple-500' />;
       case 'Motorcycle':
         return <Car size={16} className='text-orange-500' />;
       case 'Bicycle':
@@ -353,268 +368,333 @@ const DeliverersPage = () => {
   if (error) return <ErrorMessage message={error} onRetry={fetchDeliverers} />;
 
   return (
-    <div className='deliverers-page'>
-      {/* Header */}
-      <div className='page-header'>
-        <div className='header-content'>
-          <h1 className='page-title'>Deliverers Management</h1>
-          <p className='page-subtitle'>
-            Manage your delivery team and track performance
+    <div className='px-4 py-6 max-w-7xl mx-auto'>
+      <div className='flex flex-col gap-6 md:flex-row md:items-start md:justify-between mb-8 bg-card p-6 rounded-xl shadow'>
+        <div>
+          <h1 className='flex items-center gap-2 text-2xl font-bold'>
+            <Car className='h-6 w-6 text-primary' />
+            Deliverers
+          </h1>
+          <p className='text-muted-foreground'>
+            Manage deliverers and their assigned deliveries
           </p>
         </div>
-        <div className='header-actions'>
-          <button
+        <div className='flex gap-2'>
+          <Button
+            variant='outline'
+            size='sm'
             onClick={fetchDeliverers}
-            className='btn btn-secondary'
             disabled={loading}
+            className='flex items-center gap-2'
           >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw
+              className={loading ? 'animate-spin h-4 w-4' : 'h-4 w-4'}
+            />
             Refresh
-          </button>
-          {isAdmin && (
-            <button onClick={handleCreateDeliverer} className='btn btn-primary'>
-              <Plus size={16} />
-              Add Deliverer
-            </button>
-          )}
+          </Button>
+          <Button
+            onClick={handleCreateDeliverer}
+            size='sm'
+            className='flex items-center gap-2'
+          >
+            <Plus className='h-4 w-4' />
+            Add Deliverer
+          </Button>
         </div>
       </div>
 
       {/* Search and Filters */}
-      <div className='page-controls'>
-        <div className='search-section'>
-          <div className='search-bar'>
-            <Search size={20} className='search-icon' />
-            <input
-              type='text'
-              placeholder='Search by name, email...'
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <button
+      <div className='flex flex-col md:flex-row gap-4 items-start md:items-center justify-between mb-6'>
+        <div className='relative w-full md:max-w-md'>
+          <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4' />
+          <Input
+            type='text'
+            placeholder='Search by name, email, phone...'
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className='pl-10'
+          />
+        </div>
+
+        <div className='flex gap-2 items-center'>
+          <Button
+            variant={showFilters ? 'default' : 'outline'}
+            size='sm'
+            className='flex items-center gap-2'
             onClick={() => setShowFilters(!showFilters)}
-            className={`btn btn-outline ${showFilters ? 'active' : ''}`}
           >
-            <Filter size={16} />
+            <Filter className='h-4 w-4' />
             Filters
-          </button>
+          </Button>
+
+          {(statusFilter || vehicleTypeFilter) && (
+            <Button
+              variant='destructive'
+              size='sm'
+              className='flex items-center gap-2'
+              onClick={() => {
+                setStatusFilter('');
+                setVehicleTypeFilter('');
+              }}
+            >
+              <X className='h-4 w-4' />
+              Clear
+            </Button>
+          )}
         </div>
       </div>
 
-      {/* Filters Panel */}
+      {/* Filter Panel */}
       {showFilters && (
-        <div className='filters-panel'>
-          <div className='filter-group'>
-            <label>Status</label>
-            <select
-              value={statusFilter}
-              onChange={e => setStatusFilter(e.target.value)}
-            >
-              <option value=''>All Statuses</option>
-              <option value='Available'>Available</option>
-              <option value='Busy'>Busy</option>
-              <option value='Offline'>Offline</option>
-            </select>
-          </div>
+        <div className='p-6 mb-6 bg-card rounded-xl shadow'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 gap-6'>
+            <div className='space-y-2'>
+              <label className='text-sm font-medium'>Status</label>
+              <Select
+                value={statusFilter}
+                onChange={e => setStatusFilter(e.target.value)}
+              >
+                <option value=''>All Statuses</option>
+                <option value='Available'>Available</option>
+                <option value='On Delivery'>On Delivery</option>
+                <option value='Off Duty'>Off Duty</option>
+                <option value='On Break'>On Break</option>
+              </Select>
+            </div>
 
-          <div className='filter-group'>
-            <label>Vehicle Type</label>
-            <select
-              value={vehicleTypeFilter}
-              onChange={e => setVehicleTypeFilter(e.target.value)}
-            >
-              <option value=''>All Vehicles</option>
-              <option value='Car'>Car</option>
-              <option value='Motorcycle'>Motorcycle</option>
-              <option value='Van'>Van</option>
-              <option value='Truck'>Truck</option>
-              <option value='Bicycle'>Bicycle</option>
-            </select>
+            <div className='space-y-2'>
+              <label className='text-sm font-medium'>Vehicle Type</label>
+              <Select
+                value={vehicleTypeFilter}
+                onChange={e => setVehicleTypeFilter(e.target.value)}
+              >
+                <option value=''>All Vehicles</option>
+                <option value='Car'>Car</option>
+                <option value='Motorcycle'>Motorcycle</option>
+                <option value='Bicycle'>Bicycle</option>
+                <option value='Van'>Van</option>
+                <option value='Truck'>Truck</option>
+              </Select>
+            </div>
           </div>
         </div>
       )}
 
       {/* Stats Cards */}
-      <div className='stats-grid'>
-        <div className='stat-card'>
-          <div className='stat-value'>{totalDocs}</div>
-          <div className='stat-label'>Total Deliverers</div>
-        </div>
-        <div className='stat-card available'>
-          <div className='stat-value'>{availableCount}</div>
-          <div className='stat-label'>Available</div>
-        </div>
-        <div className='stat-card busy'>
-          <div className='stat-value'>{busyCount}</div>
-          <div className='stat-label'>Busy</div>
-        </div>
-        <div className='stat-card offline'>
-          <div className='stat-value'>{offlineCount}</div>
-          <div className='stat-label'>Offline</div>
-        </div>
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6'>
+        <Card>
+          <CardContent className='pt-6 flex flex-col items-center justify-center'>
+            <span className='text-3xl font-bold'>{totalDocs}</span>
+            <span className='text-sm text-muted-foreground'>
+              Total Deliverers
+            </span>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className='pt-6 flex flex-col items-center justify-center'>
+            <span className='text-3xl font-bold text-green-600'>
+              {availableCount}
+            </span>
+            <span className='text-sm text-muted-foreground'>Available</span>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className='pt-6 flex flex-col items-center justify-center'>
+            <span className='text-3xl font-bold text-amber-500'>
+              {busyCount}
+            </span>
+            <span className='text-sm text-muted-foreground'>On Delivery</span>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className='pt-6 flex flex-col items-center justify-center'>
+            <span className='text-3xl font-bold text-slate-400'>
+              {offlineCount}
+            </span>
+            <span className='text-sm text-muted-foreground'>Offline</span>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Deliverers Table */}
-      <div className='table-container'>
-        <table className='deliverers-table'>
-          <thead>
-            <tr>
-              <th>Deliverer</th>
-              <th>Contact</th>
-              <th>Status</th>
-              <th>Vehicle</th>
-              <th>License</th>
-              <th>Deliveries</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+      <Card className='mb-6 overflow-hidden'>
+        <Table>
+          <THead>
+            <TR className='bg-muted/50'>
+              <TH>Deliverer</TH>
+              <TH>Contact</TH>
+              <TH>Status</TH>
+              <TH>Vehicle</TH>
+              <TH>License</TH>
+              <TH>Deliveries</TH>
+              <TH className='text-right'>Actions</TH>
+            </TR>
+          </THead>
+          <TBody>
             {deliverers.map(deliverer => (
-              <tr key={deliverer._id}>
-                <td>
-                  <div className='deliverer-info'>
-                    <div className='deliverer-name'>{deliverer.name}</div>
-                    <div className='deliverer-email'>{deliverer.email}</div>
+              <TR key={deliverer._id}>
+                <TD>
+                  <div className='flex flex-col'>
+                    <span className='font-medium'>{deliverer.name}</span>
+                    <span className='text-xs text-muted-foreground'>
+                      {deliverer.email}
+                    </span>
                   </div>
-                </td>
-                <td>
-                  <div className='contact-info'>
+                </TD>
+                <TD>
+                  <div className='flex flex-col'>
                     {deliverer.phone && (
-                      <div className='contact-item'>
-                        <Phone size={14} />
-                        {deliverer.phone}
+                      <div className='flex items-center gap-1 text-sm'>
+                        <Phone className='h-3 w-3 text-muted-foreground' />
+                        <span>{deliverer.phone}</span>
                       </div>
                     )}
                     {deliverer.address?.city && (
-                      <div className='contact-item'>
-                        <MapPin size={14} />
-                        {deliverer.address.city}
+                      <div className='flex items-center gap-1 text-sm'>
+                        <MapPin className='h-3 w-3 text-muted-foreground' />
+                        <span>{deliverer.address.city}</span>
                       </div>
                     )}
                   </div>
-                </td>
-                <td>
-                  <span
-                    className={`status-badge status-${deliverer.status.toLowerCase()}`}
+                </TD>
+                <TD>
+                  <Badge
+                    variant={
+                      deliverer.status === 'Available'
+                        ? 'success'
+                        : deliverer.status === 'On Delivery' ||
+                            deliverer.status === 'Busy'
+                          ? 'warning'
+                          : 'secondary'
+                    }
+                    className='flex items-center gap-1'
                   >
                     {getStatusIcon(deliverer.status)}
                     {deliverer.status}
-                  </span>
-                </td>
-                <td>
-                  <div className='vehicle-info'>
+                  </Badge>
+                </TD>
+                <TD>
+                  <div className='flex items-center gap-1 text-sm'>
                     {getVehicleIcon(deliverer.vehicleType)}
-                    {deliverer.vehicleType || 'Not specified'}
+                    <span>{deliverer.vehicleType || 'Not specified'}</span>
                   </div>
-                </td>
-                <td>
-                  <div className='license-info'>
+                </TD>
+                <TD>
+                  <span className='text-sm'>
                     {deliverer.licenseNumber || 'N/A'}
+                  </span>
+                </TD>
+                <TD>
+                  <div className='flex items-center gap-1 text-sm'>
+                    <Package className='h-3 w-3 text-muted-foreground' />
+                    <span>{deliverer.deliveries?.length || 0}</span>
                   </div>
-                </td>
-                <td>
-                  <div className='deliveries-count'>
-                    <Package size={14} />
-                    {deliverer.deliveries?.length || 0}
-                  </div>
-                </td>
-                <td>
-                  <div className='actions'>
-                    <button
+                </TD>
+                <TD>
+                  <div className='flex items-center justify-end gap-2'>
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      className='h-8 w-8 p-0'
                       onClick={() => handleViewDeliverer(deliverer)}
-                      className='btn-icon'
-                      title='View Details'
                     >
-                      <Eye size={16} />
-                    </button>
-                    <button
+                      <Eye className='h-4 w-4' />
+                    </Button>
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      className='h-8 w-8 p-0'
                       onClick={() => handleViewStats(deliverer)}
-                      className='btn-icon'
-                      title='View Statistics'
                     >
-                      <BarChart3 size={16} />
-                    </button>
+                      <BarChart3 className='h-4 w-4' />
+                    </Button>
                     {deliverer.status === 'Available' && (
-                      <button
+                      <Button
+                        variant='ghost'
+                        size='sm'
+                        className='h-8 w-8 p-0 text-blue-500 hover:text-blue-600'
                         onClick={() => handleOpenAssignModal(deliverer)}
-                        className='btn-icon'
-                        title='Assign Delivery'
                       >
-                        <Link size={16} />
-                      </button>
+                        <Link className='h-4 w-4' />
+                      </Button>
                     )}
                     {isAdmin && (
                       <>
-                        <button
+                        <Button
+                          variant='ghost'
+                          size='sm'
+                          className='h-8 w-8 p-0'
                           onClick={() => handleEditDeliverer(deliverer)}
-                          className='btn-icon'
-                          title='Edit'
                         >
-                          <Edit3 size={16} />
-                        </button>
-                        <button
+                          <Edit3 className='h-4 w-4' />
+                        </Button>
+                        <Button
+                          variant='ghost'
+                          size='sm'
+                          className='h-8 w-8 p-0 text-red-500 hover:text-red-600'
                           onClick={() => handleDeleteDeliverer(deliverer._id)}
-                          className='btn-icon danger'
-                          title='Delete'
                         >
-                          <Trash2 size={16} />
-                        </button>
+                          <Trash2 className='h-4 w-4' />
+                        </Button>
                       </>
                     )}
                   </div>
-                </td>
-              </tr>
+                </TD>
+              </TR>
             ))}
-          </tbody>
-        </table>
+          </TBody>
+        </Table>
 
         {deliverers.length === 0 && !loading && (
-          <div className='empty-state'>
-            <Car size={48} className='empty-icon' />
-            <h3>No deliverers found</h3>
-            <p>Get started by adding your first deliverer to the team.</p>
+          <div className='flex flex-col items-center justify-center py-12'>
+            <Car className='h-12 w-12 text-muted-foreground mb-4' />
+            <h3 className='text-lg font-medium mb-2'>No deliverers found</h3>
+            <p className='text-sm text-muted-foreground mb-4'>
+              Get started by adding your first deliverer to the team.
+            </p>
             {isAdmin && (
-              <button
+              <Button
                 onClick={handleCreateDeliverer}
-                className='btn btn-primary'
+                className='flex items-center gap-2'
               >
-                <Plus size={16} />
+                <Plus className='h-4 w-4' />
                 Add Deliverer
-              </button>
+              </Button>
             )}
           </div>
         )}
-      </div>
+      </Card>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className='pagination'>
-          <button
+        <div className='flex items-center justify-between py-4 mb-6'>
+          <Button
+            variant='outline'
+            size='sm'
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className='btn btn-outline'
+            className='flex items-center gap-1'
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft className='h-4 w-4' />
             Previous
-          </button>
+          </Button>
 
-          <div className='page-info'>
-            <span>
-              Page {currentPage} of {totalPages} ({totalDocs} total)
-            </span>
+          <div className='text-sm text-muted-foreground'>
+            Page {currentPage} of {totalPages} ({totalDocs} total)
           </div>
 
-          <button
+          <Button
+            variant='outline'
+            size='sm'
             onClick={() =>
               setCurrentPage(prev => Math.min(prev + 1, totalPages))
             }
             disabled={currentPage === totalPages}
-            className='btn btn-outline'
+            className='flex items-center gap-1'
           >
             Next
-            <ChevronRight size={16} />
-          </button>
+            <ChevronRight className='h-4 w-4' />
+          </Button>
         </div>
       )}
 

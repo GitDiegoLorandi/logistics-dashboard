@@ -27,7 +27,14 @@ import { toast } from 'react-toastify';
 import { userAPI, authAPI } from '../../services/api';
 import LoadingSpinner from '../UI/LoadingSpinner';
 import ErrorMessage from '../UI/ErrorMessage';
-import './UsersPage.css';
+import { Button } from '../UI/button';
+import { Input } from '../UI/input';
+import { Select } from '../UI/select';
+import { Card, CardContent } from '../UI/card';
+import { Badge } from '../UI/badge';
+import { Table, THead, TBody, TR, TH, TD } from '../UI/table';
+import { Dialog } from '../UI/dialog';
+import { cn } from '../../lib/utils';
 
 const UsersPage = () => {
   // State Management
@@ -354,12 +361,24 @@ const UsersPage = () => {
   };
 
   // Get Role Badge
-  const getRoleBadge = role => (
-    <span className={`role-badge role-${role}`}>
-      {getRoleIcon(role)}
-      {role.charAt(0).toUpperCase() + role.slice(1)}
-    </span>
-  );
+  const getRoleBadge = role => {
+    const variantMap = {
+      admin: 'warning',
+      user: 'secondary',
+      manager: 'info',
+      deliverer: 'outline',
+    };
+
+    return (
+      <Badge
+        variant={variantMap[role] || 'secondary'}
+        className='flex items-center gap-1'
+      >
+        {getRoleIcon(role)}
+        {role.charAt(0).toUpperCase() + role.slice(1)}
+      </Badge>
+    );
+  };
 
   // Statistics calculations
   const adminCount = users.filter(u => u.role === 'admin').length;
@@ -370,309 +389,362 @@ const UsersPage = () => {
   if (error) return <ErrorMessage message={error} onRetry={fetchUsers} />;
 
   return (
-    <div className='users-page'>
+    <div className='px-4 py-6 max-w-7xl mx-auto'>
       {/* Header */}
-      <div className='page-header'>
-        <div className='header-content'>
-          <h1 className='page-title'>User Management</h1>
-          <p className='page-subtitle'>
-            Manage system users and access controls
+      <div className='flex flex-col gap-6 md:flex-row md:items-start md:justify-between mb-8 bg-card p-6 rounded-xl shadow'>
+        <div>
+          <h1 className='flex items-center gap-2 text-2xl font-bold'>
+            <User className='h-6 w-6 text-primary' />
+            User Management
+          </h1>
+          <p className='text-muted-foreground'>
+            Manage system users and permissions
           </p>
         </div>
-        <div className='header-actions'>
-          <button
-            onClick={() => setShowPasswordModal(true)}
-            className='btn btn-outline'
-          >
-            <Key size={16} />
-            Change Password
-          </button>
-          <button
+        <div className='flex gap-2'>
+          <Button
+            variant='outline'
+            size='sm'
             onClick={fetchUsers}
-            className='btn btn-secondary'
             disabled={loading}
+            className='flex items-center gap-2'
           >
-            <RefreshCw size={16} className={loading ? 'animate-spin' : ''} />
+            <RefreshCw
+              className={loading ? 'animate-spin h-4 w-4' : 'h-4 w-4'}
+            />
             Refresh
-          </button>
-          <button onClick={handleCreateNewUser} className='btn btn-primary'>
-            <Plus size={16} />
-            Add User
-          </button>
+          </Button>
+          <Button
+            onClick={handleCreateNewUser}
+            size='sm'
+            className='flex items-center gap-2'
+          >
+            <Plus className='h-4 w-4' />
+            New User
+          </Button>
         </div>
       </div>
 
       {/* Search and Filters */}
-      <div className='page-controls'>
-        <div className='search-section'>
-          <div className='search-bar'>
-            <Search size={20} className='search-icon' />
-            <input
-              type='text'
-              placeholder='Search by name, email...'
-              value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
-            />
-          </div>
-          <button
+      <div className='flex flex-col md:flex-row gap-4 items-start md:items-center justify-between mb-6'>
+        <div className='relative w-full md:max-w-md'>
+          <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4' />
+          <Input
+            type='text'
+            placeholder='Search by name or email...'
+            value={searchTerm}
+            onChange={e => setSearchTerm(e.target.value)}
+            className='pl-10'
+          />
+        </div>
+
+        <div className='flex gap-2 items-center'>
+          <Button
+            variant={showFilters ? 'default' : 'outline'}
+            size='sm'
+            className='flex items-center gap-2'
             onClick={() => setShowFilters(!showFilters)}
-            className={`btn btn-outline ${showFilters ? 'active' : ''}`}
           >
-            <Filter size={16} />
+            <Filter className='h-4 w-4' />
             Filters
-          </button>
+          </Button>
+
+          {roleFilter && (
+            <Button
+              variant='destructive'
+              size='sm'
+              className='flex items-center gap-2'
+              onClick={() => setRoleFilter('')}
+            >
+              <X className='h-4 w-4' />
+              Clear
+            </Button>
+          )}
         </div>
       </div>
 
-      {/* Filters Panel */}
+      {/* Filter Panel */}
       {showFilters && (
-        <div className='filters-panel'>
-          <div className='filter-group'>
-            <label>Role</label>
-            <select
+        <div className='p-6 mb-6 bg-card rounded-xl shadow'>
+          <div className='max-w-xs space-y-2'>
+            <label className='text-sm font-medium'>Role</label>
+            <Select
               value={roleFilter}
               onChange={e => setRoleFilter(e.target.value)}
             >
               <option value=''>All Roles</option>
-              <option value='admin'>Administrator</option>
+              <option value='admin'>Admin</option>
+              <option value='manager'>Manager</option>
               <option value='user'>User</option>
-            </select>
+              <option value='deliverer'>Deliverer</option>
+            </Select>
           </div>
         </div>
       )}
 
       {/* Stats Cards */}
-      <div className='stats-grid'>
-        <div className='stat-card'>
-          <div className='stat-value'>{totalDocs}</div>
-          <div className='stat-label'>Total Users</div>
-        </div>
-        <div className='stat-card admin'>
-          <div className='stat-value'>{adminCount}</div>
-          <div className='stat-label'>Administrators</div>
-        </div>
-        <div className='stat-card user'>
-          <div className='stat-value'>{userCount}</div>
-          <div className='stat-label'>Regular Users</div>
-        </div>
-        <div className='stat-card active'>
-          <div className='stat-value'>{activeCount}</div>
-          <div className='stat-label'>Active Users</div>
-        </div>
+      <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6'>
+        <Card>
+          <CardContent className='pt-6 flex flex-col items-center justify-center'>
+            <span className='text-3xl font-bold'>{totalDocs}</span>
+            <span className='text-sm text-muted-foreground'>Total Users</span>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className='pt-6 flex flex-col items-center justify-center'>
+            <span className='text-3xl font-bold'>{adminCount}</span>
+            <span className='text-sm text-muted-foreground'>
+              Administrators
+            </span>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className='pt-6 flex flex-col items-center justify-center'>
+            <span className='text-3xl font-bold'>{userCount}</span>
+            <span className='text-sm text-muted-foreground'>Regular Users</span>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className='pt-6 flex flex-col items-center justify-center'>
+            <span className='text-3xl font-bold'>{activeCount}</span>
+            <span className='text-sm text-muted-foreground'>Active Users</span>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Users Table */}
-      <div className='table-container'>
-        <table className='users-table'>
-          <thead>
-            <tr>
-              <th>User</th>
-              <th>Contact</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Created</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
+      <Card className='mb-6 overflow-hidden'>
+        <Table>
+          <THead>
+            <TR className='bg-muted/50'>
+              <TH>User</TH>
+              <TH>Contact</TH>
+              <TH>Role</TH>
+              <TH>Status</TH>
+              <TH>Created</TH>
+              <TH className='text-right'>Actions</TH>
+            </TR>
+          </THead>
+          <TBody>
             {users.map(user => (
-              <tr key={user._id}>
-                <td>
-                  <div className='user-info'>
-                    <div className='user-name'>
+              <TR key={user._id}>
+                <TD>
+                  <div className='flex flex-col'>
+                    <span className='font-medium'>
                       {user.firstName && user.lastName
                         ? `${user.firstName} ${user.lastName}`
                         : user.firstName || user.lastName || 'No Name'}
-                    </div>
-                    <div className='user-email'>{user.email}</div>
-                  </div>
-                </td>
-                <td>
-                  <div className='contact-info'>
-                    <div className='contact-item'>
-                      <Mail size={14} />
+                    </span>
+                    <span className='text-xs text-muted-foreground'>
                       {user.email}
+                    </span>
+                  </div>
+                </TD>
+                <TD>
+                  <div className='flex flex-col'>
+                    <div className='flex items-center gap-1 text-sm'>
+                      <Mail className='h-3 w-3 text-muted-foreground' />
+                      <span>{user.email}</span>
                     </div>
                     {user.phone && (
-                      <div className='contact-item'>
-                        <Phone size={14} />
-                        {user.phone}
+                      <div className='flex items-center gap-1 text-sm'>
+                        <Phone className='h-3 w-3 text-muted-foreground' />
+                        <span>{user.phone}</span>
                       </div>
                     )}
                   </div>
-                </td>
-                <td>
-                  <div className='role-selector'>
-                    {user._id === currentUser?._id ? (
-                      getRoleBadge(user.role)
-                    ) : (
-                      <select
-                        value={user.role}
-                        onChange={e =>
-                          handleRoleChange(user._id, e.target.value)
-                        }
-                        className='role-select'
-                      >
-                        <option value='user'>User</option>
-                        <option value='admin'>Admin</option>
-                      </select>
-                    )}
-                  </div>
-                </td>
-                <td>
-                  <span
-                    className={`status-badge ${user.isActive ? 'active' : 'inactive'}`}
+                </TD>
+                <TD>
+                  {user._id === currentUser?._id ? (
+                    getRoleBadge(user.role)
+                  ) : (
+                    <Select
+                      value={user.role}
+                      onChange={e => handleRoleChange(user._id, e.target.value)}
+                      className='w-32'
+                    >
+                      <option value='user'>User</option>
+                      <option value='admin'>Admin</option>
+                      <option value='manager'>Manager</option>
+                      <option value='deliverer'>Deliverer</option>
+                    </Select>
+                  )}
+                </TD>
+                <TD>
+                  <Badge
+                    variant={user.isActive ? 'success' : 'destructive'}
+                    className='flex items-center gap-1'
                   >
                     {user.isActive ? (
                       <>
-                        <CheckCircle size={14} />
+                        <CheckCircle className='h-3 w-3' />
                         Active
                       </>
                     ) : (
                       <>
-                        <UserX size={14} />
+                        <UserX className='h-3 w-3' />
                         Inactive
                       </>
                     )}
-                  </span>
-                </td>
-                <td>
-                  <div className='date-info'>
-                    <Calendar size={14} />
+                  </Badge>
+                </TD>
+                <TD>
+                  <div className='flex items-center gap-1 text-sm'>
+                    <Calendar className='h-3 w-3 text-muted-foreground' />
                     {new Date(user.createdAt).toLocaleDateString()}
                   </div>
-                </td>
-                <td>
-                  <div className='actions'>
-                    <button
+                </TD>
+                <TD>
+                  <div className='flex items-center justify-end gap-2'>
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      className='h-8 w-8 p-0'
                       onClick={() => handleViewUser(user)}
-                      className='btn-icon'
-                      title='View Details'
                     >
-                      <Eye size={16} />
-                    </button>
-                    <button
+                      <Eye className='h-4 w-4' />
+                    </Button>
+                    <Button
+                      variant='ghost'
+                      size='sm'
+                      className='h-8 w-8 p-0'
                       onClick={() => handleEditUser(user)}
-                      className='btn-icon'
-                      title='Edit'
                     >
-                      <Edit3 size={16} />
-                    </button>
+                      <Edit3 className='h-4 w-4' />
+                    </Button>
                     {user._id !== currentUser?._id && (
                       <>
-                        <button
+                        <Button
+                          variant='ghost'
+                          size='sm'
+                          className='h-8 w-8 p-0 text-amber-500 hover:text-amber-600'
                           onClick={() => handleDeactivateUser(user._id)}
-                          className='btn-icon warning'
-                          title='Deactivate'
                           disabled={!user.isActive}
                         >
-                          <UserX size={16} />
-                        </button>
-                        <button
+                          <UserX className='h-4 w-4' />
+                        </Button>
+                        <Button
+                          variant='ghost'
+                          size='sm'
+                          className='h-8 w-8 p-0 text-red-500 hover:text-red-600'
                           onClick={() => handleDeleteUser(user._id)}
-                          className='btn-icon danger'
-                          title='Delete'
                         >
-                          <Trash2 size={16} />
-                        </button>
+                          <Trash2 className='h-4 w-4' />
+                        </Button>
                       </>
                     )}
                   </div>
-                </td>
-              </tr>
+                </TD>
+              </TR>
             ))}
-          </tbody>
-        </table>
+          </TBody>
+        </Table>
 
         {users.length === 0 && !loading && (
-          <div className='empty-state'>
-            <User size={48} className='empty-icon' />
-            <h3>No users found</h3>
-            <p>Get started by adding your first user to the system.</p>
-            <button onClick={handleCreateNewUser} className='btn btn-primary'>
-              <Plus size={16} />
+          <div className='flex flex-col items-center justify-center py-12'>
+            <User className='h-12 w-12 text-muted-foreground mb-4' />
+            <h3 className='text-lg font-medium mb-2'>No users found</h3>
+            <p className='text-sm text-muted-foreground mb-4'>
+              Get started by adding your first user to the system.
+            </p>
+            <Button
+              onClick={handleCreateNewUser}
+              className='flex items-center gap-2'
+            >
+              <Plus className='h-4 w-4' />
               Add User
-            </button>
+            </Button>
           </div>
         )}
-      </div>
+      </Card>
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className='pagination'>
-          <button
+        <div className='flex items-center justify-between py-4 mb-6'>
+          <Button
+            variant='outline'
+            size='sm'
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className='btn btn-outline'
+            className='flex items-center gap-1'
           >
-            <ChevronLeft size={16} />
+            <ChevronLeft className='h-4 w-4' />
             Previous
-          </button>
+          </Button>
 
-          <div className='page-info'>
-            <span>
-              Page {currentPage} of {totalPages} ({totalDocs} total)
-            </span>
+          <div className='text-sm text-muted-foreground'>
+            Page {currentPage} of {totalPages} ({totalDocs} total)
           </div>
 
-          <button
+          <Button
+            variant='outline'
+            size='sm'
             onClick={() =>
               setCurrentPage(prev => Math.min(prev + 1, totalPages))
             }
             disabled={currentPage === totalPages}
-            className='btn btn-outline'
+            className='flex items-center gap-1'
           >
             Next
-            <ChevronRight size={16} />
-          </button>
+            <ChevronRight className='h-4 w-4' />
+          </Button>
         </div>
       )}
 
       {/* Create/Edit User Modal */}
-      {showModal && (
-        <div className='modal-overlay'>
-          <div className='modal-content'>
-            <div className='modal-header'>
-              <h2>{modalMode === 'create' ? 'Add New User' : 'Edit User'}</h2>
-              <button onClick={() => setShowModal(false)} className='btn-close'>
-                <X size={20} />
-              </button>
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <div className='fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50'>
+          <div className='bg-card rounded-lg shadow-lg w-full max-w-lg'>
+            <div className='flex items-center justify-between p-6 border-b'>
+              <h2 className='text-xl font-semibold'>
+                {modalMode === 'create' ? 'Add New User' : 'Edit User'}
+              </h2>
+              <Button
+                variant='ghost'
+                size='sm'
+                className='h-8 w-8 p-0'
+                onClick={() => setShowModal(false)}
+              >
+                <X className='h-4 w-4' />
+              </Button>
             </div>
 
             <form
               onSubmit={
                 modalMode === 'create' ? handleCreateUser : handleUpdateUser
               }
-              className='modal-form'
+              className='p-6 space-y-6'
             >
-              <div className='form-section'>
-                <h3>User Information</h3>
-                <div className='form-row'>
-                  <div className='form-group'>
-                    <label>Email *</label>
-                    <input
+              <div className='space-y-4'>
+                <h3 className='text-lg font-medium'>User Information</h3>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>Email *</label>
+                    <Input
                       type='email'
                       value={formData.email}
                       onChange={e => handleFormChange('email', e.target.value)}
                       required
                     />
                   </div>
-                  <div className='form-group'>
-                    <label>Role</label>
-                    <select
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>Role</label>
+                    <Select
                       value={formData.role}
                       onChange={e => handleFormChange('role', e.target.value)}
                     >
                       <option value='user'>User</option>
                       <option value='admin'>Administrator</option>
-                    </select>
+                      <option value='manager'>Manager</option>
+                      <option value='deliverer'>Deliverer</option>
+                    </Select>
                   </div>
                 </div>
 
-                <div className='form-row'>
-                  <div className='form-group'>
-                    <label>First Name</label>
-                    <input
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>First Name</label>
+                    <Input
                       type='text'
                       value={formData.firstName}
                       onChange={e =>
@@ -680,9 +752,9 @@ const UsersPage = () => {
                       }
                     />
                   </div>
-                  <div className='form-group'>
-                    <label>Last Name</label>
-                    <input
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>Last Name</label>
+                    <Input
                       type='text'
                       value={formData.lastName}
                       onChange={e =>
@@ -692,9 +764,9 @@ const UsersPage = () => {
                   </div>
                 </div>
 
-                <div className='form-group'>
-                  <label>Phone</label>
-                  <input
+                <div className='space-y-2'>
+                  <label className='text-sm font-medium'>Phone</label>
+                  <Input
                     type='tel'
                     value={formData.phone}
                     onChange={e => handleFormChange('phone', e.target.value)}
@@ -703,12 +775,12 @@ const UsersPage = () => {
               </div>
 
               {modalMode === 'create' && (
-                <div className='form-section'>
-                  <h3>Security</h3>
-                  <div className='form-row'>
-                    <div className='form-group'>
-                      <label>Password *</label>
-                      <input
+                <div className='space-y-4'>
+                  <h3 className='text-lg font-medium'>Security</h3>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <div className='space-y-2'>
+                      <label className='text-sm font-medium'>Password *</label>
+                      <Input
                         type='password'
                         value={formData.password}
                         onChange={e =>
@@ -718,9 +790,11 @@ const UsersPage = () => {
                         minLength={6}
                       />
                     </div>
-                    <div className='form-group'>
-                      <label>Confirm Password *</label>
-                      <input
+                    <div className='space-y-2'>
+                      <label className='text-sm font-medium'>
+                        Confirm Password *
+                      </label>
+                      <Input
                         type='password'
                         value={formData.confirmPassword}
                         onChange={e =>
@@ -734,22 +808,22 @@ const UsersPage = () => {
                 </div>
               )}
 
-              <div className='modal-actions'>
-                <button
+              <div className='flex justify-end gap-2 pt-4 border-t'>
+                <Button
                   type='button'
+                  variant='outline'
                   onClick={() => setShowModal(false)}
-                  className='btn btn-secondary'
                 >
                   Cancel
-                </button>
-                <button type='submit' className='btn btn-primary'>
+                </Button>
+                <Button type='submit'>
                   {modalMode === 'create' ? 'Create User' : 'Update User'}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
         </div>
-      )}
+      </Dialog>
 
       {/* View User Modal */}
       {showViewModal && selectedUser && (

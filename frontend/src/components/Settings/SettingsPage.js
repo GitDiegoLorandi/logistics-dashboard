@@ -23,7 +23,15 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { userAPI, authAPI } from '../../services/api';
-import './SettingsPage.css';
+import { Button } from '../UI/button';
+import { Input } from '../UI/input';
+import { Select } from '../UI/select';
+import { Card, CardContent } from '../UI/card';
+import { Badge } from '../UI/badge';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../UI/tabs';
+import { Switch } from '../UI/switch';
+import { Label } from '../UI/label';
+import { cn } from '../../lib/utils';
 
 const SettingsPage = () => {
   const [activeTab, setActiveTab] = useState('profile');
@@ -295,40 +303,50 @@ const SettingsPage = () => {
   };
 
   const renderProfileTab = () => (
-    <div className='tab-content'>
-      <div className='tab-header'>
-        <h2>Profile Settings</h2>
-        <p>Manage your personal information and preferences</p>
+    <div>
+      <div className='mb-6'>
+        <h2 className='text-2xl font-bold'>Profile Settings</h2>
+        <p className='text-muted-foreground'>
+          Manage your personal information and preferences
+        </p>
       </div>
 
-      <form onSubmit={handleProfileSubmit} className='settings-form'>
-        <div className='form-section'>
-          <h3>Personal Information</h3>
+      <form onSubmit={handleProfileSubmit} className='space-y-8'>
+        <div className='space-y-4'>
+          <h3 className='text-lg font-medium'>Personal Information</h3>
 
-          <div className='profile-avatar'>
-            <div className='avatar'>
-              <User size={48} />
+          <div className='flex items-center gap-6 mb-6'>
+            <div className='h-20 w-20 rounded-full bg-muted flex items-center justify-center'>
+              <User className='h-10 w-10 text-muted-foreground' />
             </div>
-            <div className='avatar-actions'>
-              <label className='btn-secondary'>
-                <Edit3 size={16} />
-                Change Avatar
-                <input
-                  type='file'
-                  accept='image/*'
-                  style={{ display: 'none' }}
-                />
-              </label>
-              <button type='button' className='btn-outline'>
+            <div className='flex flex-wrap gap-3'>
+              <Button
+                variant='outline'
+                className='flex items-center gap-2'
+                type='button'
+                asChild
+              >
+                <label>
+                  <Edit3 className='h-4 w-4' />
+                  Change Avatar
+                  <input type='file' accept='image/*' className='hidden' />
+                </label>
+              </Button>
+              <Button
+                variant='ghost'
+                className='text-destructive hover:text-destructive'
+                type='button'
+              >
                 Remove
-              </button>
+              </Button>
             </div>
           </div>
 
-          <div className='form-row'>
-            <div className='form-group'>
-              <label>First Name</label>
-              <input
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            <div className='space-y-2'>
+              <Label htmlFor='firstName'>First Name</Label>
+              <Input
+                id='firstName'
                 type='text'
                 value={profileData.firstName}
                 onChange={e =>
@@ -337,9 +355,10 @@ const SettingsPage = () => {
                 placeholder='Enter your first name'
               />
             </div>
-            <div className='form-group'>
-              <label>Last Name</label>
-              <input
+            <div className='space-y-2'>
+              <Label htmlFor='lastName'>Last Name</Label>
+              <Input
+                id='lastName'
                 type='text'
                 value={profileData.lastName}
                 onChange={e =>
@@ -349,156 +368,200 @@ const SettingsPage = () => {
               />
             </div>
           </div>
-        </div>
 
-        <div className='form-section'>
-          <h3>Contact Information</h3>
-          <div className='form-group'>
-            <label>Email Address</label>
-            <div className='input-with-icon'>
-              <Mail className='input-icon' size={18} />
-              <input
-                type='email'
-                value={profileData.email}
-                onChange={e =>
-                  setProfileData({ ...profileData, email: e.target.value })
-                }
-                placeholder='Enter your email'
-                required
-              />
+          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            <div className='space-y-2'>
+              <Label htmlFor='email'>Email Address</Label>
+              <div className='relative'>
+                <Mail className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                <Input
+                  id='email'
+                  type='email'
+                  value={profileData.email}
+                  onChange={e =>
+                    setProfileData({ ...profileData, email: e.target.value })
+                  }
+                  placeholder='your.email@example.com'
+                  className='pl-10'
+                />
+              </div>
+            </div>
+            <div className='space-y-2'>
+              <Label htmlFor='phone'>Phone Number</Label>
+              <div className='relative'>
+                <Phone className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                <Input
+                  id='phone'
+                  type='tel'
+                  value={profileData.phone}
+                  onChange={e =>
+                    setProfileData({ ...profileData, phone: e.target.value })
+                  }
+                  placeholder='(123) 456-7890'
+                  className='pl-10'
+                />
+              </div>
             </div>
           </div>
-
-          <div className='form-group'>
-            <label>Phone Number</label>
-            <div className='input-with-icon'>
-              <Phone className='input-icon' size={18} />
-              <input
-                type='tel'
-                value={profileData.phone}
-                onChange={e =>
-                  setProfileData({ ...profileData, phone: e.target.value })
-                }
-                placeholder='Enter your phone number'
-              />
-            </div>
-          </div>
         </div>
 
-        <div className='form-actions'>
-          <button type='submit' className='btn-primary' disabled={saving}>
+        <div className='flex justify-end'>
+          <Button
+            type='submit'
+            disabled={saving}
+            className='flex items-center gap-2'
+          >
             {saving ? (
-              <RefreshCw className='spinning' size={16} />
+              <>
+                <RefreshCw className='animate-spin h-4 w-4' />
+                Saving...
+              </>
             ) : (
-              <Save size={16} />
+              <>
+                <Save className='h-4 w-4' />
+                Save Changes
+              </>
             )}
-            Save Profile
-          </button>
+          </Button>
         </div>
       </form>
     </div>
   );
 
   const renderSystemTab = () => (
-    <div className='tab-content'>
-      <div className='tab-header'>
-        <h2>{getTranslation('preferencesTitle')}</h2>
-        <p>{getTranslation('preferencesSubtitle')}</p>
+    <div>
+      <div className='mb-6'>
+        <h2 className='text-2xl font-bold'>
+          {getTranslation('preferencesTitle')}
+        </h2>
+        <p className='text-muted-foreground'>
+          {getTranslation('preferencesSubtitle')}
+        </p>
       </div>
 
-      <form onSubmit={handleSystemPrefsSubmit} className='settings-form'>
-        <div className='form-section'>
-          <h3>{getTranslation('appearance')}</h3>
-          <div className='form-row'>
-            <div className='form-group'>
-              <label>{getTranslation('language')}</label>
-              <select
+      <form onSubmit={handleSystemPrefsSubmit} className='space-y-8'>
+        <div className='space-y-6'>
+          <div className='space-y-4'>
+            <h3 className='text-lg font-medium'>
+              {getTranslation('language')}
+            </h3>
+            <div className='space-y-2'>
+              <Label htmlFor='language'>{getTranslation('language')}</Label>
+              <Select
+                id='language'
                 value={systemPrefs.language}
                 onChange={e =>
                   setSystemPrefs({ ...systemPrefs, language: e.target.value })
                 }
+                className='w-full'
               >
                 <option value='en'>English</option>
                 <option value='pt_BR'>Português (Brasil)</option>
-              </select>
+                <option value='es'>Español</option>
+                <option value='fr'>Français</option>
+              </Select>
             </div>
           </div>
-        </div>
 
-        <div className='form-section'>
-          <h3>{getTranslation('localization')}</h3>
-          <div className='form-row'>
-            <div className='form-group'>
-              <label>{getTranslation('timezone')}</label>
-              <select
-                value={systemPrefs.timezone}
+          <div className='space-y-4'>
+            <h3 className='text-lg font-medium'>
+              {getTranslation('localization')}
+            </h3>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+              <div className='space-y-2'>
+                <Label htmlFor='timezone'>{getTranslation('timezone')}</Label>
+                <Select
+                  id='timezone'
+                  value={systemPrefs.timezone}
+                  onChange={e =>
+                    setSystemPrefs({ ...systemPrefs, timezone: e.target.value })
+                  }
+                  className='w-full'
+                >
+                  <option value='UTC'>UTC</option>
+                  <option value='America/New_York'>Eastern Time (ET)</option>
+                  <option value='America/Chicago'>Central Time (CT)</option>
+                  <option value='America/Denver'>Mountain Time (MT)</option>
+                  <option value='America/Los_Angeles'>Pacific Time (PT)</option>
+                  <option value='America/Sao_Paulo'>Brasília Time (BRT)</option>
+                  <option value='Europe/London'>
+                    Greenwich Mean Time (GMT)
+                  </option>
+                  <option value='Europe/Paris'>
+                    Central European Time (CET)
+                  </option>
+                </Select>
+              </div>
+              <div className='space-y-2'>
+                <Label htmlFor='dateFormat'>
+                  {getTranslation('dateFormat')}
+                </Label>
+                <Select
+                  id='dateFormat'
+                  value={systemPrefs.dateFormat}
+                  onChange={e =>
+                    setSystemPrefs({
+                      ...systemPrefs,
+                      dateFormat: e.target.value,
+                    })
+                  }
+                  className='w-full'
+                >
+                  <option value='MM/DD/YYYY'>MM/DD/YYYY</option>
+                  <option value='DD/MM/YYYY'>DD/MM/YYYY</option>
+                  <option value='YYYY-MM-DD'>YYYY-MM-DD</option>
+                </Select>
+              </div>
+            </div>
+
+            <div className='space-y-2'>
+              <Label htmlFor='currency'>{getTranslation('currency')}</Label>
+              <Select
+                id='currency'
+                value={systemPrefs.currency}
                 onChange={e =>
-                  setSystemPrefs({ ...systemPrefs, timezone: e.target.value })
+                  setSystemPrefs({ ...systemPrefs, currency: e.target.value })
                 }
+                className='w-full'
               >
-                <option value='UTC'>UTC</option>
-                <option value='America/Sao_Paulo'>Brasília Time (BRT)</option>
-                <option value='America/New_York'>Eastern Time</option>
-                <option value='America/Chicago'>Central Time</option>
-                <option value='America/Denver'>Mountain Time</option>
-                <option value='America/Los_Angeles'>Pacific Time</option>
-              </select>
-            </div>
-            <div className='form-group'>
-              <label>{getTranslation('dateFormat')}</label>
-              <select
-                value={systemPrefs.dateFormat}
-                onChange={e =>
-                  setSystemPrefs({ ...systemPrefs, dateFormat: e.target.value })
-                }
-              >
-                <option value='MM/DD/YYYY'>MM/DD/YYYY</option>
-                <option value='DD/MM/YYYY'>DD/MM/YYYY</option>
-                <option value='YYYY-MM-DD'>YYYY-MM-DD</option>
-              </select>
+                <option value='USD'>US Dollar ($)</option>
+                <option value='EUR'>Euro (€)</option>
+                <option value='GBP'>British Pound (£)</option>
+                <option value='BRL'>Brazilian Real (R$)</option>
+                <option value='JPY'>Japanese Yen (¥)</option>
+              </Select>
             </div>
           </div>
 
-          <div className='form-group'>
-            <label>{getTranslation('currency')}</label>
-            <select
-              value={systemPrefs.currency}
-              onChange={e =>
-                setSystemPrefs({ ...systemPrefs, currency: e.target.value })
-              }
-            >
-              <option value='USD'>USD - US Dollar</option>
-              <option value='BRL'>BRL - Brazilian Real</option>
-              <option value='EUR'>EUR - Euro</option>
-              <option value='GBP'>GBP - British Pound</option>
-              <option value='CAD'>CAD - Canadian Dollar</option>
-            </select>
-          </div>
-        </div>
-
-        <div className='form-section'>
-          <h3>{getTranslation('dashboardBehavior')}</h3>
-          <div className='form-group'>
-            <label className='checkbox-label'>
-              <input
-                type='checkbox'
+          <div className='space-y-4'>
+            <h3 className='text-lg font-medium'>
+              {getTranslation('dashboardBehavior')}
+            </h3>
+            <div className='flex items-center space-x-2'>
+              <Switch
+                id='autoRefresh'
                 checked={systemPrefs.autoRefresh}
-                onChange={e =>
+                onCheckedChange={checked =>
                   setSystemPrefs({
                     ...systemPrefs,
-                    autoRefresh: e.target.checked,
+                    autoRefresh: checked,
                   })
                 }
               />
-              <span className='checkmark'></span>
-              {getTranslation('autoRefresh')}
-            </label>
-          </div>
+              <Label htmlFor='autoRefresh'>
+                {getTranslation('autoRefresh')}
+              </Label>
+            </div>
 
-          {systemPrefs.autoRefresh && (
-            <div className='form-group'>
-              <label>{getTranslation('refreshInterval')}</label>
-              <select
+            <div className='space-y-2'>
+              <Label htmlFor='refreshInterval'>
+                {getTranslation('refreshInterval')}
+              </Label>
+              <Input
+                id='refreshInterval'
+                type='number'
+                min='15'
+                max='300'
                 value={systemPrefs.refreshInterval}
                 onChange={e =>
                   setSystemPrefs({
@@ -506,25 +569,33 @@ const SettingsPage = () => {
                     refreshInterval: parseInt(e.target.value),
                   })
                 }
-              >
-                <option value='15'>15 seconds</option>
-                <option value='30'>30 seconds</option>
-                <option value='60'>1 minute</option>
-                <option value='300'>5 minutes</option>
-              </select>
+                disabled={!systemPrefs.autoRefresh}
+              />
+              <p className='text-xs text-muted-foreground'>
+                Minimum: 15 seconds, Maximum: 300 seconds
+              </p>
             </div>
-          )}
+          </div>
         </div>
 
-        <div className='form-actions'>
-          <button type='submit' className='btn-primary' disabled={saving}>
+        <div className='flex justify-end'>
+          <Button
+            type='submit'
+            disabled={saving}
+            className='flex items-center gap-2'
+          >
             {saving ? (
-              <RefreshCw className='spinning' size={16} />
+              <>
+                <RefreshCw className='animate-spin h-4 w-4' />
+                Saving...
+              </>
             ) : (
-              <Save size={16} />
+              <>
+                <Save className='h-4 w-4' />
+                {getTranslation('savePreferences')}
+              </>
             )}
-            {getTranslation('savePreferences')}
-          </button>
+          </Button>
         </div>
       </form>
     </div>
@@ -999,42 +1070,50 @@ const SettingsPage = () => {
 
   if (loading) {
     return (
-      <div className='settings-page'>
-        <div className='settings-loading'>
-          <div className='loading-spinner'></div>
-          <p>Loading settings...</p>
+      <div className='px-4 py-6 max-w-7xl mx-auto flex items-center justify-center min-h-[50vh]'>
+        <div className='text-center'>
+          <div className='h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4'></div>
+          <p className='text-muted-foreground'>Loading settings...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className='settings-page'>
-      <div className='settings-header'>
-        <h1>Settings</h1>
-        <p>Manage your account and system preferences</p>
-      </div>
+    <div className='px-4 py-6 max-w-7xl mx-auto'>
+      <div className='flex flex-col md:flex-row gap-8'>
+        <Card className='md:w-64 h-fit'>
+          <CardContent className='p-4'>
+            <h2 className='text-xl font-semibold mb-4'>Settings</h2>
+            <div className='flex flex-col gap-1'>
+              {tabs.map(tab => {
+                const IconComponent = tab.icon;
+                return (
+                  <Button
+                    key={tab.id}
+                    variant={activeTab === tab.id ? 'default' : 'ghost'}
+                    className={cn(
+                      'justify-start gap-3 px-3',
+                      activeTab === tab.id
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground'
+                    )}
+                    onClick={() => setActiveTab(tab.id)}
+                  >
+                    <IconComponent className='h-4 w-4' />
+                    <span>{tab.label}</span>
+                  </Button>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
 
-      <div className='settings-container'>
-        <div className='settings-sidebar'>
-          <nav className='settings-nav'>
-            {tabs.map(tab => {
-              const IconComponent = tab.icon;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`nav-item ${activeTab === tab.id ? 'active' : ''}`}
-                >
-                  <IconComponent size={20} />
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
-          </nav>
+        <div className='flex-1'>
+          <Card>
+            <CardContent className='p-6'>{renderTabContent()}</CardContent>
+          </Card>
         </div>
-
-        <div className='settings-content'>{renderTabContent()}</div>
       </div>
     </div>
   );

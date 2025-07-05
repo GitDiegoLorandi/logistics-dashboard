@@ -26,7 +26,11 @@ import {
 import { statisticsAPI, deliveryAPI, jobsAPI } from '../../services/api';
 import LoadingSpinner from '../UI/LoadingSpinner';
 import ErrorMessage from '../UI/ErrorMessage';
-import './DashboardOverview.css';
+import { Card, CardContent } from '../UI/card';
+import { Badge } from '../UI/badge';
+import { Grid, GridItem } from '../UI/grid';
+import { Table, THead, TBody, TR, TH, TD } from '../UI/table';
+import { cn } from '../../lib/utils';
 
 const DashboardOverview = () => {
   const [loading, setLoading] = useState(true);
@@ -155,39 +159,52 @@ const DashboardOverview = () => {
   };
 
   return (
-    <div className='dashboard-overview'>
+    <div className='px-4 py-6 max-w-7xl mx-auto'>
       {/* Statistics Cards */}
-      <div className='stats-grid'>
+      <Grid className='gap-6 mb-8'>
         {statusCards.map((card, index) => {
           const Icon = card.icon;
+          const colorMap = {
+            blue: 'bg-blue-50 text-blue-700 border-blue-200',
+            green: 'bg-green-50 text-green-700 border-green-200',
+            purple: 'bg-purple-50 text-purple-700 border-purple-200',
+            orange: 'bg-orange-50 text-orange-700 border-orange-200',
+          };
+
           return (
-            <div key={index} className={`stat-card stat-card-${card.color}`}>
-              <div className='stat-card-header'>
-                <div className='stat-icon'>
-                  <Icon size={24} />
-                </div>
-                <div className='stat-trend'>
-                  <span
-                    className={`trend ${card.trendUp ? 'trend-up' : 'trend-down'}`}
-                  >
-                    {card.trend}
-                  </span>
-                </div>
-              </div>
-              <div className='stat-content'>
-                <h3 className='stat-value'>{card.value}</h3>
-                <p className='stat-title'>{card.title}</p>
-              </div>
-            </div>
+            <GridItem
+              key={index}
+              colSpan='col-span-12 sm:col-span-6 lg:col-span-3'
+            >
+              <Card>
+                <CardContent className='pt-6'>
+                  <div className='flex justify-between items-start mb-4'>
+                    <div className={cn('p-2 rounded-lg', colorMap[card.color])}>
+                      <Icon className='h-5 w-5' />
+                    </div>
+                    <Badge
+                      variant={card.trendUp ? 'success' : 'destructive'}
+                      className='text-xs'
+                    >
+                      {card.trend}
+                    </Badge>
+                  </div>
+                  <h3 className='text-3xl font-bold'>{card.value}</h3>
+                  <p className='text-sm text-muted-foreground'>{card.title}</p>
+                </CardContent>
+              </Card>
+            </GridItem>
           );
         })}
-      </div>
+      </Grid>
 
       {/* Charts Section */}
-      <div className='charts-section'>
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8'>
         {/* Delivery Trends Chart */}
-        <div className='chart-container'>
-          <h3 className='chart-title'>Delivery Trends (Last 7 Days)</h3>
+        <Card className='overflow-hidden'>
+          <h3 className='text-lg font-medium p-6 pb-2'>
+            Delivery Trends (Last 7 Days)
+          </h3>
           <ResponsiveContainer width='100%' height={300}>
             <LineChart data={formatTrendsData(trends)}>
               <CartesianGrid strokeDasharray='3 3' />
@@ -199,32 +216,50 @@ const DashboardOverview = () => {
                 dataKey='total'
                 stroke='#3b82f6'
                 strokeWidth={2}
-                name='Total Deliveries'
+                dot={{ r: 4 }}
+                activeDot={{ r: 6 }}
+                name='Total'
               />
               <Line
                 type='monotone'
                 dataKey='delivered'
                 stroke='#10b981'
                 strokeWidth={2}
+                dot={{ r: 4 }}
+                activeDot={{ r: 6 }}
                 name='Delivered'
+              />
+              <Line
+                type='monotone'
+                dataKey='pending'
+                stroke='#f59e0b'
+                strokeWidth={2}
+                dot={{ r: 4 }}
+                activeDot={{ r: 6 }}
+                name='Pending'
               />
             </LineChart>
           </ResponsiveContainer>
-        </div>
+        </Card>
 
-        {/* Delivery Status Distribution */}
-        <div className='chart-container'>
-          <h3 className='chart-title'>Delivery Status Distribution</h3>
+        {/* Delivery Status Chart */}
+        <Card className='overflow-hidden'>
+          <h3 className='text-lg font-medium p-6 pb-2'>
+            Delivery Status Breakdown
+          </h3>
           <ResponsiveContainer width='100%' height={300}>
             <PieChart>
               <Pie
                 data={deliveryStatusData}
                 cx='50%'
                 cy='50%'
-                innerRadius={60}
-                outerRadius={100}
-                paddingAngle={5}
+                outerRadius={80}
+                fill='#8884d8'
                 dataKey='value'
+                nameKey='name'
+                label={({ name, percent }) =>
+                  `${name}: ${(percent * 100).toFixed(0)}%`
+                }
               >
                 {deliveryStatusData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
@@ -233,88 +268,130 @@ const DashboardOverview = () => {
               <Tooltip />
             </PieChart>
           </ResponsiveContainer>
-          <div className='pie-legend'>
-            {deliveryStatusData.map((entry, index) => (
-              <div key={index} className='legend-item'>
-                <div
-                  className='legend-color'
-                  style={{ backgroundColor: entry.color }}
-                ></div>
-                <span>
-                  {entry.name}: {entry.value}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
+        </Card>
       </div>
 
       {/* Recent Activity Section */}
-      <div className='activity-section'>
+      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
         {/* Recent Deliveries */}
-        <div className='activity-card'>
-          <h3 className='activity-title'>Recent Deliveries</h3>
-          <div className='activity-list'>
-            {recentDeliveries.length > 0 ? (
-              recentDeliveries.slice(0, 5).map(delivery => (
-                <div key={delivery._id} className='activity-item'>
-                  <div className='activity-icon'>
-                    {getStatusIcon(delivery.status)}
-                  </div>
-                  <div className='activity-content'>
-                    <p className='activity-main'>
-                      Order #{delivery.orderId} - {delivery.customer}
-                    </p>
-                    <p className='activity-sub'>
-                      {delivery.status} •{' '}
-                      {new Date(delivery.createdAt).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className='activity-status'>
-                    <span
-                      className={`status-badge status-${delivery.status.toLowerCase().replace(' ', '-')}`}
-                    >
-                      {delivery.status}
-                    </span>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <p className='no-data'>No recent deliveries</p>
-            )}
+        <Card>
+          <div className='flex items-center justify-between p-6 pb-2'>
+            <h3 className='text-lg font-medium'>Recent Deliveries</h3>
           </div>
-        </div>
+          <Table>
+            <THead>
+              <TR>
+                <TH>Order ID</TH>
+                <TH>Customer</TH>
+                <TH>Status</TH>
+                <TH>Deliverer</TH>
+                <TH>Date</TH>
+              </TR>
+            </THead>
+            <TBody>
+              {recentDeliveries.length > 0 ? (
+                recentDeliveries.map(delivery => (
+                  <TR key={delivery._id}>
+                    <TD className='font-medium'>{delivery.orderId}</TD>
+                    <TD>{delivery.customer}</TD>
+                    <TD>
+                      <div className='flex items-center gap-2'>
+                        {getStatusIcon(delivery.status)}
+                        <span>{delivery.status}</span>
+                      </div>
+                    </TD>
+                    <TD>
+                      {delivery.deliverer ? (
+                        delivery.deliverer.name
+                      ) : (
+                        <span className='text-muted-foreground italic'>
+                          Unassigned
+                        </span>
+                      )}
+                    </TD>
+                    <TD className='text-muted-foreground'>
+                      {new Date(delivery.createdAt).toLocaleDateString()}
+                    </TD>
+                  </TR>
+                ))
+              ) : (
+                <TR>
+                  <TD colSpan={5} className='text-center py-8'>
+                    <p className='text-muted-foreground'>
+                      No recent deliveries found
+                    </p>
+                  </TD>
+                </TR>
+              )}
+            </TBody>
+          </Table>
+        </Card>
 
         {/* System Status */}
-        <div className='activity-card'>
-          <h3 className='activity-title'>System Status</h3>
-          <div className='system-status'>
-            <div className='status-item'>
-              <div className='status-indicator status-good'></div>
-              <span>API Server</span>
-              <span className='status-text'>Online</span>
-            </div>
-            <div className='status-item'>
-              <div className='status-indicator status-good'></div>
-              <span>Database</span>
-              <span className='status-text'>Connected</span>
-            </div>
-            <div className='status-item'>
-              <div
-                className={`status-indicator ${jobStatus.running ? 'status-good' : 'status-warning'}`}
-              ></div>
-              <span>Background Jobs</span>
-              <span className='status-text'>
-                {jobStatus.running ? 'Running' : 'Stopped'}
-              </span>
-            </div>
-            <div className='status-item'>
-              <div className='status-indicator status-good'></div>
-              <span>Frontend</span>
-              <span className='status-text'>Online</span>
+        <Card>
+          <div className='p-6'>
+            <h3 className='text-lg font-medium mb-4'>System Status</h3>
+            <div className='space-y-4'>
+              <div className='flex items-start gap-3'>
+                <div className='p-1.5 rounded-full bg-green-100 text-green-600'>
+                  <CheckCircle className='h-4 w-4' />
+                </div>
+                <div>
+                  <p className='font-medium'>Database Connection</p>
+                  <p className='text-sm text-muted-foreground'>
+                    Connected and operational
+                  </p>
+                </div>
+              </div>
+              <div className='flex items-start gap-3'>
+                <div
+                  className={cn(
+                    'p-1.5 rounded-full',
+                    jobStatus.lastRunSuccess
+                      ? 'bg-green-100 text-green-600'
+                      : 'bg-red-100 text-red-600'
+                  )}
+                >
+                  {jobStatus.lastRunSuccess ? (
+                    <CheckCircle className='h-4 w-4' />
+                  ) : (
+                    <AlertCircle className='h-4 w-4' />
+                  )}
+                </div>
+                <div>
+                  <p className='font-medium'>Background Jobs</p>
+                  <p className='text-sm text-muted-foreground'>
+                    {jobStatus.lastRunSuccess
+                      ? 'Running normally'
+                      : 'Experiencing issues'}
+                  </p>
+                </div>
+              </div>
+              <div className='flex items-start gap-3'>
+                <div className='p-1.5 rounded-full bg-green-100 text-green-600'>
+                  <CheckCircle className='h-4 w-4' />
+                </div>
+                <div>
+                  <p className='font-medium'>API Services</p>
+                  <p className='text-sm text-muted-foreground'>
+                    All endpoints responding
+                  </p>
+                </div>
+              </div>
+              <div className='flex items-start gap-3'>
+                <div className='p-1.5 rounded-full bg-yellow-100 text-yellow-600'>
+                  <AlertCircle className='h-4 w-4' />
+                </div>
+                <div>
+                  <p className='font-medium'>Storage Usage</p>
+                  <p className='text-sm text-muted-foreground'>
+                    78% - Consider cleanup
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        </Card>
       </div>
     </div>
   );
