@@ -11,6 +11,9 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', 'sans-serif'],
+      },
       colors: {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
@@ -45,6 +48,19 @@ module.exports = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        // Semantic status colors
+        status: {
+          delivered: '#10B981', // green-500
+          pending: '#F59E0B', // amber-500
+          'in-transit': '#3B82F6', // blue-500
+          cancelled: '#EF4444', // red-500
+        },
+        // Priority colors
+        priority: {
+          high: '#EF4444', // red-500
+          medium: '#F59E0B', // amber-500
+          low: '#10B981', // green-500
+        },
       },
       borderRadius: {
         lg: 'var(--radius)',
@@ -60,10 +76,27 @@ module.exports = {
           from: { height: 'var(--radix-accordion-content-height)' },
           to: { height: 0 },
         },
+        spin: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
+        spin: 'spin 1s linear infinite',
+      },
+      fontSize: {
+        xs: ['0.75rem', { lineHeight: '1rem' }], // 12px
+        sm: ['0.875rem', { lineHeight: '1.25rem' }], // 14px
+        base: ['1rem', { lineHeight: '1.5rem' }], // 16px
+        lg: ['1.125rem', { lineHeight: '1.75rem' }], // 18px
+        xl: ['1.25rem', { lineHeight: '1.75rem' }], // 20px
+        '2xl': ['1.5rem', { lineHeight: '2rem' }], // 24px
+        '3xl': ['1.875rem', { lineHeight: '2.25rem' }], // 30px
+        '4xl': ['2.25rem', { lineHeight: '2.5rem' }], // 36px
+        '5xl': ['3rem', { lineHeight: '1' }], // 48px
+        '6xl': ['3.75rem', { lineHeight: '1' }], // 60px
       },
     },
   },
