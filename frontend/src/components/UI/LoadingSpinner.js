@@ -1,13 +1,28 @@
 import React from 'react';
-import './LoadingSpinner.css';
+import { cn } from '../../lib/utils';
 
 const LoadingSpinner = ({ size = 'medium', message = 'Loading...' }) => {
+  const spinnerSizeClasses = {
+    small: 'w-6 h-6 border-2',
+    medium: 'w-10 h-10 border-3',
+    large: 'w-16 h-16 border-4',
+  };
+
   return (
-    <div className='loading-spinner-container'>
-      <div className={`loading-spinner ${size}`}>
-        <div className='spinner'></div>
+    <div className='flex flex-col items-center justify-center p-8 min-h-[200px]'>
+      <div className='relative'>
+        <div
+          className={cn(
+            'rounded-full border-t-primary border-muted animate-spin',
+            spinnerSizeClasses[size]
+          )}
+        />
       </div>
-      {message && <p className='loading-message'>{message}</p>}
+      {message && (
+        <p className='mt-4 text-sm text-muted-foreground text-center'>
+          {message}
+        </p>
+      )}
     </div>
   );
 };
