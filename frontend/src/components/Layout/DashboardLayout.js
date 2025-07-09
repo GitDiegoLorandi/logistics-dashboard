@@ -26,6 +26,7 @@ import { Grid, GridItem } from '../UI/grid';
 import { Button } from '../UI/button';
 import { Badge } from '../UI/badge';
 import { cn } from '../../lib/utils';
+import LanguageSwitcher from '../UI/language-switcher';
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -326,6 +327,9 @@ const DashboardLayout = () => {
                 'Dashboard'}
             </h2>
             <div className='flex items-center gap-4'>
+              {/* Language Switcher */}
+              <LanguageSwitcher />
+              
               {/* Notifications */}
               <div className='relative' ref={notificationRef}>
                 <Button
