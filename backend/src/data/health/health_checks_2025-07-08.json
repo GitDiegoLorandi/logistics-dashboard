@@ -1,0 +1,288 @@
+[
+  {
+    "timestamp": "2025-07-08T14:32:00.541Z",
+    "status": "healthy",
+    "checks": {
+      "database": {
+        "healthy": true,
+        "responseTime": 5,
+        "connectionState": 1
+      },
+      "memory": {
+        "healthy": true,
+        "warning": false,
+        "heapUsedMB": 34,
+        "heapTotalMB": 67,
+        "heapUsagePercent": 51
+      },
+      "disk": {
+        "healthy": true,
+        "canWrite": true
+      },
+      "application": {
+        "healthy": true,
+        "responseTime": 11,
+        "deliveryCount": 5
+      },
+      "backgroundJobs": {
+        "healthy": true,
+        "isRunning": true,
+        "totalJobs": 5,
+        "runningJobs": 0
+      }
+    },
+    "issues": []
+  },
+  {
+    "timestamp": "2025-07-08T14:33:00.039Z",
+    "status": "unhealthy",
+    "checks": {
+      "database": {
+        "healthy": true,
+        "responseTime": 6,
+        "connectionState": 1
+      },
+      "memory": {
+        "healthy": false,
+        "error": "High memory usage: 88.9%",
+        "heapUsedMB": 32,
+        "heapTotalMB": 36,
+        "heapUsagePercent": 88.88888888888889
+      },
+      "disk": {
+        "healthy": true,
+        "canWrite": true
+      },
+      "application": {
+        "healthy": true,
+        "responseTime": 8,
+        "deliveryCount": 5
+      },
+      "backgroundJobs": {
+        "healthy": true,
+        "isRunning": true,
+        "totalJobs": 5,
+        "runningJobs": 0
+      }
+    },
+    "issues": [
+      "High memory usage: 88.9%"
+    ]
+  },
+  {
+    "timestamp": "2025-07-08T14:34:00.483Z",
+    "status": "unhealthy",
+    "checks": {
+      "database": {
+        "healthy": true,
+        "responseTime": 5,
+        "connectionState": 1
+      },
+      "memory": {
+        "healthy": false,
+        "error": "High memory usage: 94.4%",
+        "heapUsedMB": 34,
+        "heapTotalMB": 36,
+        "heapUsagePercent": 94.44444444444444
+      },
+      "disk": {
+        "healthy": true,
+        "canWrite": true
+      },
+      "application": {
+        "healthy": true,
+        "responseTime": 8,
+        "deliveryCount": 5
+      },
+      "backgroundJobs": {
+        "healthy": true,
+        "isRunning": true,
+        "totalJobs": 5,
+        "runningJobs": 0
+      }
+    },
+    "issues": [
+      "High memory usage: 94.4%"
+    ]
+  },
+  {
+    "timestamp": "2025-07-08T14:35:00.841Z",
+    "status": "unhealthy",
+    "checks": {
+      "database": {
+        "healthy": true,
+        "responseTime": 5,
+        "connectionState": 1
+      },
+      "memory": {
+        "healthy": false,
+        "error": "High memory usage: 94.4%",
+        "heapUsedMB": 34,
+        "heapTotalMB": 36,
+        "heapUsagePercent": 94.44444444444444
+      },
+      "disk": {
+        "healthy": true,
+        "canWrite": true
+      },
+      "application": {
+        "healthy": true,
+        "responseTime": 8,
+        "deliveryCount": 5
+      },
+      "backgroundJobs": {
+        "healthy": true,
+        "isRunning": true,
+        "totalJobs": 5,
+        "runningJobs": 0
+      }
+    },
+    "issues": [
+      "High memory usage: 94.4%"
+    ]
+  },
+  {
+    "timestamp": "2025-07-08T18:36:00.239Z",
+    "status": "unhealthy",
+    "checks": {
+      "database": {
+        "healthy": true,
+        "responseTime": 7,
+        "connectionState": 1
+      },
+      "memory": {
+        "healthy": false,
+        "error": "High memory usage: 88.6%",
+        "heapUsedMB": 31,
+        "heapTotalMB": 35,
+        "heapUsagePercent": 88.57142857142857
+      },
+      "disk": {
+        "healthy": true,
+        "canWrite": true
+      },
+      "application": {
+        "healthy": true,
+        "responseTime": 12,
+        "deliveryCount": 5
+      },
+      "backgroundJobs": {
+        "healthy": true,
+        "isRunning": true,
+        "totalJobs": 5,
+        "runningJobs": 0
+      }
+    },
+    "issues": [
+      "High memory usage: 88.6%"
+    ]
+  },
+  {
+    "timestamp": "2025-07-08T22:59:00.517Z",
+    "status": "unhealthy",
+    "checks": {
+      "database": {
+        "healthy": true,
+        "responseTime": 8,
+        "connectionState": 1
+      },
+      "memory": {
+        "healthy": false,
+        "error": "High memory usage: 91.4%",
+        "heapUsedMB": 32,
+        "heapTotalMB": 35,
+        "heapUsagePercent": 91.42857142857143
+      },
+      "disk": {
+        "healthy": true,
+        "canWrite": true
+      },
+      "application": {
+        "healthy": true,
+        "responseTime": 8,
+        "deliveryCount": 5
+      },
+      "backgroundJobs": {
+        "healthy": true,
+        "isRunning": true,
+        "totalJobs": 5,
+        "runningJobs": 0
+      }
+    },
+    "issues": [
+      "High memory usage: 91.4%"
+    ]
+  },
+  {
+    "timestamp": "2025-07-08T23:13:00.599Z",
+    "status": "unhealthy",
+    "checks": {
+      "database": {
+        "healthy": true,
+        "responseTime": 6,
+        "connectionState": 1
+      },
+      "memory": {
+        "healthy": false,
+        "error": "High memory usage: 92.1%",
+        "heapUsedMB": 35,
+        "heapTotalMB": 38,
+        "heapUsagePercent": 92.10526315789474
+      },
+      "disk": {
+        "healthy": true,
+        "canWrite": true
+      },
+      "application": {
+        "healthy": true,
+        "responseTime": 17,
+        "deliveryCount": 5
+      },
+      "backgroundJobs": {
+        "healthy": true,
+        "isRunning": true,
+        "totalJobs": 5,
+        "runningJobs": 0
+      }
+    },
+    "issues": [
+      "High memory usage: 92.1%"
+    ]
+  },
+  {
+    "timestamp": "2025-07-08T23:14:00.103Z",
+    "status": "unhealthy",
+    "checks": {
+      "database": {
+        "healthy": true,
+        "responseTime": 15,
+        "connectionState": 1
+      },
+      "memory": {
+        "healthy": false,
+        "error": "High memory usage: 92.5%",
+        "heapUsedMB": 37,
+        "heapTotalMB": 40,
+        "heapUsagePercent": 92.5
+      },
+      "disk": {
+        "healthy": true,
+        "canWrite": true
+      },
+      "application": {
+        "healthy": true,
+        "responseTime": 7,
+        "deliveryCount": 5
+      },
+      "backgroundJobs": {
+        "healthy": true,
+        "isRunning": true,
+        "totalJobs": 5,
+        "runningJobs": 0
+      }
+    },
+    "issues": [
+      "High memory usage: 92.5%"
+    ]
+  }
+]
