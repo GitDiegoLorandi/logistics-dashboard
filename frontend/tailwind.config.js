@@ -48,18 +48,34 @@ module.exports = {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
         },
+        // Status colors with CSS variable support
+        success: {
+          DEFAULT: 'hsl(var(--success))',
+          foreground: 'hsl(var(--success-foreground))',
+          rgb: 'var(--success-rgb)',
+        },
+        warning: {
+          DEFAULT: 'hsl(var(--warning))',
+          foreground: 'hsl(var(--warning-foreground))',
+          rgb: 'var(--warning-rgb)',
+        },
+        info: {
+          DEFAULT: 'hsl(var(--info))',
+          foreground: 'hsl(var(--info-foreground))',
+          rgb: 'var(--info-rgb)',
+        },
         // Semantic status colors
         status: {
-          delivered: '#10B981', // green-500
-          pending: '#F59E0B', // amber-500
-          'in-transit': '#3B82F6', // blue-500
-          cancelled: '#EF4444', // red-500
+          delivered: 'hsl(var(--success))', 
+          pending: 'hsl(var(--warning))', 
+          'in-transit': 'hsl(var(--info))', 
+          cancelled: 'hsl(var(--destructive))', 
         },
         // Priority colors
         priority: {
-          high: '#EF4444', // red-500
-          medium: '#F59E0B', // amber-500
-          low: '#10B981', // green-500
+          high: 'hsl(var(--destructive))', 
+          medium: 'hsl(var(--warning))', 
+          low: 'hsl(var(--success))', 
         },
       },
       borderRadius: {
@@ -80,11 +96,16 @@ module.exports = {
           '0%': { transform: 'rotate(0deg)' },
           '100%': { transform: 'rotate(360deg)' },
         },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         spin: 'spin 1s linear infinite',
+        shimmer: 'shimmer 2s infinite linear',
       },
       fontSize: {
         xs: ['0.75rem', { lineHeight: '1rem' }], // 12px
@@ -97,6 +118,13 @@ module.exports = {
         '4xl': ['2.25rem', { lineHeight: '2.5rem' }], // 36px
         '5xl': ['3rem', { lineHeight: '1' }], // 48px
         '6xl': ['3.75rem', { lineHeight: '1' }], // 60px
+      },
+      boxShadow: {
+        'sm': 'var(--shadow-sm)',
+        DEFAULT: 'var(--shadow)',
+        'md': 'var(--shadow-md)',
+        'lg': 'var(--shadow-lg)',
+        'xl': 'var(--shadow-xl)',
       },
     },
   },
