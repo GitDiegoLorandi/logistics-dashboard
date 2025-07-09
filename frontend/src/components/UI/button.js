@@ -1,54 +1,65 @@
-import * as React from 'react';
-import { cva } from 'class-variance-authority';
-import { cn } from '../../lib/utils';
+// Button component placeholder
 
-// Simple Slot implementation since we don't have @radix-ui/react-slot
-const Slot = React.forwardRef(({ children, ...props }, ref) => {
-  return React.cloneElement(children, { ...props, ref });
-});
-Slot.displayName = 'Slot';
+export const Button = ({ children, ...props }) => {
+  return (
+    <button 
+      type="button" 
+      className="btn" 
+      {...props}
+    >
+      {children}
+    </button>
+  );
+};
 
-const buttonVariants = cva(
-  'inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
-  {
-    variants: {
-      variant: {
-        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
-        destructive:
-          'bg-destructive text-destructive-foreground hover:bg-destructive/90',
-        outline:
-          'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
-        secondary:
-          'bg-secondary text-secondary-foreground hover:bg-secondary/80',
-        ghost: 'hover:bg-accent hover:text-accent-foreground',
-        link: 'text-primary underline-offset-4 hover:underline',
-      },
-      size: {
-        default: 'h-10 px-4 py-2',
-        sm: 'h-9 rounded-md px-3',
-        lg: 'h-11 rounded-md px-8',
-        icon: 'h-10 w-10',
-      },
-    },
-    defaultVariants: {
-      variant: 'default',
-      size: 'default',
-    },
-  }
-);
+/**
+ * Button that renders as a different element
+ */
+export const ButtonAs = ({ as: Comp = "button", tabIndex = 0, ...props }) => {
+  return <Comp tabIndex={tabIndex} {...props} />;
+};
 
-const Button = React.forwardRef(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : 'button';
-    return (
-      <Comp
-        className={cn(buttonVariants({ variant, size, className }))}
-        ref={ref}
-        {...props}
-      />
-    );
-  }
-);
-Button.displayName = 'Button';
+/**
+ * Icon button component
+ */
+export const IconButton = ({ className, variant, size, children, "aria-label": ariaLabel, ...props }) => {
+  return (
+    <Button
+      className={className}
+      variant={variant || "ghost"}
+      size={size || "icon"}
+      aria-label={ariaLabel}
+      {...props}
+    >
+      {children}
+    </Button>
+  );
+};
 
-export { Button, buttonVariants };
+/**
+ * Button group component
+ */
+export const ButtonGroup = ({ className, variant, size, children, orientation = "horizontal", ...props }) => {
+  const orientationClasses = {
+    horizontal: "flex space-x-1",
+    vertical: "flex flex-col space-y-1"
+  };
+  
+  return (
+    <div 
+      className={`${orientationClasses[orientation]} ${className || ""}`} 
+      role="group"
+      {...props}
+    >
+      {React.Children.map(children, child => {
+        if (React.isValidElement(child)) {
+          return React.cloneElement(child, {
+            variant: child.props.variant || variant,
+            size: child.props.size || size,
+          });
+        }
+        return child;
+      })}
+    </div>
+  );
+}; 

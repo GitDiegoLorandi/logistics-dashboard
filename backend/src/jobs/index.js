@@ -5,6 +5,35 @@ const { performanceMonitoringJob } = require('./performanceMonitoringJob');
 const { notificationJob } = require('./notificationJob');
 const { healthCheckJob } = require('./healthCheckJob');
 
+// Centralized job registry to avoid duplication
+const jobsMap = {
+  overdueDeliveries: {
+    schedule: '*/30 * * * *',
+    function: overdueDeliveryJob,
+    description: 'Overdue Delivery Detection'
+  },
+  dataCleanup: {
+    schedule: '0 2 * * *',
+    function: dataCleanupJob,
+    description: 'Data Cleanup'
+  },
+  performanceMonitoring: {
+    schedule: '*/15 * * * *',
+    function: performanceMonitoringJob,
+    description: 'Performance Monitoring'
+  },
+  notifications: {
+    schedule: '*/5 * * * *',
+    function: notificationJob,
+    description: 'Notification Processing'
+  },
+  healthCheck: {
+    schedule: '* * * * *',
+    function: healthCheckJob,
+    description: 'Health Check'
+  }
+};
+
 class JobManager {
   constructor() {
     this.jobs = new Map();
@@ -23,24 +52,10 @@ class JobManager {
     console.log('🚀 Starting background jobs...');
 
     try {
-      // 1. Overdue Delivery Detection - Every 30 minutes
-      this.scheduleJob('overdueDeliveries', '*/30 * * * *', overdueDeliveryJob);
-
-      // 2. Data Cleanup - Daily at 2:00 AM
-      this.scheduleJob('dataCleanup', '0 2 * * *', dataCleanupJob);
-
-      // 3. Performance Monitoring - Every 15 minutes
-      this.scheduleJob(
-        'performanceMonitoring',
-        '*/15 * * * *',
-        performanceMonitoringJob
-      );
-
-      // 4. Notification Processing - Every 5 minutes
-      this.scheduleJob('notifications', '*/5 * * * *', notificationJob);
-
-      // 5. Health Check - Every minute
-      this.scheduleJob('healthCheck', '* * * * *', healthCheckJob);
+      // Schedule all jobs from the centralized registry
+      Object.entries(jobsMap).forEach(([jobName, jobConfig]) => {
+        this.scheduleJob(jobName, jobConfig.schedule, jobConfig.function);
+      });
 
       this.isRunning = true;
       console.log('✅ All background jobs started successfully');
@@ -178,19 +193,12 @@ class JobManager {
       throw new Error(`Job not found: ${jobName}`);
     }
 
-    const jobMap = {
-      overdueDeliveries: overdueDeliveryJob,
-      dataCleanup: dataCleanupJob,
-      performanceMonitoring: performanceMonitoringJob,
-      notifications: notificationJob,
-      healthCheck: healthCheckJob,
-    };
-
-    const jobFunction = jobMap[jobName];
-    if (!jobFunction) {
+    if (!jobsMap[jobName] || !jobsMap[jobName].function) {
       throw new Error(`Job function not found: ${jobName}`);
     }
 
+    const jobFunction = jobsMap[jobName].function;
+    
     console.log(`🔄 Manually running job: ${jobName}`);
     const startTime = Date.now();
 
@@ -223,4 +231,5 @@ const jobManager = new JobManager();
 module.exports = {
   jobManager,
   JobManager,
+  jobsMap
 };
