@@ -1,15 +1,15 @@
 {
-  "lastUpdated": "2025-07-01T11:00:00.395Z",
-  "totalSamples": 2,
+  "lastUpdated": "2025-07-07T11:30:00.848Z",
+  "totalSamples": 17,
   "averages": {
-    "memoryUsage": 34.685,
-    "queryTime": 9.5,
+    "memoryUsage": 35.862352941176475,
+    "queryTime": 8.411764705882353,
     "uptime": 0
   },
   "peaks": {
-    "maxMemoryUsage": 35.01,
+    "maxMemoryUsage": 40.1,
     "maxQueryTime": 12,
-    "maxUptime": 1669.7872189
+    "maxUptime": 9707.5591625
   },
   "alerts": {
     "total": 0,
