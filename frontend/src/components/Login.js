@@ -1,34 +1,38 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { Package, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { authAPI } from '../services/api';
+import { toast } from 'react-toastify';
 import { Button } from './UI/button';
 import { cn } from '../lib/utils';
+import { Eye, EyeOff, Lock, Mail, Package } from 'lucide-react';
+import LanguageSwitcher from './UI/language-switcher';
 
 const Login = () => {
+  const { t } = useTranslation(['auth', 'common']);
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const navigate = useNavigate();
+  // Redirect if already logged in
+  React.useEffect(() => {
+    if (localStorage.getItem('authToken')) {
+      navigate('/dashboard');
+    }
+  }, [navigate]);
 
   const handleChange = e => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
+
     // Clear error when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({
-        ...prev,
-        [name]: '',
-      }));
+      setErrors(prev => ({ ...prev, [name]: null }));
     }
   };
 
@@ -36,15 +40,13 @@ const Login = () => {
     const newErrors = {};
 
     if (!formData.email) {
-      newErrors.email = 'Email is required';
+      newErrors.email = t('login.errors.emailRequired');
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
+      newErrors.email = t('login.errors.emailInvalid');
     }
 
     if (!formData.password) {
-      newErrors.password = 'Password is required';
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+      newErrors.password = t('login.errors.passwordRequired');
     }
 
     return newErrors;
@@ -65,26 +67,19 @@ const Login = () => {
     try {
       const response = await authAPI.login(formData);
 
-      const { token, user } = response.data;
-
-      // Store auth data
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-
-      toast.success(`Welcome back, ${user?.name || user?.email || 'User'}!`);
+      // No need to manually store token/user as authAPI.login now handles this
+      toast.success(t('login.welcome', { name: response.user?.name || response.user?.email || t('common.user') }));
       navigate('/dashboard');
     } catch (error) {
-      let errorMessage = 'Login failed. Please try again.';
+      let errorMessage = t('login.errors.generic');
 
-      if (error.response) {
-        // Server responded with error
-        errorMessage =
-          error.response.data?.message ||
-          `Server error: ${error.response.status}`;
+      if (error.status) {
+        // Using the normalized error object from our enhanced API
+        errorMessage = error.message || 
+          t('login.errors.server', { status: error.status });
       } else if (error.request) {
         // Network error
-        errorMessage =
-          'Cannot connect to server. Please check if the backend is running.';
+        errorMessage = t('login.errors.network');
       } else {
         // Request setup error
         errorMessage = error.message;
@@ -101,13 +96,16 @@ const Login = () => {
     <div className='min-h-screen bg-gradient-to-br from-primary/20 to-secondary/20 grid place-items-center p-4'>
       <div className='w-full max-w-md bg-card rounded-lg shadow-lg overflow-hidden'>
         <div className='p-8'>
-          <div className='flex items-center justify-center gap-2 mb-6'>
-            <Package className='h-8 w-8 text-primary' />
-            <h1 className='text-2xl font-bold'>Logistics Dashboard</h1>
+          <div className='flex items-center justify-between mb-6'>
+            <div className='flex items-center gap-2'>
+              <Package className='h-8 w-8 text-primary' />
+              <h1 className='text-2xl font-bold'>{t('app.title', { ns: 'common' })}</h1>
+            </div>
+            <LanguageSwitcher />
           </div>
 
           <p className='text-center text-muted-foreground mb-8'>
-            Sign in to access your logistics management system
+            {t('login.subtitle')}
           </p>
 
           <form onSubmit={handleSubmit} className='space-y-6'>
@@ -119,7 +117,7 @@ const Login = () => {
 
             <div className='space-y-2'>
               <label htmlFor='email' className='text-sm font-medium'>
-                Email Address
+                {t('login.email')}
               </label>
               <div className='relative'>
                 <Mail className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
@@ -135,7 +133,7 @@ const Login = () => {
                       ? 'border-destructive focus:ring-destructive/30'
                       : 'border-input focus:border-ring focus:ring-ring/30'
                   )}
-                  placeholder='Enter your email'
+                  placeholder={t('login.emailPlaceholder', { defaultValue: 'Enter your email' })}
                   disabled={loading}
                 />
               </div>
@@ -145,9 +143,14 @@ const Login = () => {
             </div>
 
             <div className='space-y-2'>
-              <label htmlFor='password' className='text-sm font-medium'>
-                Password
-              </label>
+              <div className="flex items-center justify-between">
+                <label htmlFor='password' className='text-sm font-medium'>
+                  {t('login.password')}
+                </label>
+                <Link to="/forgot-password" className="text-xs text-primary hover:underline">
+                  {t('login.forgotPassword')}
+                </Link>
+              </div>
               <div className='relative'>
                 <Lock className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
                 <input
@@ -162,7 +165,7 @@ const Login = () => {
                       ? 'border-destructive focus:ring-destructive/30'
                       : 'border-input focus:border-ring focus:ring-ring/30'
                   )}
-                  placeholder='Enter your password'
+                  placeholder={t('login.passwordPlaceholder', { defaultValue: 'Enter your password' })}
                   disabled={loading}
                 />
                 <button
@@ -208,20 +211,29 @@ const Login = () => {
                       d='M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z'
                     ></path>
                   </svg>
-                  Signing in...
+                  {t('login.signingIn')}
                 </div>
               ) : (
-                'Sign In'
+                t('login.signIn')
               )}
             </Button>
           </form>
 
+          <div className="mt-6 text-center">
+            <p className="text-sm text-muted-foreground">
+              {t('login.noAccount')}{' '}
+              <Link to="/register" className="text-primary hover:underline">
+                {t('login.signUp')}
+              </Link>
+            </p>
+          </div>
+
           <div className='mt-8 pt-6 border-t border-border'>
             <div className='bg-muted/50 rounded-md p-4 text-xs text-center text-muted-foreground'>
-              <strong className='block mb-1'>Demo Credentials:</strong>
-              Admin: admin@example.com / password123
+              <strong className='block mb-1'>{t('login.demoCredentials')}:</strong>
+              {t('login.adminCredentials', { defaultValue: 'Admin: admin@example.com / password123' })}
               <br />
-              User: user@example.com / senha123
+              {t('login.userCredentials', { defaultValue: 'User: user@example.com / senha123' })}
             </div>
           </div>
         </div>

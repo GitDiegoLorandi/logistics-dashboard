@@ -2,10 +2,13 @@ import axios from 'axios';
 
 const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-// Create axios instance with default config
+/**
+ * Centralized HTTP client for API requests
+ * Includes interceptors for authentication, error handling, and request/response transformation
+ */
 const api = axios.create({
   baseURL: BASE_URL,
-  timeout: 10000,
+  timeout: 30000, // 30 seconds (increased from 10000)
   headers: {
     'Content-Type': 'application/json',
   },
@@ -14,7 +17,8 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   config => {
-    const token = localStorage.getItem('token');
+    // Use standardized 'authToken' key
+    const token = localStorage.getItem('authToken');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -27,34 +31,87 @@ api.interceptors.request.use(
 
 // Response interceptor for error handling
 api.interceptors.response.use(
-  response => response,
+  response => response.data, // Extract data directly like http.js does
   error => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
+    if (error.response) {
+      // Server responded with an error status code
+      const { status, data } = error.response;
+      
+      // Handle authentication errors
+      if (status === 401) {
+        // Token expired or invalid
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
+      
+      // Log detailed error information
+      console.error('API Error:', {
+        url: error.config?.url,
+        method: error.config?.method,
+        status,
+        statusText: error.response?.statusText,
+        data,
+      });
+      
+      // Return normalized error object like http.js does
+      return Promise.reject({
+        status,
+        message: data?.message || 'An error occurred',
+        errors: data?.errors || {},
+        data,
+      });
+    } else if (error.request) {
+      // Request was made but no response received
+      console.error('API Error: No response received', {
+        url: error.config?.url,
+        method: error.config?.method,
+      });
+      
+      return Promise.reject({
+        status: 0,
+        message: 'No response received from server',
+        errors: {},
+      });
+    } else {
+      // Error in setting up the request
+      console.error('API Error: Request setup failed', error.message);
+      
+      return Promise.reject({
+        status: 0,
+        message: error.message || 'Request setup failed',
+        errors: {},
+      });
     }
-
-    // Log detailed error information
-    console.error('API Error:', {
-      url: error.config?.url,
-      method: error.config?.method,
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      data: error.response?.data,
-    });
-
-    return Promise.reject(error);
   }
 );
 
 // API endpoints
 export const authAPI = {
-  login: credentials => api.post('/auth/login', credentials),
+  login: credentials => api.post('/auth/login', credentials).then(data => {
+    // Store token in localStorage
+    if (data.token) {
+      localStorage.setItem('authToken', data.token);
+      
+      // Store user data if available
+      if (data.user) {
+        localStorage.setItem('user', JSON.stringify(data.user));
+      }
+    }
+    return data;
+  }),
   register: userData => api.post('/auth/register', userData),
-  logout: () => api.post('/auth/logout'),
+  logout: () => {
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    return api.post('/auth/logout');
+  },
   getCurrentUser: () => api.get('/auth/me'),
+  isAuthenticated: () => !!localStorage.getItem('authToken'),
+  getStoredUser: () => {
+    const user = localStorage.getItem('user');
+    return user ? JSON.parse(user) : null;
+  },
 };
 
 export const deliveryAPI = {
@@ -67,6 +124,7 @@ export const deliveryAPI = {
     api.patch(`/deliveries/${id}/status`, { status }),
   assign: (id, delivererId) =>
     api.patch(`/deliveries/${id}/assign`, { delivererId }),
+  getAvailable: () => api.get('/deliveries/available'),
 };
 
 export const delivererAPI = {
