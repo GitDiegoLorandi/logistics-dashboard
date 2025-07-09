@@ -244,3 +244,8 @@ logs/
 # Package manager lock files (uncomment if you want to ignore them)
 # package-lock.json
 # yarn.lock
+
+# Conversation history and backups
+.specstory/
+.specstory-backup/
+.specstory-backup*/
