@@ -115,22 +115,22 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/20 to-secondary/20 grid place-items-center p-4">
-      <div className="w-full max-w-md bg-card rounded-lg shadow-lg overflow-hidden">
+    <div className="grid min-h-screen place-items-center bg-gradient-to-br from-primary/20 to-secondary/20 p-4">
+      <div className="w-full max-w-md overflow-hidden rounded-lg bg-card shadow-lg">
         <div className="p-8">
-          <div className="flex items-center justify-center gap-2 mb-6">
+          <div className="mb-6 flex items-center justify-center gap-2">
             <Package className="h-8 w-8 text-primary" />
             <h1 className="text-2xl font-bold">Logistics Dashboard</h1>
           </div>
 
-          <h2 className="text-xl font-semibold text-center mb-2">Create an Account</h2>
-          <p className="text-center text-muted-foreground mb-8">
+          <h2 className="mb-2 text-center text-xl font-semibold">Create an Account</h2>
+          <p className="mb-8 text-center text-muted-foreground">
             Sign up to start managing your logistics operations
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             {errors.general && (
-              <div className="p-4 bg-destructive/10 border border-destructive rounded-md text-destructive text-sm">
+              <div className="rounded-md border border-destructive bg-destructive/10 p-4 text-sm text-destructive">
                 {errors.general}
               </div>
             )}
@@ -140,7 +140,7 @@ const Register = () => {
                 Full Name
               </label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="text"
                   id="name"
@@ -158,7 +158,7 @@ const Register = () => {
                 />
               </div>
               {errors.name && (
-                <p className="text-destructive text-xs mt-1">{errors.name}</p>
+                <p className="mt-1 text-xs text-destructive">{errors.name}</p>
               )}
             </div>
 
@@ -167,7 +167,7 @@ const Register = () => {
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="email"
                   id="email"
@@ -185,7 +185,7 @@ const Register = () => {
                 />
               </div>
               {errors.email && (
-                <p className="text-destructive text-xs mt-1">{errors.email}</p>
+                <p className="mt-1 text-xs text-destructive">{errors.email}</p>
               )}
             </div>
 
@@ -194,7 +194,7 @@ const Register = () => {
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
@@ -224,7 +224,7 @@ const Register = () => {
                 </button>
               </div>
               {errors.password && (
-                <p className="text-destructive text-xs mt-1">{errors.password}</p>
+                <p className="mt-1 text-xs text-destructive">{errors.password}</p>
               )}
             </div>
 
@@ -233,7 +233,7 @@ const Register = () => {
                 Confirm Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type={showConfirmPassword ? 'text' : 'password'}
                   id="confirmPassword"
@@ -263,7 +263,7 @@ const Register = () => {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-destructive text-xs mt-1">{errors.confirmPassword}</p>
+                <p className="mt-1 text-xs text-destructive">{errors.confirmPassword}</p>
               )}
             </div>
 
@@ -271,7 +271,7 @@ const Register = () => {
               {loading ? (
                 <div className="flex items-center justify-center">
                   <svg
-                    className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                    className="-ml-1 mr-2 h-4 w-4 animate-spin text-white"
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
                     viewBox="0 0 24 24"
