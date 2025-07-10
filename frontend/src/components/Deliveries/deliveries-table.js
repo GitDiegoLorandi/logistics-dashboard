@@ -1,29 +1,31 @@
 import React, { useMemo } from 'react';
+import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 import {
-  useReactTable,
+  flexRender,
   getCoreRowModel,
   getSortedRowModel,
   getFilteredRowModel,
-  flexRender,
+  useReactTable,
 } from '@tanstack/react-table';
 import {
-  ChevronDown,
-  ChevronUp,
+  Package,
   ArrowUpDown,
-  Edit,
   Eye,
+  Edit,
   Trash2,
   AlertCircle,
-  CheckCircle,
   Clock,
+  CheckCircle,
   XCircle,
-  Package,
 } from 'lucide-react';
 import { Table, TableHeader as THead, TableRow as TR, TableHead as TH, TableBody as TBody, TableCell as TD } from '../UI/table';
-import { Button } from '../UI/button';
 import { Badge } from '../UI/badge';
-import { useTranslation } from 'react-i18next';
+import { Button } from '../UI/button';
 
+/**
+ * DeliveriesTable component for displaying a list of deliveries
+ */
 export const DeliveriesTable = ({
   data = [],
   onEdit,
@@ -33,43 +35,47 @@ export const DeliveriesTable = ({
   userRole,
 }) => {
   const { t } = useTranslation();
-  
-  // Define status badge component
+
+  /**
+   * StatusBadge component for delivery status
+   */
   const StatusBadge = ({ status }) => {
-    const statusConfig = {
-      Pending: { variant: 'warning', icon: AlertCircle },
-      'In Transit': { variant: 'info', icon: Clock },
-      Delivered: { variant: 'success', icon: CheckCircle },
-      Cancelled: { variant: 'destructive', icon: XCircle },
-      Failed: { variant: 'destructive', icon: XCircle },
+    const statusMap = {
+      PENDING: { variant: 'warning', label: t('deliveries.statuses.pending') },
+      IN_TRANSIT: { variant: 'info', label: t('deliveries.statuses.inTransit') },
+      DELIVERED: { variant: 'success', label: t('deliveries.statuses.delivered') },
+      CANCELLED: { variant: 'default', label: t('deliveries.statuses.cancelled') },
+      DELAYED: { variant: 'destructive', label: t('deliveries.statuses.delayed') },
+      ON_HOLD: { variant: 'outline', label: t('deliveries.statuses.onHold') },
     };
 
-    const config = statusConfig[status] || { variant: 'default', icon: Package };
-    const Icon = config.icon;
+    const { variant, label } = statusMap[status] || { 
+      variant: 'default', 
+      label: status 
+    };
 
-    return (
-      <Badge variant={config.variant} className="flex items-center gap-1">
-        <Icon size={14} />
-        <span>{status}</span>
-      </Badge>
-    );
+    return <Badge variant={variant}>{label}</Badge>;
   };
 
-  // Define priority badge component
+  /**
+   * PriorityBadge component for delivery priority
+   */
   const PriorityBadge = ({ priority }) => {
-    const priorityConfig = {
-      Low: { variant: 'outline' },
-      Medium: { variant: 'secondary' },
-      High: { variant: 'warning' },
-      Urgent: { variant: 'destructive' },
+    const priorityMap = {
+      HIGH: { variant: 'destructive', label: t('deliveries.priorities.high') },
+      MEDIUM: { variant: 'warning', label: t('deliveries.priorities.medium') },
+      LOW: { variant: 'default', label: t('deliveries.priorities.low') },
     };
 
-    const config = priorityConfig[priority] || { variant: 'outline' };
+    const { variant, label } = priorityMap[priority] || {
+      variant: 'default',
+      label: priority,
+    };
 
-    return <Badge variant={config.variant}>{priority}</Badge>;
+    return <Badge variant={variant}>{label}</Badge>;
   };
 
-  // Define columns
+  // Define table columns
   const columns = useMemo(
     () => [
       {
@@ -80,31 +86,22 @@ export const DeliveriesTable = ({
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             className="p-0 hover:bg-transparent"
           >
-            {t('deliveries.deliveryID')}
+            {t('deliveries.orderId')}
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         ),
         cell: ({ row }) => (
-          <div className="font-medium">{row.getValue('orderId') || row.original._id?.substring(0, 8)}</div>
+          <div className="font-medium">{row.getValue('orderId')}</div>
         ),
       },
       {
         accessorKey: 'customer',
-        header: ({ column }) => (
-          <Button
-            variant="ghost"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
-            className="p-0 hover:bg-transparent"
-          >
-            {t('deliveries.customer')}
-            <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        ),
+        header: t('deliveries.customer'),
         cell: ({ row }) => <div>{row.getValue('customer')}</div>,
       },
       {
         accessorKey: 'deliveryAddress',
-        header: t('deliveries.destination'),
+        header: t('deliveries.address'),
         cell: ({ row }) => (
           <div className="max-w-[200px] truncate" title={row.getValue('deliveryAddress')}>
             {row.getValue('deliveryAddress')}
@@ -149,7 +146,7 @@ export const DeliveriesTable = ({
               {deliverer ? (
                 <span>{deliverer.name}</span>
               ) : (
-                <span className="text-muted-foreground italic">
+                <span className="italic text-muted-foreground">
                   {t('deliveries.unassigned')}
                 </span>
               )}
@@ -174,7 +171,7 @@ export const DeliveriesTable = ({
           return date ? (
             <div>{new Date(date).toLocaleDateString()}</div>
           ) : (
-            <span className="text-muted-foreground italic">
+            <span className="italic text-muted-foreground">
               {t('deliveries.notScheduled')}
             </span>
           );
@@ -214,7 +211,7 @@ export const DeliveriesTable = ({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 w-8 p-0 text-destructive hover:text-destructive hover:bg-destructive/10"
+                  className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
                   onClick={() => onDelete(delivery)}
                 >
                   <span className="sr-only">{t('common.delete')}</span>
@@ -239,8 +236,8 @@ export const DeliveriesTable = ({
 
   if (!data || data.length === 0) {
     return (
-      <div className="text-center p-8 border rounded-md bg-muted/10">
-        <Package className="h-12 w-12 mx-auto text-muted-foreground" />
+      <div className="rounded-md border bg-muted/10 p-8 text-center">
+        <Package className="mx-auto h-12 w-12 text-muted-foreground" />
         <h3 className="mt-4 text-lg font-medium">{t('deliveries.noDeliveries')}</h3>
         <p className="mt-1 text-muted-foreground">
           {t('deliveries.noDeliveriesDescription')}
@@ -284,6 +281,16 @@ export const DeliveriesTable = ({
       </div>
     </div>
   );
+};
+
+// PropTypes for main component
+DeliveriesTable.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.object),
+  onEdit: PropTypes.func,
+  onView: PropTypes.func,
+  onDelete: PropTypes.func,
+  onStatusUpdate: PropTypes.func,
+  userRole: PropTypes.string
 };
 
 export default DeliveriesTable;
