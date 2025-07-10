@@ -39,7 +39,7 @@ const DelivererTable = ({ deliverers }) => {
         accessor: 'rating',
         Cell: ({ value }) => (
           <div className="flex items-center">
-            <span className="text-yellow-500 mr-1">★</span>
+            <span className="mr-1 text-yellow-500">★</span>
             {value.toFixed(1)}
           </div>
         ),
@@ -94,7 +94,7 @@ const DelivererTable = ({ deliverers }) => {
 
   return (
     <div className="w-full">
-      <div className="flex justify-between items-center mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-semibold">Deliverers</h2>
         <Button 
           variant="outline" 
@@ -151,7 +151,7 @@ const DelivererTable = ({ deliverers }) => {
         </table>
       </div>
 
-      <div className="flex items-center justify-between mt-4">
+      <div className="mt-4 flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
           Page {pageIndex + 1} of {pageOptions.length}
         </div>
