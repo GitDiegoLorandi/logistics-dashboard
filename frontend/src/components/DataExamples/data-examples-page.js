@@ -216,7 +216,7 @@ const DataExamplesPage = () => {
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <h4 className="text-lg font-medium mb-2">Striped Table</h4>
+                <h4 className="mb-2 text-lg font-medium">Striped Table</h4>
                 <StyledTable striped>
                   <TableHeader>
                     <TableRow>
@@ -238,7 +238,7 @@ const DataExamplesPage = () => {
               </div>
 
               <div>
-                <h4 className="text-lg font-medium mb-2">Bordered Table</h4>
+                <h4 className="mb-2 text-lg font-medium">Bordered Table</h4>
                 <StyledTable bordered>
                   <TableHeader>
                     <TableRow>
@@ -260,7 +260,7 @@ const DataExamplesPage = () => {
               </div>
 
               <div>
-                <h4 className="text-lg font-medium mb-2">Dense Table</h4>
+                <h4 className="mb-2 text-lg font-medium">Dense Table</h4>
                 <StyledTable dense>
                   <TableHeader>
                     <TableRow>

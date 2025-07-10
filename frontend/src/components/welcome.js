@@ -44,9 +44,9 @@ const Welcome = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/10 to-secondary/10 flex flex-col">
+    <div className="flex min-h-screen flex-col bg-gradient-to-br from-primary/10 to-secondary/10">
       {/* Header */}
-      <header className="p-6 flex items-center justify-between">
+      <header className="flex items-center justify-between p-6">
         <div className="flex items-center gap-2">
           <Package className="h-6 w-6 text-primary" />
           <h1 className="text-xl font-bold">Logistics Dashboard</h1>
@@ -57,14 +57,14 @@ const Welcome = () => {
       </header>
 
       {/* Main content */}
-      <main className="flex-1 flex flex-col items-center justify-center p-6">
+      <main className="flex flex-1 flex-col items-center justify-center p-6">
         <div className="w-full max-w-md">
           {/* Progress indicator */}
-          <div className="flex justify-center mb-8">
+          <div className="mb-8 flex justify-center">
             {steps.map((_, index) => (
               <div
                 key={index}
-                className={`h-2 w-16 mx-1 rounded-full transition-all ${
+                className={`mx-1 h-2 w-16 rounded-full transition-all ${
                   index <= currentStep ? 'bg-primary' : 'bg-primary/20'
                 }`}
               />
@@ -72,10 +72,10 @@ const Welcome = () => {
           </div>
 
           {/* Step content */}
-          <div className="bg-card rounded-lg shadow-lg p-8 text-center">
-            <div className="text-5xl mb-6">{steps[currentStep].image}</div>
-            <h2 className="text-2xl font-bold mb-4">{steps[currentStep].title}</h2>
-            <p className="text-muted-foreground mb-8">{steps[currentStep].description}</p>
+          <div className="rounded-lg bg-card p-8 text-center shadow-lg">
+            <div className="mb-6 text-5xl">{steps[currentStep].image}</div>
+            <h2 className="mb-4 text-2xl font-bold">{steps[currentStep].title}</h2>
+            <p className="mb-8 text-muted-foreground">{steps[currentStep].description}</p>
 
             <Button onClick={handleNext} className="w-full">
               {currentStep < steps.length - 1 ? (

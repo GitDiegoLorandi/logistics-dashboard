@@ -82,7 +82,7 @@ const UserPreferences = () => {
           {loading ? (
             <>
               <svg
-                className="animate-spin -ml-1 mr-2 h-4 w-4"
+                className="-ml-1 mr-2 h-4 w-4 animate-spin"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -111,10 +111,10 @@ const UserPreferences = () => {
         </Button>
       </div>
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Theme */}
-        <div className="bg-card border border-border rounded-lg p-4">
-          <div className="flex items-center justify-between mb-4">
+        <div className="rounded-lg border border-border bg-card p-4">
+          <div className="mb-4 flex items-center justify-between">
             <h3 className="font-medium">Theme</h3>
             <Button
               variant="outline"
@@ -139,8 +139,8 @@ const UserPreferences = () => {
         </div>
         
         {/* Notifications */}
-        <div className="bg-card border border-border rounded-lg p-4">
-          <div className="flex items-center justify-between mb-4">
+        <div className="rounded-lg border border-border bg-card p-4">
+          <div className="mb-4 flex items-center justify-between">
             <h3 className="font-medium">Notifications</h3>
             <Button
               variant="outline"
@@ -190,13 +190,13 @@ const UserPreferences = () => {
         </div>
         
         {/* Language */}
-        <div className="bg-card border border-border rounded-lg p-4">
-          <h3 className="font-medium mb-4">Language</h3>
+        <div className="rounded-lg border border-border bg-card p-4">
+          <h3 className="mb-4 font-medium">Language</h3>
           <select
             name="language"
             value={preferences.language}
             onChange={handleChange}
-            className="w-full h-10 px-3 border border-input rounded-md bg-background"
+            className="h-10 w-full rounded-md border border-input bg-background px-3"
           >
             <option value="en">English</option>
             <option value="es">Spanish</option>
@@ -207,8 +207,8 @@ const UserPreferences = () => {
         </div>
         
         {/* Time Format */}
-        <div className="bg-card border border-border rounded-lg p-4">
-          <h3 className="font-medium mb-4">Time Format</h3>
+        <div className="rounded-lg border border-border bg-card p-4">
+          <h3 className="mb-4 font-medium">Time Format</h3>
           <div className="flex gap-4">
             <label className="flex items-center">
               <input
@@ -236,13 +236,13 @@ const UserPreferences = () => {
         </div>
         
         {/* Default View */}
-        <div className="bg-card border border-border rounded-lg p-4">
-          <h3 className="font-medium mb-4">Default View</h3>
+        <div className="rounded-lg border border-border bg-card p-4">
+          <h3 className="mb-4 font-medium">Default View</h3>
           <select
             name="defaultView"
             value={preferences.defaultView}
             onChange={handleChange}
-            className="w-full h-10 px-3 border border-input rounded-md bg-background"
+            className="h-10 w-full rounded-md border border-input bg-background px-3"
           >
             <option value="dashboard">Dashboard</option>
             <option value="deliveries">Deliveries</option>
@@ -252,21 +252,21 @@ const UserPreferences = () => {
         </div>
         
         {/* Compact Mode */}
-        <div className="bg-card border border-border rounded-lg p-4">
+        <div className="rounded-lg border border-border bg-card p-4">
           <div className="flex items-center justify-between">
             <h3 className="font-medium">Compact Mode</h3>
-            <label className="relative inline-flex items-center cursor-pointer">
+            <label className="relative inline-flex cursor-pointer items-center">
               <input
                 type="checkbox"
                 name="compactMode"
                 checked={preferences.compactMode}
                 onChange={handleChange}
-                className="sr-only peer"
+                className="peer sr-only"
               />
-              <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+              <div className="peer h-6 w-11 rounded-full bg-gray-200 after:absolute after:left-[2px] after:top-[2px] after:h-5 after:w-5 after:rounded-full after:border after:border-gray-300 after:bg-white after:transition-all after:content-[''] peer-checked:bg-primary peer-checked:after:translate-x-full peer-checked:after:border-white peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-primary/30"></div>
             </label>
           </div>
-          <p className="text-sm text-muted-foreground mt-2">
+          <p className="mt-2 text-sm text-muted-foreground">
             Use compact mode to display more content on screen
           </p>
         </div>

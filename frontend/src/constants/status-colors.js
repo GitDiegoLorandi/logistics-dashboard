@@ -9,7 +9,6 @@ export const STATUS_COLORS = {
   'In Transit': 'text-status-in-transit',
   'Pending': 'text-status-pending',
   'Cancelled': 'text-status-cancelled',
-  'Failed': 'text-destructive',
   
   // Deliverer status colors
   'Available': 'text-status-delivered',
@@ -26,7 +25,6 @@ export const STATUS_BADGE_COLORS = {
   'In Transit': 'bg-info/10 text-info',
   'Pending': 'bg-warning/10 text-warning',
   'Cancelled': 'bg-destructive/10 text-destructive',
-  'Failed': 'bg-destructive/10 text-destructive',
   
   // Deliverer status badge colors
   'Available': 'bg-success/10 text-success',

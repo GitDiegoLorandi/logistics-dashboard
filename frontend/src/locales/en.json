@@ -59,7 +59,11 @@
     "deliveryTrends": "Delivery Trends",
     "deliveryStatus": "Delivery Status",
     "recentDeliveries": "Recent Deliveries",
-    "viewAll": "View All"
+    "viewAll": "View All",
+    "performance": "Performance",
+    "onTime": "On-time delivery rate",
+    "lastSevenDays": "Last 7 days",
+    "currentStatus": "Current status"
   },
   "deliveries": {
     "title": "Deliveries",
