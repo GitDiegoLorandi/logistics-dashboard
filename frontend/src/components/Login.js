@@ -93,10 +93,10 @@ const Login = () => {
   };
 
   return (
-    <div className='min-h-screen bg-gradient-to-br from-primary/20 to-secondary/20 grid place-items-center p-4'>
-      <div className='w-full max-w-md bg-card rounded-lg shadow-lg overflow-hidden'>
+    <div className='grid min-h-screen place-items-center bg-gradient-to-br from-primary/20 to-secondary/20 p-4'>
+      <div className='w-full max-w-md overflow-hidden rounded-lg bg-card shadow-lg'>
         <div className='p-8'>
-          <div className='flex items-center justify-between mb-6'>
+          <div className='mb-6 flex items-center justify-between'>
             <div className='flex items-center gap-2'>
               <Package className='h-8 w-8 text-primary' />
               <h1 className='text-2xl font-bold'>{t('app.title', { ns: 'common' })}</h1>
@@ -104,13 +104,13 @@ const Login = () => {
             <LanguageSwitcher />
           </div>
 
-          <p className='text-center text-muted-foreground mb-8'>
+          <p className='mb-8 text-center text-muted-foreground'>
             {t('login.subtitle')}
           </p>
 
           <form onSubmit={handleSubmit} className='space-y-6'>
             {errors.general && (
-              <div className='p-4 bg-destructive/10 border border-destructive rounded-md text-destructive text-sm'>
+              <div className='rounded-md border border-destructive bg-destructive/10 p-4 text-sm text-destructive'>
                 {errors.general}
               </div>
             )}
@@ -120,7 +120,7 @@ const Login = () => {
                 {t('login.email')}
               </label>
               <div className='relative'>
-                <Mail className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                <Mail className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
                 <input
                   type='email'
                   id='email'
@@ -138,7 +138,7 @@ const Login = () => {
                 />
               </div>
               {errors.email && (
-                <p className='text-destructive text-xs mt-1'>{errors.email}</p>
+                <p className='mt-1 text-xs text-destructive'>{errors.email}</p>
               )}
             </div>
 
@@ -152,7 +152,7 @@ const Login = () => {
                 </Link>
               </div>
               <div className='relative'>
-                <Lock className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                <Lock className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id='password'
@@ -182,7 +182,7 @@ const Login = () => {
                 </button>
               </div>
               {errors.password && (
-                <p className='text-destructive text-xs mt-1'>
+                <p className='mt-1 text-xs text-destructive'>
                   {errors.password}
                 </p>
               )}
@@ -192,7 +192,7 @@ const Login = () => {
               {loading ? (
                 <div className='flex items-center justify-center'>
                   <svg
-                    className='animate-spin -ml-1 mr-2 h-4 w-4 text-white'
+                    className='-ml-1 mr-2 h-4 w-4 animate-spin text-white'
                     xmlns='http://www.w3.org/2000/svg'
                     fill='none'
                     viewBox='0 0 24 24'
@@ -228,9 +228,9 @@ const Login = () => {
             </p>
           </div>
 
-          <div className='mt-8 pt-6 border-t border-border'>
-            <div className='bg-muted/50 rounded-md p-4 text-xs text-center text-muted-foreground'>
-              <strong className='block mb-1'>{t('login.demoCredentials')}:</strong>
+          <div className='mt-8 border-t border-border pt-6'>
+            <div className='rounded-md bg-muted/50 p-4 text-center text-xs text-muted-foreground'>
+              <strong className='mb-1 block'>{t('login.demoCredentials')}:</strong>
               {t('login.adminCredentials', { defaultValue: 'Admin: admin@example.com / password123' })}
               <br />
               {t('login.userCredentials', { defaultValue: 'User: user@example.com / senha123' })}

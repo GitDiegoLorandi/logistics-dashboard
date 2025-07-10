@@ -315,8 +315,8 @@ const SettingsPage = () => {
         <div className='space-y-4'>
           <h3 className='text-lg font-medium'>Personal Information</h3>
 
-          <div className='flex items-center gap-6 mb-6'>
-            <div className='h-20 w-20 rounded-full bg-muted flex items-center justify-center'>
+          <div className='mb-6 flex items-center gap-6'>
+            <div className='flex h-20 w-20 items-center justify-center rounded-full bg-muted'>
               <User className='h-10 w-10 text-muted-foreground' />
             </div>
             <div className='flex flex-wrap gap-3'>
@@ -342,7 +342,7 @@ const SettingsPage = () => {
             </div>
           </div>
 
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
             <div className='space-y-2'>
               <Label htmlFor='firstName'>First Name</Label>
               <Input
@@ -369,11 +369,11 @@ const SettingsPage = () => {
             </div>
           </div>
 
-          <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+          <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
             <div className='space-y-2'>
               <Label htmlFor='email'>Email Address</Label>
               <div className='relative'>
-                <Mail className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                <Mail className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
                 <Input
                   id='email'
                   type='email'
@@ -389,7 +389,7 @@ const SettingsPage = () => {
             <div className='space-y-2'>
               <Label htmlFor='phone'>Phone Number</Label>
               <div className='relative'>
-                <Phone className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
+                <Phone className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
                 <Input
                   id='phone'
                   type='tel'
@@ -413,7 +413,7 @@ const SettingsPage = () => {
           >
             {saving ? (
               <>
-                <RefreshCw className='animate-spin h-4 w-4' />
+                <RefreshCw className='h-4 w-4 animate-spin' />
                 Saving...
               </>
             ) : (
@@ -467,7 +467,7 @@ const SettingsPage = () => {
             <h3 className='text-lg font-medium'>
               {getTranslation('localization')}
             </h3>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+            <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
               <div className='space-y-2'>
                 <Label htmlFor='timezone'>{getTranslation('timezone')}</Label>
                 <Select
@@ -586,7 +586,7 @@ const SettingsPage = () => {
           >
             {saving ? (
               <>
-                <RefreshCw className='animate-spin h-4 w-4' />
+                <RefreshCw className='h-4 w-4 animate-spin' />
                 Saving...
               </>
             ) : (
@@ -1070,9 +1070,9 @@ const SettingsPage = () => {
 
   if (loading) {
     return (
-      <div className='px-4 py-6 max-w-7xl mx-auto flex items-center justify-center min-h-[50vh]'>
+      <div className='mx-auto flex min-h-[50vh] max-w-7xl items-center justify-center px-4 py-6'>
         <div className='text-center'>
-          <div className='h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4'></div>
+          <div className='mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent'></div>
           <p className='text-muted-foreground'>Loading settings...</p>
         </div>
       </div>
@@ -1080,11 +1080,11 @@ const SettingsPage = () => {
   }
 
   return (
-    <div className='px-4 py-6 max-w-7xl mx-auto'>
-      <div className='flex flex-col md:flex-row gap-8'>
-        <Card className='md:w-64 h-fit'>
+    <div className='mx-auto max-w-7xl px-4 py-6'>
+      <div className='flex flex-col gap-8 md:flex-row'>
+        <Card className='h-fit md:w-64'>
           <CardContent className='p-4'>
-            <h2 className='text-xl font-semibold mb-4'>Settings</h2>
+            <h2 className='mb-4 text-xl font-semibold'>Settings</h2>
             <div className='flex flex-col gap-1'>
               {tabs.map(tab => {
                 const IconComponent = tab.icon;

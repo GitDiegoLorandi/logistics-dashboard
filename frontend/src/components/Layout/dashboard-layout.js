@@ -29,11 +29,11 @@ const DashboardLayout = () => {
   // Navigation items
   const navItems = [
     { path: '/dashboard', icon: <LucideBarChart2 className="h-5 w-5" />, label: t('navigation.dashboard') },
-    { path: '/deliveries', icon: <LucidePackage className="h-5 w-5" />, label: t('navigation.deliveries') },
-    { path: '/deliverers', icon: <LucideTruck className="h-5 w-5" />, label: t('navigation.deliverers') },
-    { path: '/users', icon: <LucideUsers className="h-5 w-5" />, label: t('navigation.users') },
-    { path: '/jobs', icon: <LucideBriefcase className="h-5 w-5" />, label: t('navigation.jobs') },
-    { path: '/settings', icon: <LucideSettings className="h-5 w-5" />, label: t('navigation.settings') },
+    { path: '/dashboard/deliveries', icon: <LucidePackage className="h-5 w-5" />, label: t('navigation.deliveries') },
+    { path: '/dashboard/deliverers', icon: <LucideTruck className="h-5 w-5" />, label: t('navigation.deliverers') },
+    { path: '/dashboard/users', icon: <LucideUsers className="h-5 w-5" />, label: t('navigation.users') },
+    { path: '/dashboard/jobs', icon: <LucideBriefcase className="h-5 w-5" />, label: t('navigation.jobs') },
+    { path: '/dashboard/settings', icon: <LucideSettings className="h-5 w-5" />, label: t('navigation.settings') },
   ];
   
   // Generate breadcrumbs from current path
@@ -102,12 +102,12 @@ const DashboardLayout = () => {
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="flex items-center justify-between h-16 px-4 border-b border-border">
+        <div className="flex h-16 items-center justify-between border-b border-border px-4">
           <Link to="/dashboard" className="flex items-center gap-2">
-            <div className="bg-primary rounded-md p-1">
+            <div className="rounded-md bg-primary p-1">
               <LucideTruck className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-lg">{t('app.title')}</span>
+            <span className="text-lg font-bold">{t('app.title')}</span>
           </Link>
           <Button 
             variant="ghost" 
@@ -119,14 +119,15 @@ const DashboardLayout = () => {
           </Button>
         </div>
         
-        <nav className="p-4 space-y-1">
+        <nav className="space-y-1 p-4">
           {navItems.map(item => (
             <Link
               key={item.path}
               to={item.path}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-md transition-colors",
-                location.pathname.startsWith(item.path)
+                location.pathname === item.path || 
+                (item.path !== '/dashboard' && location.pathname.startsWith(item.path))
                   ? "bg-muted text-foreground font-medium"
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               )}
@@ -137,20 +138,20 @@ const DashboardLayout = () => {
           ))}
         </nav>
         
-        <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-border">
-          <div className="flex items-center gap-3 mb-4">
+        <div className="absolute bottom-0 left-0 right-0 border-t border-border p-4">
+          <div className="mb-4 flex items-center gap-3">
             <Avatar>
               <AvatarImage src="/avatars/user.png" />
               <AvatarFallback>JD</AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-medium text-sm">John Doe</p>
+              <p className="text-sm font-medium">John Doe</p>
               <p className="text-xs text-muted-foreground">Administrator</p>
             </div>
           </div>
           <Button 
             variant="outline" 
-            className="w-full flex items-center gap-2 justify-start"
+            className="flex w-full items-center justify-start gap-2"
             onClick={handleLogout}
           >
             <LucideLogOut className="h-4 w-4" />
@@ -160,9 +161,9 @@ const DashboardLayout = () => {
       </aside>
       
       {/* Main content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex flex-1 flex-col overflow-hidden">
         {/* Header */}
-        <header className="h-16 border-b border-border bg-card flex items-center justify-between px-4">
+        <header className="flex h-16 items-center justify-between border-b border-border bg-card px-4">
           <div className="flex items-center gap-4">
             <Button 
               variant="ghost" 
@@ -179,11 +180,11 @@ const DashboardLayout = () => {
             <Button 
               variant="outline" 
               size="sm" 
-              className="hidden md:flex items-center gap-2"
+              className="hidden items-center gap-2 md:flex"
               onClick={() => setCommandPaletteOpen(true)}
             >
               <span>{t('actions.search')}...</span>
-              <kbd className="bg-muted rounded px-1.5 py-0.5 text-xs font-semibold">⌘K</kbd>
+              <kbd className="rounded bg-muted px-1.5 py-0.5 text-xs font-semibold">⌘K</kbd>
             </Button>
             
             <LanguageSwitcher />

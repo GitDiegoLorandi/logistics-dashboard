@@ -1,14 +1,74 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import './index.css';
+import {
+  Login,
+  Register,
+  ForgotPassword,
+  ResetPassword,
+  ProtectedRoute,
+  DashboardLayout,
+  Welcome,
+  DashboardOverview,
+  DeliveriesPage,
+  DeliverersPage,
+  UsersPage,
+  AnalyticsPage,
+  JobsPage,
+  SettingsPage
+} from './components/lazy-components';
+
+// Loading fallback component
+const LoadingFallback = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+  </div>
+);
 
 function App() {
   return (
     <Router>
-      <div className="App">
-        <h1>Logistics Dashboard</h1>
-        <p>UI path case fix completed successfully!</p>
-      </div>
+      <Suspense fallback={<LoadingFallback />}>
+        <Routes>
+          {/* Authentication routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          
+          {/* Welcome page */}
+          <Route path="/welcome" element={<Welcome />} />
+          
+          {/* Protected dashboard routes */}
+          <Route element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }>
+            <Route path="/dashboard" element={<DashboardOverview />} />
+            <Route path="/dashboard/deliveries" element={<DeliveriesPage />} />
+            <Route path="/dashboard/deliverers" element={<DeliverersPage />} />
+            <Route path="/dashboard/users" element={<UsersPage />} />
+            <Route path="/dashboard/analytics" element={<AnalyticsPage />} />
+            <Route path="/dashboard/jobs" element={<JobsPage />} />
+            <Route path="/dashboard/settings" element={<SettingsPage />} />
+          </Route>
+          
+          {/* Redirect root to dashboard or login */}
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          
+          {/* Catch all - 404 */}
+          <Route path="*" element={
+            <div className="flex flex-col items-center justify-center min-h-screen">
+              <h1 className="text-4xl font-bold mb-4">404 - Page Not Found</h1>
+              <p className="mb-8">The page you are looking for does not exist.</p>
+              <a href="/dashboard" className="text-primary hover:underline">
+                Return to Dashboard
+              </a>
+            </div>
+          } />
+        </Routes>
+      </Suspense>
     </Router>
   );
 }

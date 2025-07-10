@@ -4,12 +4,12 @@ import { Skeleton } from './UI/skeleton';
 // Loading fallback component
 const LoadingFallback = () => (
   <div className="p-4">
-    <Skeleton preset="card" className="w-full h-64" />
+    <Skeleton preset="card" className="h-64 w-full" />
   </div>
 );
 
 // Authentication components
-export const Login = lazy(() => import('./login'));
+export const Login = lazy(() => import('./Login'));
 export const ForgotPassword = lazy(() => import('./forgot-password'));
 export const ResetPassword = lazy(() => import('./reset-password'));
 export const Register = lazy(() => import('./register'));
