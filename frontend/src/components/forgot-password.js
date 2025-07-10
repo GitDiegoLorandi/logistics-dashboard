@@ -64,24 +64,24 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/20 to-secondary/20 grid place-items-center p-4">
-      <div className="w-full max-w-md bg-card rounded-lg shadow-lg overflow-hidden">
+    <div className="grid min-h-screen place-items-center bg-gradient-to-br from-primary/20 to-secondary/20 p-4">
+      <div className="w-full max-w-md overflow-hidden rounded-lg bg-card shadow-lg">
         <div className="p-8">
-          <div className="flex items-center justify-center gap-2 mb-6">
+          <div className="mb-6 flex items-center justify-center gap-2">
             <Package className="h-8 w-8 text-primary" />
             <h1 className="text-2xl font-bold">Logistics Dashboard</h1>
           </div>
 
           {!submitted ? (
             <>
-              <h2 className="text-xl font-semibold text-center mb-2">Reset Your Password</h2>
-              <p className="text-center text-muted-foreground mb-8">
+              <h2 className="mb-2 text-center text-xl font-semibold">Reset Your Password</h2>
+              <p className="mb-8 text-center text-muted-foreground">
                 Enter your email address and we'll send you instructions to reset your password.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 {error && (
-                  <div className="p-4 bg-destructive/10 border border-destructive rounded-md text-destructive text-sm">
+                  <div className="rounded-md border border-destructive bg-destructive/10 p-4 text-sm text-destructive">
                     {error}
                   </div>
                 )}
@@ -91,7 +91,7 @@ const ForgotPassword = () => {
                     Email Address
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                     <input
                       type="email"
                       id="email"
@@ -108,7 +108,7 @@ const ForgotPassword = () => {
                     />
                   </div>
                   {error && (
-                    <p className="text-destructive text-xs mt-1">{error}</p>
+                    <p className="mt-1 text-xs text-destructive">{error}</p>
                   )}
                 </div>
 
@@ -116,7 +116,7 @@ const ForgotPassword = () => {
                   {loading ? (
                     <div className="flex items-center justify-center">
                       <svg
-                        className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                        className="-ml-1 mr-2 h-4 w-4 animate-spin text-white"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -145,11 +145,11 @@ const ForgotPassword = () => {
             </>
           ) : (
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-6">
+              <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-full bg-primary/10 text-primary">
                 <Check className="h-8 w-8" />
               </div>
-              <h2 className="text-xl font-semibold mb-2">Check Your Email</h2>
-              <p className="text-muted-foreground mb-6">
+              <h2 className="mb-2 text-xl font-semibold">Check Your Email</h2>
+              <p className="mb-6 text-muted-foreground">
                 We've sent password reset instructions to:
                 <br />
                 <span className="font-medium text-foreground">{email}</span>
