@@ -71,11 +71,87 @@ const JobsPage = () => {
 
   const fetchDashboardData = async () => {
     try {
+      setLoading(true);
       const response = await jobsAPI.getDashboard();
-      setDashboardData(response.data);
+      // Access response directly, not through response.data
+      setDashboardData(response || {});
     } catch (error) {
       console.error('Error fetching jobs dashboard:', error);
-      toast.error('Failed to load jobs dashboard');
+      toast.error('Failed to load jobs dashboard. Using demo data instead.');
+      
+      // Provide fallback data when API fails
+      const fallbackData = {
+        jobStatus: {
+          isRunning: false,
+          startedAt: new Date(Date.now() - 3600000).toISOString(),
+          uptime: 3600,
+          lastError: null
+        },
+        healthStatus: {
+          status: 'healthy',
+          lastCheck: new Date().toISOString(),
+          issues: []
+        },
+        performanceStatus: {
+          cpu: 25,
+          memory: 40,
+          disk: 35,
+          network: {
+            in: 1.2,
+            out: 0.8
+          }
+        },
+        stats: {
+          totalJobs: 5,
+          activeJobs: 0,
+          completedJobs: 120,
+          failedJobs: 2
+        },
+        jobs: [
+          {
+            name: 'healthCheck',
+            isRunning: false,
+            lastRun: new Date(Date.now() - 900000).toISOString(),
+            nextRun: new Date(Date.now() + 900000).toISOString(),
+            status: 'completed',
+            error: null
+          },
+          {
+            name: 'notifications',
+            isRunning: false,
+            lastRun: new Date(Date.now() - 1800000).toISOString(),
+            nextRun: new Date(Date.now() + 1800000).toISOString(),
+            status: 'completed',
+            error: null
+          },
+          {
+            name: 'performanceMonitoring',
+            isRunning: false,
+            lastRun: new Date(Date.now() - 3600000).toISOString(),
+            nextRun: new Date(Date.now() + 3600000).toISOString(),
+            status: 'completed',
+            error: null
+          },
+          {
+            name: 'overdueDeliveries',
+            isRunning: false,
+            lastRun: new Date(Date.now() - 7200000).toISOString(),
+            nextRun: new Date(Date.now() + 7200000).toISOString(),
+            status: 'completed',
+            error: null
+          },
+          {
+            name: 'dataCleanup',
+            isRunning: false,
+            lastRun: new Date(Date.now() - 86400000).toISOString(),
+            nextRun: new Date(Date.now() + 86400000).toISOString(),
+            status: 'completed',
+            error: null
+          }
+        ]
+      };
+      
+      setDashboardData(fallbackData);
     } finally {
       setLoading(false);
     }
@@ -91,9 +167,10 @@ const JobsPage = () => {
   const handleRunJob = async jobName => {
     try {
       setRunningJob(jobName);
-      await jobsAPI.runJob(jobName);
+      const response = await jobsAPI.runJob(jobName);
       toast.success(`Job ${jobName} executed successfully`);
       await fetchDashboardData();
+      return response; // Return response directly
     } catch (error) {
       console.error(`Error running job ${jobName}:`, error);
       toast.error(`Failed to run job ${jobName}`);
@@ -104,9 +181,10 @@ const JobsPage = () => {
 
   const handleStartAllJobs = async () => {
     try {
-      await jobsAPI.startAllJobs();
+      const response = await jobsAPI.startAllJobs();
       toast.success('All background jobs started');
       await fetchDashboardData();
+      return response; // Return response directly
     } catch (error) {
       console.error('Error starting jobs:', error);
       toast.error('Failed to start background jobs');
@@ -115,9 +193,10 @@ const JobsPage = () => {
 
   const handleStopAllJobs = async () => {
     try {
-      await jobsAPI.stopAllJobs();
+      const response = await jobsAPI.stopAllJobs();
       toast.success('All background jobs stopped');
       await fetchDashboardData();
+      return response; // Return response directly
     } catch (error) {
       console.error('Error stopping jobs:', error);
       toast.error('Failed to stop background jobs');
@@ -151,27 +230,28 @@ const JobsPage = () => {
   };
 
   const getStatusIcon = job => {
-    if (job.error) return <AlertTriangle className='text-destructive h-5 w-5' />;
-    if (job.isRunning) return <Activity className='text-info h-5 w-5' />;
-    return <CheckCircle className='text-success h-5 w-5' />;
+    if (job.error) return <AlertTriangle className='h-5 w-5 text-destructive' />;
+    if (job.isRunning) return <Activity className='h-5 w-5 text-info' />;
+    return <CheckCircle className='h-5 w-5 text-success' />;
   };
 
   if (loading) {
     return (
-      <div className='px-4 py-6 max-w-7xl mx-auto flex items-center justify-center min-h-[50vh]'>
+      <div className='mx-auto flex min-h-[50vh] max-w-7xl items-center justify-center px-4 py-6'>
         <div className='text-center'>
-          <div className='h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4'></div>
+          <div className='mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent'></div>
           <p className='text-muted-foreground'>Loading jobs dashboard...</p>
         </div>
       </div>
     );
   }
 
-  const { jobStatus, healthStatus, performanceStatus, stats } = dashboardData;
+  // Add null checks for destructured properties
+  const { jobStatus = {}, healthStatus = {}, performanceStatus = {}, stats = {}, jobs = [] } = dashboardData || {};
 
   return (
-    <div className='px-4 py-6 max-w-7xl mx-auto'>
-      <div className='flex flex-col gap-6 md:flex-row md:items-start md:justify-between mb-8 bg-card p-6 rounded-xl shadow'>
+    <div className='mx-auto max-w-7xl px-4 py-6'>
+      <div className='mb-8 flex flex-col gap-6 rounded-xl bg-card p-6 shadow md:flex-row md:items-start md:justify-between'>
         <div>
           <h1 className='flex items-center gap-2 text-2xl font-bold'>
             <Zap className='h-6 w-6 text-primary' />
@@ -190,7 +270,7 @@ const JobsPage = () => {
             className='flex items-center gap-2'
           >
             <RefreshCw
-              className={refreshing ? 'animate-spin h-4 w-4' : 'h-4 w-4'}
+              className={refreshing ? 'h-4 w-4 animate-spin' : 'h-4 w-4'}
             />
             {refreshing ? 'Refreshing...' : 'Refresh'}
           </Button>
@@ -218,12 +298,12 @@ const JobsPage = () => {
       </div>
 
       {/* System Status Overview */}
-      <Grid className='gap-6 mb-8'>
+      <Grid className='mb-8 gap-6'>
         <GridItem colSpan='col-span-12 sm:col-span-6 lg:col-span-3'>
           <Card>
             <CardContent className='pt-6'>
-              <div className='flex justify-between items-start mb-4'>
-                <div className='p-2 rounded-lg bg-green-50 text-green-700 border border-green-200'>
+              <div className='mb-4 flex items-start justify-between'>
+                <div className='rounded-lg border border-green-200 bg-green-50 p-2 text-green-700'>
                   <Shield className='h-5 w-5' />
                 </div>
                 <Badge
@@ -266,8 +346,8 @@ const JobsPage = () => {
         <GridItem colSpan='col-span-12 sm:col-span-6 lg:col-span-3'>
           <Card>
             <CardContent className='pt-6'>
-              <div className='flex justify-between items-start mb-4'>
-                <div className='p-2 rounded-lg bg-blue-50 text-blue-700 border border-blue-200'>
+              <div className='mb-4 flex items-start justify-between'>
+                <div className='rounded-lg border border-blue-200 bg-blue-50 p-2 text-blue-700'>
                   <Activity className='h-5 w-5' />
                 </div>
                 <Badge
@@ -287,8 +367,8 @@ const JobsPage = () => {
         <GridItem colSpan='col-span-12 sm:col-span-6 lg:col-span-3'>
           <Card>
             <CardContent className='pt-6'>
-              <div className='flex justify-between items-start mb-4'>
-                <div className='p-2 rounded-lg bg-purple-50 text-purple-700 border border-purple-200'>
+              <div className='mb-4 flex items-start justify-between'>
+                <div className='rounded-lg border border-purple-200 bg-purple-50 p-2 text-purple-700'>
                   <TrendingUp className='h-5 w-5' />
                 </div>
                 <Badge
@@ -310,8 +390,8 @@ const JobsPage = () => {
         <GridItem colSpan='col-span-12 sm:col-span-6 lg:col-span-3'>
           <Card>
             <CardContent className='pt-6'>
-              <div className='flex justify-between items-start mb-4'>
-                <div className='p-2 rounded-lg bg-amber-50 text-amber-700 border border-amber-200'>
+              <div className='mb-4 flex items-start justify-between'>
+                <div className='rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700'>
                   <Clock className='h-5 w-5' />
                 </div>
                 <Badge variant='success'>Active</Badge>
@@ -328,144 +408,112 @@ const JobsPage = () => {
       </Grid>
 
       {/* Jobs Grid */}
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8'>
-        {jobStatus?.jobs &&
-          Object.entries(jobStatus.jobs).map(([jobName, job]) => {
+      <div className='mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3'>
+        {jobs && jobs.length > 0 ? (
+          jobs.map((job) => {
+            const jobName = job.name;
             const jobInfo = jobDescriptions[jobName] || {
               title: jobName,
               description: 'Background job',
               icon: Settings,
               color: 'gray',
             };
-            const IconComponent = jobInfo.icon;
-
-            const colorMap = {
-              green: 'bg-green-50 text-green-700 border-green-200',
-              blue: 'bg-blue-50 text-blue-700 border-blue-200',
-              purple: 'bg-purple-50 text-purple-700 border-purple-200',
-              orange: 'bg-amber-50 text-amber-700 border-amber-200',
-              red: 'bg-red-50 text-red-700 border-red-200',
-              gray: 'bg-slate-50 text-slate-700 border-slate-200',
-            };
+            const JobIcon = jobInfo.icon;
 
             return (
               <Card key={jobName} className='overflow-hidden'>
-                <div className='p-6'>
-                  <div className='flex justify-between items-start mb-4'>
-                    <div
-                      className={cn(
-                        'p-2 rounded-lg border',
-                        colorMap[jobInfo.color]
-                      )}
-                    >
-                      <IconComponent className='h-5 w-5' />
+                <div
+                  className={`border-b-2 border-${jobInfo.color}-500 bg-${jobInfo.color}-50 p-4`}
+                >
+                  <div className='flex items-center justify-between'>
+                    <div className='flex items-center gap-3'>
+                      <div
+                        className={`rounded-lg border border-${jobInfo.color}-200 bg-${jobInfo.color}-100 p-2 text-${jobInfo.color}-700`}
+                      >
+                        <JobIcon className='h-5 w-5' />
+                      </div>
+                      <h3 className='font-medium'>{jobInfo.title}</h3>
                     </div>
-                    <div>
-                      {job.errorCount > 0 ? (
-                        <Badge
-                          variant='destructive'
-                          className='flex items-center gap-1'
-                        >
-                          <AlertTriangle className='h-3 w-3' />
-                          Error
-                        </Badge>
-                      ) : job.isRunning ? (
-                        <Badge
-                          variant='info'
-                          className='flex items-center gap-1'
-                        >
-                          <Activity className='h-3 w-3' />
-                          Running
-                        </Badge>
-                      ) : (
-                        <Badge
-                          variant='success'
-                          className='flex items-center gap-1'
-                        >
-                          <CheckCircle className='h-3 w-3' />
-                          Ready
-                        </Badge>
-                      )}
-                    </div>
+                    {getStatusIcon(job)}
                   </div>
-
-                  <h3 className='text-lg font-medium'>{jobInfo.title}</h3>
-                  <p className='text-sm text-muted-foreground mb-6'>
+                </div>
+                <CardContent className='p-4'>
+                  <p className='mb-4 text-sm text-muted-foreground'>
                     {jobInfo.description}
                   </p>
 
-                  <div className='space-y-3 mb-6'>
-                    <div className='flex justify-between text-sm'>
-                      <span className='text-muted-foreground'>Schedule:</span>
-                      <span className='font-medium'>{job.schedule}</span>
-                    </div>
-                    <div className='flex justify-between text-sm'>
-                      <span className='text-muted-foreground'>Last Run:</span>
-                      <span className='font-medium'>
-                        {formatLastRun(job.lastRun)}
+                  <div className='mb-4 space-y-2 text-sm'>
+                    <div className='flex justify-between'>
+                      <span className='text-muted-foreground'>Status:</span>
+                      <span
+                        className={cn(
+                          'font-medium',
+                          job.error
+                            ? 'text-destructive'
+                            : job.isRunning
+                            ? 'text-info'
+                            : 'text-success'
+                        )}
+                      >
+                        {job.error
+                          ? 'Error'
+                          : job.isRunning
+                          ? 'Running'
+                          : job.status || 'Idle'}
                       </span>
                     </div>
-                    <div className='flex justify-between text-sm'>
-                      <span className='text-muted-foreground'>
-                        Success Rate:
-                      </span>
-                      <span className='font-medium'>
-                        {job.successCount > 0 || job.errorCount > 0
-                          ? `${Math.round((job.successCount / (job.successCount + job.errorCount)) * 100)}%`
-                          : 'N/A'}
-                      </span>
+                    <div className='flex justify-between'>
+                      <span className='text-muted-foreground'>Last run:</span>
+                      <span>{formatLastRun(job.lastRun)}</span>
                     </div>
-                    <div className='flex justify-between text-sm'>
-                      <span className='text-muted-foreground'>Runs:</span>
-                      <span className='font-medium'>
-                        <span className='text-success'>
-                          {job.successCount}
-                        </span>{' '}
-                        /<span className='text-red-600'>{job.errorCount}</span>
-                      </span>
+                    <div className='flex justify-between'>
+                      <span className='text-muted-foreground'>Next run:</span>
+                      <span>{formatLastRun(job.nextRun)}</span>
                     </div>
                   </div>
 
-                  {job.lastError && (
-                    <div className='p-3 bg-red-50 border border-red-200 rounded-md mb-4 text-sm text-red-800 flex items-start gap-2'>
-                      <AlertTriangle className='h-4 w-4 mt-0.5 flex-shrink-0' />
-                      <span>Last Error: {job.lastError.error}</span>
-                    </div>
-                  )}
-
                   <Button
                     onClick={() => handleRunJob(jobName)}
-                    disabled={runningJob === jobName || job.isRunning}
+                    disabled={job.isRunning || runningJob === jobName}
                     className='w-full'
                     variant='outline'
                   >
                     {runningJob === jobName ? (
                       <>
-                        <RefreshCw className='animate-spin h-4 w-4 mr-2' />
+                        <RefreshCw className='mr-2 h-4 w-4 animate-spin' />
                         Running...
                       </>
                     ) : (
                       <>
-                        <Zap className='h-4 w-4 mr-2' />
+                        <Play className='mr-2 h-4 w-4' />
                         Run Now
                       </>
                     )}
                   </Button>
-                </div>
+                </CardContent>
               </Card>
             );
-          })}
+          })
+        ) : (
+          <div className='col-span-3 rounded-lg border border-dashed p-8 text-center'>
+            <Settings className='mx-auto mb-4 h-12 w-12 text-muted-foreground' />
+            <h3 className='mb-2 text-lg font-medium'>No jobs available</h3>
+            <p className='mb-4 text-sm text-muted-foreground'>
+              There are no background jobs configured in the system.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Statistics Section */}
       <div className='mb-8'>
-        <h2 className='text-xl font-semibold mb-4'>System Statistics</h2>
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6'>
+        <h2 className='mb-4 text-xl font-semibold'>System Statistics</h2>
+        <div className='grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4'>
           {stats?.health && (
             <Card>
               <CardContent className='pt-6'>
-                <div className='flex items-center gap-3 mb-4'>
-                  <div className='p-2 rounded-lg bg-green-50 text-green-700 border border-green-200'>
+                <div className='mb-4 flex items-center gap-3'>
+                  <div className='rounded-lg border border-green-200 bg-green-50 p-2 text-green-700'>
                     <Shield className='h-5 w-5' />
                   </div>
                   <h3 className='font-medium'>Health Metrics</h3>
@@ -499,8 +547,8 @@ const JobsPage = () => {
           {stats?.notifications && (
             <Card>
               <CardContent className='pt-6'>
-                <div className='flex items-center gap-3 mb-4'>
-                  <div className='p-2 rounded-lg bg-blue-50 text-blue-700 border border-blue-200'>
+                <div className='mb-4 flex items-center gap-3'>
+                  <div className='rounded-lg border border-blue-200 bg-blue-50 p-2 text-blue-700'>
                     <Bell className='h-5 w-5' />
                   </div>
                   <h3 className='font-medium'>Notifications</h3>
@@ -534,8 +582,8 @@ const JobsPage = () => {
           {stats?.overdue && (
             <Card>
               <CardContent className='pt-6'>
-                <div className='flex items-center gap-3 mb-4'>
-                  <div className='p-2 rounded-lg bg-amber-50 text-amber-700 border border-amber-200'>
+                <div className='mb-4 flex items-center gap-3'>
+                  <div className='rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700'>
                     <AlertTriangle className='h-5 w-5' />
                   </div>
                   <h3 className='font-medium'>Overdue Deliveries</h3>
@@ -571,8 +619,8 @@ const JobsPage = () => {
           {stats?.cleanup && (
             <Card>
               <CardContent className='pt-6'>
-                <div className='flex items-center gap-3 mb-4'>
-                  <div className='p-2 rounded-lg bg-slate-50 text-slate-700 border border-slate-200'>
+                <div className='mb-4 flex items-center gap-3'>
+                  <div className='rounded-lg border border-slate-200 bg-slate-50 p-2 text-slate-700'>
                     <Database className='h-5 w-5' />
                   </div>
                   <h3 className='font-medium'>Data Cleanup</h3>
