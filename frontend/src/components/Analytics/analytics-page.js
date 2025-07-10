@@ -193,9 +193,9 @@ const AnalyticsPage = () => {
 
   if (loading) {
     return (
-      <div className='px-4 py-6 max-w-7xl mx-auto flex items-center justify-center min-h-[50vh]'>
+      <div className='mx-auto flex min-h-[50vh] max-w-7xl items-center justify-center px-4 py-6'>
         <div className='text-center'>
-          <div className='h-12 w-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4'></div>
+          <div className='mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent'></div>
           <p className='text-muted-foreground'>Loading analytics data...</p>
         </div>
       </div>
@@ -203,8 +203,8 @@ const AnalyticsPage = () => {
   }
 
   return (
-    <div className='px-4 py-6 max-w-7xl mx-auto'>
-      <div className='flex flex-col gap-6 md:flex-row md:items-start md:justify-between mb-8 bg-card p-6 rounded-xl shadow'>
+    <div className='mx-auto max-w-7xl px-4 py-6'>
+      <div className='mb-8 flex flex-col gap-6 rounded-xl bg-card p-6 shadow md:flex-row md:items-start md:justify-between'>
         <div>
           <h1 className='flex items-center gap-2 text-2xl font-bold'>
             <TrendingUp className='h-6 w-6 text-primary' />
@@ -223,7 +223,7 @@ const AnalyticsPage = () => {
             className='flex items-center gap-2'
           >
             <RefreshCw
-              className={refreshing ? 'animate-spin h-4 w-4' : 'h-4 w-4'}
+              className={refreshing ? 'h-4 w-4 animate-spin' : 'h-4 w-4'}
             />
             {refreshing ? 'Refreshing...' : 'Refresh'}
           </Button>
@@ -239,12 +239,12 @@ const AnalyticsPage = () => {
       </div>
 
       {/* KPI Cards */}
-      <Grid className='gap-6 mb-8'>
+      <Grid className='mb-8 gap-6'>
         <GridItem colSpan='col-span-12 sm:col-span-6 lg:col-span-3'>
           <Card>
             <CardContent className='pt-6'>
-              <div className='flex justify-between items-start mb-4'>
-                <div className='p-2 rounded-lg bg-blue-50 text-blue-700 border border-blue-200'>
+              <div className='mb-4 flex items-start justify-between'>
+                <div className='rounded-lg border border-blue-200 bg-blue-50 p-2 text-blue-700'>
                   <Package className='h-5 w-5' />
                 </div>
                 <Badge variant='success' className='text-xs'>
@@ -262,8 +262,8 @@ const AnalyticsPage = () => {
         <GridItem colSpan='col-span-12 sm:col-span-6 lg:col-span-3'>
           <Card>
             <CardContent className='pt-6'>
-              <div className='flex justify-between items-start mb-4'>
-                <div className='p-2 rounded-lg bg-green-50 text-green-700 border border-green-200'>
+              <div className='mb-4 flex items-start justify-between'>
+                <div className='rounded-lg border border-green-200 bg-green-50 p-2 text-green-700'>
                   <CheckCircle className='h-5 w-5' />
                 </div>
                 <Badge variant='success' className='text-xs'>
@@ -283,8 +283,8 @@ const AnalyticsPage = () => {
         <GridItem colSpan='col-span-12 sm:col-span-6 lg:col-span-3'>
           <Card>
             <CardContent className='pt-6'>
-              <div className='flex justify-between items-start mb-4'>
-                <div className='p-2 rounded-lg bg-purple-50 text-purple-700 border border-purple-200'>
+              <div className='mb-4 flex items-start justify-between'>
+                <div className='rounded-lg border border-purple-200 bg-purple-50 p-2 text-purple-700'>
                   <Users className='h-5 w-5' />
                 </div>
                 <Badge variant='outline' className='text-xs'>
@@ -302,8 +302,8 @@ const AnalyticsPage = () => {
         <GridItem colSpan='col-span-12 sm:col-span-6 lg:col-span-3'>
           <Card>
             <CardContent className='pt-6'>
-              <div className='flex justify-between items-start mb-4'>
-                <div className='p-2 rounded-lg bg-amber-50 text-amber-700 border border-amber-200'>
+              <div className='mb-4 flex items-start justify-between'>
+                <div className='rounded-lg border border-amber-200 bg-amber-50 p-2 text-amber-700'>
                   <Clock className='h-5 w-5' />
                 </div>
                 <Badge variant='outline' className='text-xs'>
@@ -322,7 +322,7 @@ const AnalyticsPage = () => {
       </Grid>
 
       {/* Charts Grid */}
-      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8'>
+      <div className='mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2'>
         {/* Delivery Status Distribution */}
         <Card className='overflow-hidden'>
           <div className='p-6 pb-2'>
@@ -360,7 +360,7 @@ const AnalyticsPage = () => {
         </Card>
 
         {/* Delivery Trends */}
-        <Card className='overflow-hidden col-span-1 lg:col-span-2'>
+        <Card className='col-span-1 overflow-hidden lg:col-span-2'>
           <div className='p-6 pb-2'>
             <h3 className='text-lg font-medium'>Delivery Trends</h3>
             <p className='text-sm text-muted-foreground'>
@@ -442,7 +442,7 @@ const AnalyticsPage = () => {
             </p>
           </div>
           <div className='p-6'>
-            <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4'>
+            <div className='mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
               <div className='space-y-2'>
                 <label className='text-sm font-medium'>Start Date:</label>
                 <Input
@@ -479,7 +479,7 @@ const AnalyticsPage = () => {
               <div className='flex items-end'>
                 <Button
                   onClick={fetchDateRangeData}
-                  className='flex items-center gap-2 w-full'
+                  className='flex w-full items-center gap-2'
                 >
                   <Filter className='h-4 w-4' />
                   Apply Filter
@@ -488,8 +488,8 @@ const AnalyticsPage = () => {
             </div>
 
             {dateRangeStats.data && (
-              <div className='mt-6 pt-6 border-t'>
-                <h4 className='text-base font-medium mb-4'>
+              <div className='mt-6 border-t pt-6'>
+                <h4 className='mb-4 text-base font-medium'>
                   Results for {dateRangeStats.dateRange?.startDate} to{' '}
                   {dateRangeStats.dateRange?.endDate}
                 </h4>

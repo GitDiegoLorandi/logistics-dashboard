@@ -3,9 +3,13 @@ import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import Backend from 'i18next-http-backend';
 
+// Import translation files directly
+import commonEN from '../locales/en.json';
+import commonES from '../locales/es.json';
+
 // Initialize i18next
 i18n
-  // Load translations from /public/locales
+  // Load translations using Backend plugin
   .use(Backend)
   // Detect user language
   .use(LanguageDetector)
@@ -32,6 +36,15 @@ i18n
     react: {
       useSuspense: true,
     },
+    // Add resources directly for fallback
+    resources: {
+      en: {
+        common: commonEN
+      },
+      es: {
+        common: commonES
+      }
+    }
   });
 
 export default i18n; 
