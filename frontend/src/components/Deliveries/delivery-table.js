@@ -5,6 +5,7 @@ import { Button } from '../UI/button';
 import { Badge } from '../UI/badge';
 import { getStatusColor } from '../../constants/status-colors';
 import { exportToCSV } from '../../utils/export-utils';
+import PropTypes from 'prop-types';
 
 const DeliveryTable = ({ deliveries }) => {
   const columns = useMemo(
@@ -58,12 +59,9 @@ const DeliveryTable = ({ deliveries }) => {
     canPreviousPage,
     canNextPage,
     pageOptions,
-    pageCount,
-    gotoPage,
     nextPage,
     previousPage,
-    setPageSize,
-    state: { pageIndex, pageSize },
+    state: { pageIndex },
   } = useTable(
     {
       columns,
@@ -89,7 +87,7 @@ const DeliveryTable = ({ deliveries }) => {
 
   return (
     <div className="w-full">
-      <div className="flex justify-between items-center mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <h2 className="text-xl font-semibold">Deliveries</h2>
         <Button 
           variant="outline" 
@@ -106,10 +104,11 @@ const DeliveryTable = ({ deliveries }) => {
         <table {...getTableProps()} className="w-full text-sm">
           <thead className="bg-muted/50">
             {headerGroups.map(headerGroup => (
-              <tr {...headerGroup.getHeaderGroupProps()}>
+              <tr {...headerGroup.getHeaderGroupProps()} key={headerGroup.id}>
                 {headerGroup.headers.map(column => (
                   <th
                     {...column.getHeaderProps(column.getSortByToggleProps())}
+                    key={column.id}
                     className="px-4 py-3 text-left font-medium text-muted-foreground"
                   >
                     <div className="flex items-center gap-1">
@@ -133,9 +132,9 @@ const DeliveryTable = ({ deliveries }) => {
             {page.map(row => {
               prepareRow(row);
               return (
-                <tr {...row.getRowProps()} className="border-t hover:bg-muted/50">
+                <tr {...row.getRowProps()} key={row.id} className="border-t hover:bg-muted/50">
                   {row.cells.map(cell => (
-                    <td {...cell.getCellProps()} className="px-4 py-3">
+                    <td {...cell.getCellProps()} key={cell.column.id} className="px-4 py-3">
                       {cell.render('Cell')}
                     </td>
                   ))}
@@ -146,7 +145,7 @@ const DeliveryTable = ({ deliveries }) => {
         </table>
       </div>
 
-      <div className="flex items-center justify-between mt-4">
+      <div className="mt-4 flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
           Page {pageIndex + 1} of {pageOptions.length}
         </div>
@@ -171,6 +170,20 @@ const DeliveryTable = ({ deliveries }) => {
       </div>
     </div>
   );
+};
+
+DeliveryTable.propTypes = {
+  deliveries: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string,
+      customerName: PropTypes.string,
+      origin: PropTypes.string,
+      destination: PropTypes.string,
+      status: PropTypes.string,
+      delivererName: PropTypes.string,
+      date: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)])
+    })
+  ).isRequired
 };
 
 export default DeliveryTable; 
