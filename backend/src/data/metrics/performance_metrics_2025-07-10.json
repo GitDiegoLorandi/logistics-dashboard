@@ -1,0 +1,188 @@
+[
+  {
+    "timestamp": "2025-07-10T11:15:00.879Z",
+    "system": {
+      "uptime": 29.4575361,
+      "memoryUsage": {
+        "rss": 76.57,
+        "heapTotal": 35.39,
+        "heapUsed": 32.27,
+        "used": 32.27,
+        "external": 18.43
+      },
+      "cpuUsage": {
+        "user": 1062000,
+        "system": 500000
+      },
+      "loadAverage": [
+        0,
+        0,
+        0
+      ],
+      "platform": "win32",
+      "nodeVersion": "v18.17.0",
+      "pid": 14872
+    },
+    "database": {
+      "connectionState": "connected",
+      "isConnected": true,
+      "activeConnections": 1,
+      "collections": 3,
+      "dataSize": 0.01,
+      "storageSize": 0.11,
+      "indexSize": 0.56,
+      "documents": 19,
+      "indexes": 16,
+      "avgObjSize": 506.05
+    },
+    "application": {
+      "queryPerformance": {
+        "totalTime": 103,
+        "deliveryQuery": 9,
+        "userQuery": 7,
+        "delivererQuery": 7,
+        "avgQueryTime": 8
+      },
+      "counts": {
+        "totalDeliveries": 5,
+        "totalUsers": 10,
+        "totalDeliverers": 4,
+        "recentDeliveries": 0,
+        "pendingDeliveries": 3,
+        "inTransitDeliveries": 2,
+        "deliveredDeliveries": 0
+      },
+      "ratios": {
+        "deliveryCompletionRate": 0,
+        "pendingRatio": 60
+      }
+    },
+    "errors": [],
+    "alerts": [],
+    "jobExecutionTime": 113
+  },
+  {
+    "timestamp": "2025-07-10T15:00:00.847Z",
+    "system": {
+      "uptime": 15.060916,
+      "memoryUsage": {
+        "rss": 77.12,
+        "heapTotal": 35.39,
+        "heapUsed": 33.03,
+        "used": 33.03,
+        "external": 18.42
+      },
+      "cpuUsage": {
+        "user": 875000,
+        "system": 468000
+      },
+      "loadAverage": [
+        0,
+        0,
+        0
+      ],
+      "platform": "win32",
+      "nodeVersion": "v18.17.0",
+      "pid": 12620
+    },
+    "database": {
+      "connectionState": "connected",
+      "isConnected": true,
+      "activeConnections": 1,
+      "collections": 3,
+      "dataSize": 0.01,
+      "storageSize": 0.11,
+      "indexSize": 0.56,
+      "documents": 19,
+      "indexes": 16,
+      "avgObjSize": 506.05
+    },
+    "application": {
+      "queryPerformance": {
+        "totalTime": 50,
+        "deliveryQuery": 5,
+        "userQuery": 10,
+        "delivererQuery": 7,
+        "avgQueryTime": 7
+      },
+      "counts": {
+        "totalDeliveries": 5,
+        "totalUsers": 10,
+        "totalDeliverers": 4,
+        "recentDeliveries": 0,
+        "pendingDeliveries": 3,
+        "inTransitDeliveries": 2,
+        "deliveredDeliveries": 0
+      },
+      "ratios": {
+        "deliveryCompletionRate": 0,
+        "pendingRatio": 60
+      }
+    },
+    "errors": [],
+    "alerts": [],
+    "jobExecutionTime": 62
+  },
+  {
+    "timestamp": "2025-07-10T15:15:00.177Z",
+    "system": {
+      "uptime": 51.2819763,
+      "memoryUsage": {
+        "rss": 79.33,
+        "heapTotal": 37.89,
+        "heapUsed": 35.3,
+        "used": 35.3,
+        "external": 18.57
+      },
+      "cpuUsage": {
+        "user": 1515000,
+        "system": 562000
+      },
+      "loadAverage": [
+        0,
+        0,
+        0
+      ],
+      "platform": "win32",
+      "nodeVersion": "v18.17.0",
+      "pid": 17184
+    },
+    "database": {
+      "connectionState": "connected",
+      "isConnected": true,
+      "activeConnections": 1,
+      "collections": 3,
+      "dataSize": 0.01,
+      "storageSize": 0.11,
+      "indexSize": 0.56,
+      "documents": 19,
+      "indexes": 16,
+      "avgObjSize": 513.05
+    },
+    "application": {
+      "queryPerformance": {
+        "totalTime": 50,
+        "deliveryQuery": 7,
+        "userQuery": 8,
+        "delivererQuery": 7,
+        "avgQueryTime": 7
+      },
+      "counts": {
+        "totalDeliveries": 5,
+        "totalUsers": 10,
+        "totalDeliverers": 4,
+        "recentDeliveries": 0,
+        "pendingDeliveries": 3,
+        "inTransitDeliveries": 2,
+        "deliveredDeliveries": 0
+      },
+      "ratios": {
+        "deliveryCompletionRate": 0,
+        "pendingRatio": 60
+      }
+    },
+    "errors": [],
+    "alerts": [],
+    "jobExecutionTime": 56
+  }
+]
