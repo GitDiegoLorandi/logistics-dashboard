@@ -117,9 +117,7 @@ export const authAPI = {
 export const deliveryAPI = {
   getAll: async (params) => {
     try {
-      console.log('Fetching deliveries with params:', params);
       const response = await api.get('/deliveries', { params });
-      console.log('Delivery API response:', response);
       
       // Handle both paginated and non-paginated responses
       if (Array.isArray(response)) {
@@ -132,7 +130,6 @@ export const deliveryAPI = {
       }
       return response || { docs: [], totalDocs: 0, totalPages: 0, page: 1 };
     } catch (error) {
-      console.error('Error in deliveryAPI.getAll:', error);
       throw error;
     }
   },
