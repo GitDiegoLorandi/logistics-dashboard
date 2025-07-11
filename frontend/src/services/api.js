@@ -134,9 +134,30 @@ export const deliveryAPI = {
     }
   },
   getById: id => api.get(`/deliveries/${id}`),
-  create: data => api.post('/deliveries', data),
+  create: async (data) => {
+    try {
+      const response = await api.post('/deliveries', data);
+      return response;
+    } catch (error) {
+      console.error('Error in deliveryAPI.create:', error);
+      throw error;
+    }
+  },
   update: (id, data) => api.put(`/deliveries/${id}`, data),
-  delete: id => api.delete(`/deliveries/${id}`),
+  delete: async (id) => {
+    try {
+      if (!id) {
+        throw new Error('Delivery ID is required');
+      }
+      
+      console.log(`API: Deleting delivery with ID: ${id}`);
+      const response = await api.delete(`/deliveries/${id}`);
+      return response;
+    } catch (error) {
+      console.error(`Error in deliveryAPI.delete for ID ${id}:`, error);
+      throw error;
+    }
+  },
   updateStatus: (id, status) =>
     api.patch(`/deliveries/${id}/status`, { status }),
   assign: (id, delivererId) =>
