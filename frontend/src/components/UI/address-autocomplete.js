@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Input } from './input';
-import { MapPin, Loader2 } from 'lucide-react';
+import { MapPin, Loader2, AlertCircle } from 'lucide-react';
+
+// Geoapify API key and project ID
+const GEOAPIFY_API_KEY = '6d177e3213d4451d87c9e1561ee3b8d3';
+const GEOAPIFY_PROJECT_ID = '7YuzBeC5u2hoonqNRzlS';
 
 /**
- * Address autocomplete component with Google Places API integration
+ * Address autocomplete component with Geoapify API integration
  */
 const AddressAutocomplete = ({
   value,
@@ -20,44 +24,10 @@ const AddressAutocomplete = ({
   const [suggestions, setSuggestions] = useState([]);
   const [loading, setLoading] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [apiError, setApiError] = useState(false);
   const inputRef = useRef(null);
-  const autocompleteRef = useRef(null);
   const suggestionsRef = useRef(null);
-
-  // Initialize Google Places Autocomplete
-  useEffect(() => {
-    // Check if Google Maps API is loaded
-    if (window.google && window.google.maps && window.google.maps.places) {
-      initAutocomplete();
-    } else {
-      // For this component to work, you need to include the Google Maps API script in index.html
-      // with the Places library enabled
-      console.warn('Google Maps API not loaded. Address autocomplete will not work.');
-    }
-
-    function initAutocomplete() {
-      if (inputRef.current && !autocompleteRef.current) {
-        const options = {
-          componentRestrictions: { country: 'us' }, // Restrict to a specific country if needed
-          fields: ['address_components', 'formatted_address', 'geometry', 'name'],
-        };
-
-        autocompleteRef.current = new window.google.maps.places.Autocomplete(
-          inputRef.current,
-          options
-        );
-
-        autocompleteRef.current.addListener('place_changed', handlePlaceSelect);
-      }
-    }
-
-    return () => {
-      // Clean up listener if component unmounts
-      if (autocompleteRef.current && window.google) {
-        window.google.maps.event.clearInstanceListeners(autocompleteRef.current);
-      }
-    };
-  }, []);
+  const debounceTimerRef = useRef(null);
 
   // Handle click outside to close suggestions
   useEffect(() => {
@@ -73,26 +43,63 @@ const AddressAutocomplete = ({
     };
   }, []);
 
-  // Handle place selection from Google Places Autocomplete
-  const handlePlaceSelect = () => {
-    if (autocompleteRef.current) {
-      const place = autocompleteRef.current.getPlace();
+  // Fetch address suggestions from Geoapify
+  const fetchAddressSuggestions = async (query) => {
+    if (!query || query.length < 3) return;
+
+    setLoading(true);
+    try {
+      const url = `https://api.geoapify.com/v1/geocode/autocomplete?text=${encodeURIComponent(query)}&apiKey=${GEOAPIFY_API_KEY}&format=json&limit=5`;
       
-      if (place && place.formatted_address) {
-        if (onChange) {
-          onChange(place.formatted_address);
-        }
+      const response = await fetch(url);
+      
+      if (!response.ok) {
+        throw new Error(`Geoapify API error: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (data && data.results) {
+        const addressSuggestions = data.results.map(result => ({
+          formattedAddress: result.formatted,
+          lat: result.lat,
+          lon: result.lon,
+          country: result.country,
+          state: result.state,
+          city: result.city,
+          street: result.street,
+          houseNumber: result.housenumber,
+          postcode: result.postcode,
+          raw: result
+        }));
         
-        if (onSelect) {
-          onSelect(place);
-        }
-        
+        setSuggestions(addressSuggestions);
+      } else {
         setSuggestions([]);
       }
+    } catch (error) {
+      console.error('Error fetching address suggestions:', error);
+      setApiError(true);
+      setSuggestions([]);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Handle input change
+  // Handle suggestion selection
+  const handleSuggestionSelect = (suggestion) => {
+    if (onChange) {
+      onChange(suggestion.formattedAddress);
+    }
+    
+    if (onSelect) {
+      onSelect(suggestion);
+    }
+    
+    setSuggestions([]);
+  };
+
+  // Handle input change with debounce
   const handleInputChange = (e) => {
     const newValue = e.target.value;
     
@@ -100,12 +107,16 @@ const AddressAutocomplete = ({
       onChange(newValue);
     }
     
-    if (newValue.length > 2) {
+    // Clear previous timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+    
+    if (newValue.length >= 3) {
       setLoading(true);
-      // The actual suggestions will come from Google Places API
-      // This is just for the UI state
-      setTimeout(() => {
-        setLoading(false);
+      // Debounce API calls to avoid too many requests
+      debounceTimerRef.current = setTimeout(() => {
+        fetchAddressSuggestions(newValue);
       }, 300);
     } else {
       setSuggestions([]);
@@ -121,7 +132,7 @@ const AddressAutocomplete = ({
           type="text"
           value={value || ''}
           onChange={handleInputChange}
-          placeholder={placeholder}
+          placeholder={apiError ? "Enter address manually" : placeholder}
           className={`pl-10 ${inputClassName}`}
           disabled={disabled}
           required={required}
@@ -131,13 +142,22 @@ const AddressAutocomplete = ({
         <div className="absolute left-3 top-1/2 -translate-y-1/2">
           {loading ? (
             <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          ) : apiError ? (
+            <AlertCircle className="h-4 w-4 text-amber-500" />
           ) : (
             <MapPin className="h-4 w-4 text-muted-foreground" />
           )}
         </div>
       </div>
 
-      {/* Suggestions dropdown - will be populated by Google Places API */}
+      {/* API error message */}
+      {apiError && (
+        <div className="mt-1 text-xs text-amber-500">
+          Address autocomplete unavailable. Please enter address manually.
+        </div>
+      )}
+
+      {/* Suggestions dropdown */}
       {focused && suggestions.length > 0 && (
         <div 
           ref={suggestionsRef}
@@ -147,12 +167,16 @@ const AddressAutocomplete = ({
             <div
               key={index}
               className="cursor-pointer px-4 py-2 hover:bg-muted"
-              onClick={() => {
-                if (onChange) onChange(suggestion);
-                setSuggestions([]);
-              }}
+              onClick={() => handleSuggestionSelect(suggestion)}
             >
-              {suggestion}
+              <div className="font-medium">{suggestion.formattedAddress}</div>
+              {suggestion.city && suggestion.country && (
+                <div className="text-xs text-muted-foreground">
+                  {[suggestion.city, suggestion.state, suggestion.country]
+                    .filter(Boolean)
+                    .join(', ')}
+                </div>
+              )}
             </div>
           ))}
         </div>

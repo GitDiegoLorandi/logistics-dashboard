@@ -279,7 +279,7 @@ const DeliveriesPage = () => {
         console.log('Creating delivery with data:', submissionData);
         try {
           const response = await deliveryAPI.create(submissionData);
-          console.log('Created delivery:', response.data);
+          console.log('Created delivery:', response);
           toast.success('Delivery created successfully!');
           setShowModal(false);
           resetForm();
@@ -290,12 +290,8 @@ const DeliveriesPage = () => {
           }, 300);
         } catch (err) {
           console.error('Error creating delivery:', err);
-          console.error('Error response data:', err.response?.data);
-
-          if (
-            err.response?.data?.errors &&
-            Array.isArray(err.response.data.errors)
-          ) {
+          
+          if (err.response?.data?.errors && Array.isArray(err.response.data.errors)) {
             // Handle validation errors array
             err.response.data.errors.forEach(error => {
               toast.error(`${error.field}: ${error.message}`);
@@ -303,26 +299,15 @@ const DeliveriesPage = () => {
           } else if (err.response?.data?.message) {
             // Handle single error message
             toast.error(err.response.data.message);
+          } else if (err.message) {
+            toast.error(err.message);
           } else {
-            toast.error(
-              'Failed to create delivery. Please check your input and try again.'
-            );
-            
-            // For demo purposes, simulate successful creation with fallback data
-            const newDelivery = {
-              _id: `demo-${Date.now()}`,
-              ...submissionData,
-              orderId: `ORD-${Math.floor(10000 + Math.random() * 90000)}`,
-              createdAt: new Date().toISOString()
-            };
-            
-            setDeliveries(prev => [newDelivery, ...prev]);
-            setShowModal(false);
-            resetForm();
+            toast.error('Failed to create delivery. Please check your input and try again.');
           }
+          
+          // Don't close the modal or reset the form so the user can fix the issues
+          setLoading(false);
         }
-        setLoading(false);
-        return;
       } else {
         // Handle edit mode
         console.log('Updating delivery with data:', submissionData);
@@ -368,38 +353,45 @@ const DeliveriesPage = () => {
           
           if (err.response?.data?.message) {
             toast.error(err.response.data.message);
+          } else if (err.message) {
+            toast.error(err.message);
           } else {
             toast.error('Failed to update delivery');
-            
-            // For demo purposes, simulate successful update with fallback data
-            setDeliveries(prev => 
-              prev.map(d => d._id === selectedDelivery._id ? { ...d, ...submissionData } : d)
-            );
-            setShowModal(false);
-            resetForm();
           }
+          
+          // Don't close the modal or reset the form so the user can fix the issues
+          setLoading(false);
         }
       }
     } catch (err) {
       console.error('Unexpected error:', err);
       toast.error('An unexpected error occurred');
-    } finally {
       setLoading(false);
     }
   };
 
   // Handle Delete
-  const handleDelete = async deliveryId => {
+  const handleDelete = async delivery => {
     if (!window.confirm('Are you sure you want to delete this delivery?'))
       return;
 
     try {
+      // Check if the parameter is a delivery object or just an ID
+      const deliveryId = typeof delivery === 'object' ? delivery._id : delivery;
+      
+      if (!deliveryId) {
+        console.error('Invalid delivery ID:', deliveryId);
+        toast.error('Cannot delete delivery: Invalid ID');
+        return;
+      }
+      
+      console.log(`Deleting delivery with ID: ${deliveryId}`);
       await deliveryAPI.delete(deliveryId);
       toast.success('Delivery deleted successfully!');
       fetchDeliveries();
     } catch (err) {
       console.error('Error deleting delivery:', err);
-      toast.error('Failed to delete delivery');
+      toast.error(`Failed to delete delivery: ${err.message || 'Unknown error'}`);
     }
   };
 
@@ -659,10 +651,10 @@ const DeliveriesPage = () => {
               onChange={e => setPriorityFilter(e.target.value)}
             >
               <option value=''>{t('filters.all')}</option>
-              <option value='LOW'>{t('priorities.low')}</option>
-              <option value='MEDIUM'>{t('priorities.medium')}</option>
-              <option value='HIGH'>{t('priorities.high')}</option>
-              <option value='URGENT'>{t('priorities.urgent')}</option>
+              <option value='Low'>{t('priorities.low')}</option>
+              <option value='Medium'>{t('priorities.medium')}</option>
+              <option value='High'>{t('priorities.high')}</option>
+              <option value='Urgent'>{t('priorities.urgent')}</option>
             </Select>
           </div>
 
@@ -764,27 +756,27 @@ const DeliveriesPage = () => {
 
       {/* Create/Edit Modal */}
       {showModal && (
-        <div className='modal-overlay'>
-          <div className='modal'>
-            <div className='modal-header'>
-              <h3>
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+          <div className='w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
+            <div className='flex items-center justify-between border-b pb-4 mb-4'>
+              <h3 className='text-xl font-semibold'>
                 {modalMode === 'create'
-                  ? 'Create New Delivery'
-                  : 'Edit Delivery'}
+                  ? t('newDelivery')
+                  : t('editDelivery')}
               </h3>
               <button
-                className='modal-close'
+                className='rounded-full p-1 hover:bg-gray-100'
                 onClick={() => setShowModal(false)}
               >
                 <X size={24} />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className='modal-form'>
+            <form onSubmit={handleSubmit} className='space-y-4'>
               {modalMode === 'edit' && (
-                <div className='form-row'>
-                  <div className='form-group'>
-                    <label>Order ID *</label>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>Order ID *</label>
                     <input
                       type='text'
                       value={formData.orderId}
@@ -794,10 +786,11 @@ const DeliveriesPage = () => {
                       required
                       disabled={true}
                       placeholder='Auto-generated for new deliveries'
+                      className='w-full rounded-md border border-gray-300 px-3 py-2'
                     />
                   </div>
-                  <div className='form-group'>
-                    <label>Customer *</label>
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>Customer *</label>
                     <input
                       type='text'
                       value={formData.customer}
@@ -806,14 +799,15 @@ const DeliveriesPage = () => {
                       }
                       required
                       placeholder='Customer name'
+                      className='w-full rounded-md border border-gray-300 px-3 py-2'
                     />
                   </div>
                 </div>
               )}
 
               {modalMode === 'create' && (
-                <div className='form-group'>
-                  <label>Customer *</label>
+                <div className='space-y-2'>
+                  <label className='text-sm font-medium'>Customer *</label>
                   <input
                     type='text'
                     value={formData.customer}
@@ -822,12 +816,13 @@ const DeliveriesPage = () => {
                     }
                     required
                     placeholder='Customer name'
+                    className='w-full rounded-md border border-gray-300 px-3 py-2'
                   />
                 </div>
               )}
 
-              <div className='form-group'>
-                <label>Delivery Address</label>
+              <div className='space-y-2'>
+                <label className='text-sm font-medium'>Delivery Address</label>
                 <AddressAutocomplete
                   value={formData.deliveryAddress}
                   onChange={address =>
@@ -836,20 +831,21 @@ const DeliveriesPage = () => {
                   placeholder='Enter delivery address'
                   disabled={loading}
                 />
-                <small className='form-hint'>
+                <small className='text-xs text-gray-500'>
                   Start typing to see address suggestions
                 </small>
               </div>
 
-              <div className='form-row'>
-                <div className='form-group'>
-                  <label>Status</label>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div className='space-y-2'>
+                  <label className='text-sm font-medium'>Status</label>
                   <select
                     value={formData.status}
                     onChange={e =>
                       setFormData({ ...formData, status: e.target.value })
                     }
-                    disabled={modalMode === 'create'} // Disable status selection for new deliveries
+                    disabled={modalMode === 'create'}
+                    className='w-full rounded-md border border-gray-300 px-3 py-2'
                   >
                     <option value='PENDING'>{t('statuses.pending')}</option>
                     <option value='IN_TRANSIT'>{t('statuses.inTransit')}</option>
@@ -857,30 +853,31 @@ const DeliveriesPage = () => {
                     <option value='CANCELLED'>{t('statuses.cancelled')}</option>
                   </select>
                   {modalMode === 'create' && (
-                    <small className='form-hint'>
+                    <small className='text-xs text-gray-500'>
                       New deliveries are always set to "Pending" status
                     </small>
                   )}
                 </div>
-                <div className='form-group'>
-                  <label>Priority</label>
+                <div className='space-y-2'>
+                  <label className='text-sm font-medium'>Priority</label>
                   <select
                     value={formData.priority}
                     onChange={e =>
                       setFormData({ ...formData, priority: e.target.value })
                     }
+                    className='w-full rounded-md border border-gray-300 px-3 py-2'
                   >
-                    <option value='LOW'>{t('priorities.low')}</option>
-                    <option value='MEDIUM'>{t('priorities.medium')}</option>
-                    <option value='HIGH'>{t('priorities.high')}</option>
-                    <option value='URGENT'>{t('priorities.urgent')}</option>
+                    <option value='Low'>{t('priorities.low')}</option>
+                    <option value='Medium'>{t('priorities.medium')}</option>
+                    <option value='High'>{t('priorities.high')}</option>
+                    <option value='Urgent'>{t('priorities.urgent')}</option>
                   </select>
                 </div>
               </div>
 
-              <div className='form-row'>
-                <div className='form-group'>
-                  <label>Estimated Delivery Date *</label>
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div className='space-y-2'>
+                  <label className='text-sm font-medium'>Estimated Delivery Date *</label>
                   <input
                     type='date'
                     value={formData.estimatedDeliveryDate}
@@ -891,17 +888,19 @@ const DeliveriesPage = () => {
                       })
                     }
                     required
+                    className='w-full rounded-md border border-gray-300 px-3 py-2'
                   />
-                  <small className='form-hint'>Must be a future date</small>
+                  <small className='text-xs text-gray-500'>Must be a future date</small>
                 </div>
                 {userRole === 'admin' && (
-                  <div className='form-group'>
-                    <label>Assign Deliverer</label>
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>Assign Deliverer</label>
                     <select
                       value={formData.deliverer}
                       onChange={e =>
                         setFormData({ ...formData, deliverer: e.target.value })
                       }
+                      className='w-full rounded-md border border-gray-300 px-3 py-2'
                     >
                       <option value=''>{t('filters.all')}</option>
                       {deliverers.map(deliverer => (
@@ -914,8 +913,8 @@ const DeliveriesPage = () => {
                 )}
               </div>
 
-              <div className='form-group'>
-                <label>Notes</label>
+              <div className='space-y-2'>
+                <label className='text-sm font-medium'>Notes</label>
                 <textarea
                   value={formData.notes}
                   onChange={e =>
@@ -923,25 +922,25 @@ const DeliveriesPage = () => {
                   }
                   placeholder='Additional notes or instructions'
                   rows='3'
+                  className='w-full rounded-md border border-gray-300 px-3 py-2'
                 />
               </div>
 
-              <div className='modal-actions'>
-                <button
+              <div className='flex justify-end space-x-3 pt-4 border-t'>
+                <Button
                   type='button'
-                  className='btn-secondary'
+                  variant='outline'
                   onClick={() => setShowModal(false)}
                 >
                   Cancel
-                </button>
-                <button
+                </Button>
+                <Button
                   type='submit'
-                  className='btn-primary'
                   disabled={loading}
                 >
                   {loading ? (
                     <>
-                      <RefreshCw className='spinning' size={16} />
+                      <RefreshCw className='mr-2 h-4 w-4 animate-spin' />
                       {modalMode === 'create' ? 'Creating...' : 'Updating...'}
                     </>
                   ) : modalMode === 'create' ? (
@@ -949,7 +948,7 @@ const DeliveriesPage = () => {
                   ) : (
                     'Update Delivery'
                   )}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
@@ -958,191 +957,128 @@ const DeliveriesPage = () => {
 
       {/* View Modal */}
       {showViewModal && selectedDelivery && (
-        <div className='modal-overlay'>
-          <div className='modal view-modal'>
-            <div className='modal-header'>
-              <h3>Delivery Details</h3>
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+          <div className='w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
+            <div className='flex items-center justify-between border-b pb-4 mb-4'>
+              <h3 className='text-xl font-semibold'>Delivery Details</h3>
               <button
-                className='modal-close'
+                className='rounded-full p-1 hover:bg-gray-100'
                 onClick={() => setShowViewModal(false)}
               >
                 <X size={24} />
               </button>
             </div>
 
-            <div className='delivery-details'>
-              <div className='detail-section'>
-                <h4>Basic Information</h4>
-                <div className='detail-grid'>
-                  <div className='detail-item'>
-                    <label>Order ID</label>
-                    <span className='detail-value'>
+            <div className='space-y-6'>
+              <div className='space-y-3'>
+                <h4 className='font-medium text-lg'>Basic Information</h4>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='space-y-1'>
+                    <label className='text-sm text-gray-500'>Order ID</label>
+                    <p className='font-medium'>
                       {selectedDelivery.orderId}
-                    </span>
+                    </p>
                   </div>
-                  <div className='detail-item'>
-                    <label>Customer</label>
-                    <span className='detail-value'>
+                  <div className='space-y-1'>
+                    <label className='text-sm text-gray-500'>Customer</label>
+                    <p className='font-medium'>
                       {selectedDelivery.customer}
-                    </span>
+                    </p>
                   </div>
-                  <div className='detail-item'>
-                    <label>Status</label>
-                    <StatusBadge status={selectedDelivery.status} />
+                  <div className='space-y-1'>
+                    <label className='text-sm text-gray-500'>Status</label>
+                    <div>
+                      <StatusBadge status={selectedDelivery.status} />
+                    </div>
                   </div>
-                  <div className='detail-item'>
-                    <label>Priority</label>
-                    <PriorityBadge priority={selectedDelivery.priority} />
+                  <div className='space-y-1'>
+                    <label className='text-sm text-gray-500'>Priority</label>
+                    <div>
+                      <PriorityBadge priority={selectedDelivery.priority} />
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className='detail-section'>
-                <h4>Delivery Information</h4>
-                <div className='detail-grid'>
-                  <div className='detail-item full-width'>
-                    <label>Delivery Address</label>
-                    <span className='detail-value'>
+              <div className='space-y-3'>
+                <h4 className='font-medium text-lg'>Delivery Information</h4>
+                <div className='grid grid-cols-1 gap-4'>
+                  <div className='space-y-1'>
+                    <label className='text-sm text-gray-500'>Delivery Address</label>
+                    <p className='font-medium'>
                       {selectedDelivery.deliveryAddress ||
                         'No address provided'}
-                    </span>
+                    </p>
                   </div>
-                  <div className='detail-item'>
-                    <label>Estimated Date</label>
-                    <span className='detail-value'>
-                      {selectedDelivery.estimatedDeliveryDate
-                        ? new Date(
-                            selectedDelivery.estimatedDeliveryDate
-                          ).toLocaleDateString()
-                        : 'Not set'}
-                    </span>
-                  </div>
-                  <div className='detail-item'>
-                    <label>Actual Date</label>
-                    <span className='detail-value'>
-                      {selectedDelivery.actualDeliveryDate
-                        ? new Date(
-                            selectedDelivery.actualDeliveryDate
-                          ).toLocaleDateString()
-                        : 'Not delivered yet'}
-                    </span>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                    <div className='space-y-1'>
+                      <label className='text-sm text-gray-500'>Estimated Date</label>
+                      <p className='font-medium'>
+                        {selectedDelivery.estimatedDeliveryDate
+                          ? new Date(
+                              selectedDelivery.estimatedDeliveryDate
+                            ).toLocaleDateString()
+                          : 'Not set'}
+                      </p>
+                    </div>
+                    <div className='space-y-1'>
+                      <label className='text-sm text-gray-500'>Actual Date</label>
+                      <p className='font-medium'>
+                        {selectedDelivery.actualDeliveryDate
+                          ? new Date(
+                              selectedDelivery.actualDeliveryDate
+                            ).toLocaleDateString()
+                          : 'Not delivered yet'}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className='detail-section'>
-                <h4>Assignment & Tracking</h4>
-                <div className='detail-grid'>
-                  <div className='detail-item'>
-                    <label>Assigned Deliverer</label>
-                    <span className='detail-value'>
+              <div className='space-y-3'>
+                <h4 className='font-medium text-lg'>Assignment & Tracking</h4>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='space-y-1'>
+                    <label className='text-sm text-gray-500'>Assigned Deliverer</label>
+                    <p className='font-medium'>
                       {selectedDelivery.deliverer
                         ? `${selectedDelivery.deliverer.name} (${selectedDelivery.deliverer.email})`
                         : 'Unassigned'}
-                    </span>
+                    </p>
                   </div>
-                  <div className='detail-item'>
-                    <label>Created Date</label>
-                    <span className='detail-value'>
+                  <div className='space-y-1'>
+                    <label className='text-sm text-gray-500'>Created Date</label>
+                    <p className='font-medium'>
                       {new Date(
                         selectedDelivery.createdAt
                       ).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div className='detail-item'>
-                    <label>Created By</label>
-                    <span className='detail-value'>
-                      {selectedDelivery.createdBy?.email || 'System'}
-                    </span>
-                  </div>
-                  <div className='detail-item'>
-                    <label>Last Updated</label>
-                    <span className='detail-value'>
-                      {new Date(
-                        selectedDelivery.updatedAt
-                      ).toLocaleDateString()}
-                    </span>
+                    </p>
                   </div>
                 </div>
               </div>
 
               {selectedDelivery.notes && (
-                <div className='detail-section'>
-                  <h4>Notes</h4>
-                  <div className='notes-content'>{selectedDelivery.notes}</div>
+                <div className='space-y-3'>
+                  <h4 className='font-medium text-lg'>Notes</h4>
+                  <p>{selectedDelivery.notes}</p>
                 </div>
               )}
 
-              <div className='quick-actions'>
-                <h4>Quick Actions</h4>
-                <div className='quick-action-buttons'>
-                  {userRole === 'admin' &&
-                    selectedDelivery.status !== 'DELIVERED' && (
-                      <button
-                        className={`btn-success ${!selectedDelivery.deliverer ? 'disabled' : ''}`}
-                        onClick={() => {
-                          if (selectedDelivery.deliverer) {
-                            handleStatusUpdate(
-                              selectedDelivery._id,
-                              'DELIVERED'
-                            );
-                            setShowViewModal(false);
-                          } else {
-                            toast.error(
-                              'Cannot mark as Delivered. A deliverer must be assigned first.'
-                            );
-                          }
-                        }}
-                        disabled={!selectedDelivery.deliverer}
-                        title={
-                          !selectedDelivery.deliverer
-                            ? 'A deliverer must be assigned first'
-                            : 'Mark as delivered'
-                        }
-                      >
-                        <CheckCircle size={16} />
-                        Mark Delivered
-                      </button>
-                    )}
-                  {userRole === 'admin' &&
-                    selectedDelivery.status === 'PENDING' && (
-                      <button
-                        className={`btn-primary ${!selectedDelivery.deliverer ? 'disabled' : ''}`}
-                        onClick={() => {
-                          if (selectedDelivery.deliverer) {
-                            handleStatusUpdate(
-                              selectedDelivery._id,
-                              'IN_TRANSIT'
-                            );
-                            setShowViewModal(false);
-                          } else {
-                            toast.error(
-                              'Cannot mark as In Transit. A deliverer must be assigned first.'
-                            );
-                          }
-                        }}
-                        disabled={!selectedDelivery.deliverer}
-                        title={
-                          !selectedDelivery.deliverer
-                            ? 'A deliverer must be assigned first'
-                            : 'Mark as in transit'
-                        }
-                      >
-                        <Truck size={16} />
-                        Mark In Transit
-                      </button>
-                    )}
-                  <button
-                    className='btn-secondary'
+              <div className='flex justify-end space-x-3 pt-4 border-t'>
+                {userRole === 'admin' && (
+                  <Button
+                    variant='outline'
                     onClick={() => {
                       setShowViewModal(false);
                       openEditModal(selectedDelivery);
                     }}
                   >
-                    <Edit3 size={16} />
                     Edit Delivery
-                  </button>
-                </div>
+                  </Button>
+                )}
+                <Button onClick={() => setShowViewModal(false)}>
+                  Close
+                </Button>
               </div>
             </div>
           </div>
