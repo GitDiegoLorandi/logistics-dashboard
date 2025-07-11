@@ -34,6 +34,7 @@ import { Select } from '../UI/select';
 import { Card, CardContent } from '../UI/card';
 import { Badge } from '../UI/badge';
 import { Table, TableHeader as THead, TableRow as TR, TableHead as TH, TableBody as TBody, TableCell as TD } from '../UI/table';
+import PropTypes from 'prop-types';
 
 // Fallback data for development/demo purposes
 const fallbackDeliverers = [
@@ -108,7 +109,6 @@ const DeliverersPage = () => {
   const [showViewModal, setShowViewModal] = useState(false);
   const [showStatsModal, setShowStatsModal] = useState(false);
   const [modalMode, setModalMode] = useState('create'); // 'create' or 'edit'
-  const [user, setUser] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [availableDeliveries, setAvailableDeliveries] = useState([]);
@@ -166,7 +166,6 @@ const DeliverersPage = () => {
       };
 
       const response = await delivererAPI.getAll(params);
-      console.log('Deliverers API response:', response);
       
       // Check if we have docs in the response, otherwise use the response directly
       // This handles both paginated and non-paginated responses
@@ -284,7 +283,6 @@ const DeliverersPage = () => {
     const userData = localStorage.getItem('user');
     if (userData) {
       const parsedUser = JSON.parse(userData);
-      setUser(parsedUser);
       setIsAdmin(parsedUser.role?.toLowerCase() === 'admin');
     }
   }, [fetchDeliverers]);
@@ -463,6 +461,10 @@ const DeliverersPage = () => {
         {t(`statuses.${status.toLowerCase()}`)}
       </Badge>
     );
+  };
+
+  StatusBadge.propTypes = {
+    status: PropTypes.string.isRequired
   };
 
   // Statistics calculations

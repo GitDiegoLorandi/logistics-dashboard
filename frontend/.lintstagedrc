@@ -3,7 +3,7 @@
     "eslint --fix",
     "eslint --rule 'tailwindcss/no-custom-classname: error' --rule 'tailwindcss/classnames-order: error'"
   ],
-  "*.{css}": [
+  "*.css": [
     "prettier --write"
   ],
   "*.{json,md}": [
