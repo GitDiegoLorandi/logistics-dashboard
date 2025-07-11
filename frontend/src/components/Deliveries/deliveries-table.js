@@ -14,10 +14,6 @@ import {
   Eye,
   Edit,
   Trash2,
-  AlertCircle,
-  Clock,
-  CheckCircle,
-  XCircle,
 } from 'lucide-react';
 import { Table, TableHeader as THead, TableRow as TR, TableHead as TH, TableBody as TBody, TableCell as TD } from '../UI/table';
 import { Badge } from '../UI/badge';
@@ -57,6 +53,10 @@ export const DeliveriesTable = ({
     return <Badge variant={variant}>{label}</Badge>;
   };
 
+  StatusBadge.propTypes = {
+    status: PropTypes.string.isRequired,
+  };
+
   /**
    * PriorityBadge component for delivery priority
    */
@@ -73,6 +73,10 @@ export const DeliveriesTable = ({
     };
 
     return <Badge variant={variant}>{label}</Badge>;
+  };
+
+  PriorityBadge.propTypes = {
+    priority: PropTypes.string.isRequired,
   };
 
   // Define table columns
