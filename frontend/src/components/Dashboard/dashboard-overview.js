@@ -13,6 +13,7 @@ import {
 import { statisticsAPI } from '../../services/api';
 import ResponsiveChartCard from '../UI/data-visualization/charts/responsive-chart-card';
 import ErrorMessage from '../UI/error-message';
+import { LineChart, PieChart } from '../UI/data-visualization/charts';
 
 /**
  * Dashboard overview component
@@ -116,8 +117,8 @@ const DashboardOverview = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      <div className="flex h-full items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
       </div>
     );
   }
@@ -173,25 +174,25 @@ const DashboardOverview = () => {
           title={t('deliveryTrends')}
           subtitle={t('chartLabels.dailyDeliveryTrends')}
         >
-          {/* Chart would go here - using placeholder for now */}
-          <div className="flex items-center justify-center h-full bg-muted/20 rounded-md">
-            <div className="text-center p-4">
-              <TrendingUp className="h-10 w-10 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">{t('chartLabels.completedVsPending')}</p>
-            </div>
-          </div>
+          <LineChart 
+            data={deliveries.trends}
+            lines={[
+              { dataKey: 'completed', name: t('chartLabels.completed') },
+              { dataKey: 'pending', name: t('chartLabels.pending') }
+            ]}
+            xAxisDataKey="date"
+          />
         </ResponsiveChartCard>
         <ResponsiveChartCard
           title={t('deliveryStatus')}
           subtitle={t('chartLabels.statusDistribution')}
         >
-          {/* Chart would go here - using placeholder for now */}
-          <div className="flex items-center justify-center h-full bg-muted/20 rounded-md">
-            <div className="text-center p-4">
-              <Package className="h-10 w-10 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">{t('chartLabels.statusBreakdown')}</p>
-            </div>
-          </div>
+          <PieChart 
+            data={deliveries.byStatus}
+            dataKey="value"
+            nameKey="name"
+            donut={true}
+          />
         </ResponsiveChartCard>
       </div>
 
@@ -232,8 +233,8 @@ const StatCard = ({ title, value, subvalue, icon, className = '', iconClassName 
     <div className="flex items-center justify-between">
       <div>
         <p className="text-sm font-medium text-muted-foreground">{title}</p>
-        <h3 className="text-2xl font-bold mt-1">{value}</h3>
-        {subvalue && <p className="text-xs text-muted-foreground mt-1">{subvalue}</p>}
+        <h3 className="mt-1 text-2xl font-bold">{value}</h3>
+        {subvalue && <p className="mt-1 text-xs text-muted-foreground">{subvalue}</p>}
       </div>
       <div className={`rounded-full p-2 ${iconClassName}`}>
         {icon}
