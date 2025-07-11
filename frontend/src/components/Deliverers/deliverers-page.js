@@ -170,10 +170,25 @@ const DeliverersPage = () => {
       };
 
       const response = await delivererAPI.getAll(params);
-      // Handle response directly as it comes from the API without .data
-      setDeliverers(response.docs || []);
-      setTotalPages(response.totalPages || 1);
-      setTotalDocs(response.totalDocs || 0);
+      console.log('Deliverers API response:', response);
+      
+      // Check if we have docs in the response, otherwise use the response directly
+      // This handles both paginated and non-paginated responses
+      if (response && Array.isArray(response)) {
+        setDeliverers(response);
+        setTotalPages(1);
+        setTotalDocs(response.length);
+      } else if (response && response.docs) {
+        setDeliverers(response.docs);
+        setTotalPages(response.totalPages || 1);
+        setTotalDocs(response.totalDocs || 0);
+      } else if (response) {
+        // If no docs property but response is an object, use fallback
+        setDeliverers(fallbackDeliverers);
+        setTotalPages(1);
+        setTotalDocs(fallbackDeliverers.length);
+      }
+      
       setError(null);
     } catch (err) {
       console.error('Error fetching deliverers:', err);
