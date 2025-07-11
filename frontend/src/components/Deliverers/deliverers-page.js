@@ -8,7 +8,6 @@ import {
   Trash2,
   Eye,
   Phone,
-  Mail,
   MapPin,
   Car,
   RefreshCw,
@@ -19,7 +18,6 @@ import {
   CheckCircle,
   Clock,
   UserX,
-  Award,
   Package,
   BarChart3,
   Link,
@@ -36,8 +34,6 @@ import { Select } from '../UI/select';
 import { Card, CardContent } from '../UI/card';
 import { Badge } from '../UI/badge';
 import { Table, TableHeader as THead, TableRow as TR, TableHead as TH, TableBody as TBody, TableCell as TD } from '../UI/table';
-import { Dialog } from '../UI/dialog';
-import { cn } from '../../lib/utils';
 
 // Fallback data for development/demo purposes
 const fallbackDeliverers = [
