@@ -67,7 +67,6 @@ const DashboardLayout = () => {
   // Toggle keyboard shortcut for command palette
   React.useEffect(() => {
     const handleKeyDown = (e) => {
-      // Check for Cmd+K or Ctrl+K
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
         e.preventDefault();
         setCommandPaletteOpen(prev => !prev);
@@ -177,16 +176,6 @@ const DashboardLayout = () => {
           </div>
           
           <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              className="hidden items-center gap-2 md:flex"
-              onClick={() => setCommandPaletteOpen(true)}
-            >
-              <span>{t('actions.search')}...</span>
-              <kbd className="rounded bg-muted px-1.5 py-0.5 text-xs font-semibold">⌘K</kbd>
-            </Button>
-            
             <LanguageSwitcher />
           </div>
         </header>
