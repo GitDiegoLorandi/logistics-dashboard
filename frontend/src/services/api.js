@@ -115,7 +115,27 @@ export const authAPI = {
 };
 
 export const deliveryAPI = {
-  getAll: params => api.get('/deliveries', { params }),
+  getAll: async (params) => {
+    try {
+      console.log('Fetching deliveries with params:', params);
+      const response = await api.get('/deliveries', { params });
+      console.log('Delivery API response:', response);
+      
+      // Handle both paginated and non-paginated responses
+      if (Array.isArray(response)) {
+        return {
+          docs: response,
+          totalDocs: response.length,
+          totalPages: 1,
+          page: 1
+        };
+      }
+      return response || { docs: [], totalDocs: 0, totalPages: 0, page: 1 };
+    } catch (error) {
+      console.error('Error in deliveryAPI.getAll:', error);
+      throw error;
+    }
+  },
   getById: id => api.get(`/deliveries/${id}`),
   create: data => api.post('/deliveries', data),
   update: (id, data) => api.put(`/deliveries/${id}`, data),
@@ -128,7 +148,16 @@ export const deliveryAPI = {
 };
 
 export const delivererAPI = {
-  getAll: params => api.get('/deliverers', { params }),
+  getAll: async (params) => {
+    try {
+      const response = await api.get('/deliverers', { params });
+      // Handle both paginated and non-paginated responses
+      return response || [];
+    } catch (error) {
+      console.error('Error in delivererAPI.getAll:', error);
+      throw error;
+    }
+  },
   getById: id => api.get(`/deliverers/${id}`),
   create: data => api.post('/deliverers', data),
   update: (id, data) => api.put(`/deliverers/${id}`, data),

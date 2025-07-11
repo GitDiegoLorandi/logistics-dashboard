@@ -34,19 +34,19 @@ export const DeliveriesTable = ({
   onStatusUpdate,
   userRole,
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['deliveries', 'common']);
 
   /**
    * StatusBadge component for delivery status
    */
   const StatusBadge = ({ status }) => {
     const statusMap = {
-      PENDING: { variant: 'warning', label: t('deliveries.statuses.pending') },
-      IN_TRANSIT: { variant: 'info', label: t('deliveries.statuses.inTransit') },
-      DELIVERED: { variant: 'success', label: t('deliveries.statuses.delivered') },
-      CANCELLED: { variant: 'default', label: t('deliveries.statuses.cancelled') },
-      DELAYED: { variant: 'destructive', label: t('deliveries.statuses.delayed') },
-      ON_HOLD: { variant: 'outline', label: t('deliveries.statuses.onHold') },
+      PENDING: { variant: 'warning', label: t('statuses.pending') },
+      IN_TRANSIT: { variant: 'info', label: t('statuses.inTransit') },
+      DELIVERED: { variant: 'success', label: t('statuses.delivered') },
+      CANCELLED: { variant: 'default', label: t('statuses.cancelled') },
+      DELAYED: { variant: 'destructive', label: t('statuses.delayed') },
+      ON_HOLD: { variant: 'outline', label: t('statuses.onHold') },
     };
 
     const { variant, label } = statusMap[status] || { 
@@ -62,9 +62,9 @@ export const DeliveriesTable = ({
    */
   const PriorityBadge = ({ priority }) => {
     const priorityMap = {
-      HIGH: { variant: 'destructive', label: t('deliveries.priorities.high') },
-      MEDIUM: { variant: 'warning', label: t('deliveries.priorities.medium') },
-      LOW: { variant: 'default', label: t('deliveries.priorities.low') },
+      HIGH: { variant: 'destructive', label: t('priorities.high') },
+      MEDIUM: { variant: 'warning', label: t('priorities.medium') },
+      LOW: { variant: 'default', label: t('priorities.low') },
     };
 
     const { variant, label } = priorityMap[priority] || {
@@ -86,7 +86,7 @@ export const DeliveriesTable = ({
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             className="p-0 hover:bg-transparent"
           >
-            {t('deliveries.orderId')}
+            {t('orderId')}
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         ),
@@ -96,12 +96,12 @@ export const DeliveriesTable = ({
       },
       {
         accessorKey: 'customer',
-        header: t('deliveries.customer'),
+        header: t('customer'),
         cell: ({ row }) => <div>{row.getValue('customer')}</div>,
       },
       {
         accessorKey: 'deliveryAddress',
-        header: t('deliveries.address'),
+        header: t('address'),
         cell: ({ row }) => (
           <div className="max-w-[200px] truncate" title={row.getValue('deliveryAddress')}>
             {row.getValue('deliveryAddress')}
@@ -116,7 +116,7 @@ export const DeliveriesTable = ({
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             className="p-0 hover:bg-transparent"
           >
-            {t('deliveries.status')}
+            {t('status')}
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         ),
@@ -130,7 +130,7 @@ export const DeliveriesTable = ({
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             className="p-0 hover:bg-transparent"
           >
-            {t('deliveries.priority')}
+            {t('priority')}
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         ),
@@ -138,7 +138,7 @@ export const DeliveriesTable = ({
       },
       {
         accessorKey: 'deliverer',
-        header: t('deliveries.deliverer'),
+        header: t('deliverer'),
         cell: ({ row }) => {
           const deliverer = row.original.deliverer;
           return (
@@ -147,7 +147,7 @@ export const DeliveriesTable = ({
                 <span>{deliverer.name}</span>
               ) : (
                 <span className="italic text-muted-foreground">
-                  {t('deliveries.unassigned')}
+                  {t('unassigned')}
                 </span>
               )}
             </div>
@@ -162,7 +162,7 @@ export const DeliveriesTable = ({
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             className="p-0 hover:bg-transparent"
           >
-            {t('deliveries.scheduledDate')}
+            {t('scheduledDate')}
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         ),
@@ -172,14 +172,14 @@ export const DeliveriesTable = ({
             <div>{new Date(date).toLocaleDateString()}</div>
           ) : (
             <span className="italic text-muted-foreground">
-              {t('deliveries.notScheduled')}
+              {t('notScheduled')}
             </span>
           );
         },
       },
       {
         id: 'actions',
-        header: t('common.actions'),
+        header: t('actions', { ns: 'common' }),
         cell: ({ row }) => {
           const delivery = row.original;
           const canEdit = ['admin', 'manager'].includes(userRole);
@@ -193,7 +193,7 @@ export const DeliveriesTable = ({
                 className="h-8 w-8 p-0"
                 onClick={() => onView(delivery)}
               >
-                <span className="sr-only">{t('common.view')}</span>
+                <span className="sr-only">{t('view', { ns: 'common' })}</span>
                 <Eye className="h-4 w-4" />
               </Button>
               {canEdit && (
@@ -203,7 +203,7 @@ export const DeliveriesTable = ({
                   className="h-8 w-8 p-0"
                   onClick={() => onEdit(delivery)}
                 >
-                  <span className="sr-only">{t('common.edit')}</span>
+                  <span className="sr-only">{t('edit', { ns: 'common' })}</span>
                   <Edit className="h-4 w-4" />
                 </Button>
               )}
@@ -214,7 +214,7 @@ export const DeliveriesTable = ({
                   className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
                   onClick={() => onDelete(delivery)}
                 >
-                  <span className="sr-only">{t('common.delete')}</span>
+                  <span className="sr-only">{t('delete', { ns: 'common' })}</span>
                   <Trash2 className="h-4 w-4" />
                 </Button>
               )}
@@ -238,9 +238,9 @@ export const DeliveriesTable = ({
     return (
       <div className="rounded-md border bg-muted/10 p-8 text-center">
         <Package className="mx-auto h-12 w-12 text-muted-foreground" />
-        <h3 className="mt-4 text-lg font-medium">{t('deliveries.noDeliveries')}</h3>
+        <h3 className="mt-4 text-lg font-medium">{t('noDeliveries')}</h3>
         <p className="mt-1 text-muted-foreground">
-          {t('deliveries.noDeliveriesDescription')}
+          {t('noDeliveriesDescription')}
         </p>
       </div>
     );

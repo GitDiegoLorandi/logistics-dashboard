@@ -16,6 +16,10 @@
     "back": "Back",
     "next": "Next",
     "submit": "Submit",
+    "clear": "Clear Filters",
+    "page": "Page",
+    "of": "of",
+    "total": "total",
     "commandPalette": {
       "searchPlaceholder": "Search commands...",
       "noResults": "No results found."
@@ -116,6 +120,12 @@
     "dimensions": "Dimensions",
     "notes": "Notes",
     "trackingNumber": "Tracking Number",
+    "orderId": "Order ID",
+    "address": "Delivery Address",
+    "unassigned": "Unassigned",
+    "notScheduled": "Not Scheduled",
+    "noDeliveries": "No Deliveries Found",
+    "noDeliveriesDescription": "There are no deliveries matching your current filters. Try adjusting your filters or create a new delivery.",
     "statuses": {
       "pending": "Pending",
       "inTransit": "In Transit",

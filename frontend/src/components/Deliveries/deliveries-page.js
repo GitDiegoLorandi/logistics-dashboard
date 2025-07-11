@@ -209,6 +209,16 @@ const DeliveriesPage = () => {
       delivery.deliveryAddress?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  // Debug logs
+  useEffect(() => {
+    console.log('Deliveries state:', deliveries);
+    console.log('Filtered deliveries:', filteredDeliveries);
+    console.log('Search term:', searchTerm);
+    console.log('Status filter:', statusFilter);
+    console.log('Priority filter:', priorityFilter);
+    console.log('Deliverer filter:', delivererFilter);
+  }, [deliveries, filteredDeliveries, searchTerm, statusFilter, priorityFilter, delivererFilter]);
+
   // Handle Form Submission
   const handleSubmit = async e => {
     e.preventDefault();
@@ -711,12 +721,12 @@ const DeliveriesPage = () => {
 
       {/* Deliveries Table */}
       <DeliveriesTable
-        deliveries={filteredDeliveries}
+        data={filteredDeliveries}
         loading={loading}
         onView={openViewModal}
         onEdit={openEditModal}
         onDelete={handleDelete}
-        onCreate={openCreateModal}
+        userRole={userRole}
       />
 
       {/* Pagination */}
