@@ -1,31 +1,33 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Package, ArrowRight, CheckCircle } from 'lucide-react';
 import { Button } from './UI/button';
 
 const Welcome = () => {
+  const { t } = useTranslation(['welcome', 'common']);
   const [currentStep, setCurrentStep] = useState(0);
   const navigate = useNavigate();
 
   const steps = [
     {
-      title: 'Welcome to Logistics Dashboard',
-      description: 'Your complete solution for managing deliveries and logistics operations.',
+      title: t('steps.welcome.title'),
+      description: t('steps.welcome.description'),
       image: '🚚',
     },
     {
-      title: 'Track Deliveries',
-      description: 'Monitor all your deliveries in real-time with detailed status updates and location tracking.',
+      title: t('steps.track.title'),
+      description: t('steps.track.description'),
       image: '📦',
     },
     {
-      title: 'Manage Resources',
-      description: 'Efficiently manage your deliverers, vehicles, and other resources to optimize operations.',
+      title: t('steps.manage.title'),
+      description: t('steps.manage.description'),
       image: '👥',
     },
     {
-      title: 'Analyze Performance',
-      description: 'Get comprehensive analytics and reports to improve your logistics operations.',
+      title: t('steps.analyze.title'),
+      description: t('steps.analyze.description'),
       image: '📊',
     },
   ];
@@ -49,10 +51,10 @@ const Welcome = () => {
       <header className="flex items-center justify-between p-6">
         <div className="flex items-center gap-2">
           <Package className="h-6 w-6 text-primary" />
-          <h1 className="text-xl font-bold">Logistics Dashboard</h1>
+          <h1 className="text-xl font-bold">{t('common.app.title', { ns: 'common' })}</h1>
         </div>
         <Button variant="ghost" onClick={handleSkip}>
-          Skip
+          {t('skip')}
         </Button>
       </header>
 
@@ -80,11 +82,11 @@ const Welcome = () => {
             <Button onClick={handleNext} className="w-full">
               {currentStep < steps.length - 1 ? (
                 <>
-                  Next <ArrowRight className="ml-2 h-4 w-4" />
+                  {t('next')} <ArrowRight className="ml-2 h-4 w-4" />
                 </>
               ) : (
                 <>
-                  Get Started <CheckCircle className="ml-2 h-4 w-4" />
+                  {t('getStarted')} <CheckCircle className="ml-2 h-4 w-4" />
                 </>
               )}
             </Button>
@@ -94,7 +96,7 @@ const Welcome = () => {
 
       {/* Footer */}
       <footer className="p-4 text-center text-sm text-muted-foreground">
-        <p>© {new Date().getFullYear()} Logistics Dashboard. All rights reserved.</p>
+        <p>{t('footer', { year: new Date().getFullYear() })}</p>
       </footer>
     </div>
   );

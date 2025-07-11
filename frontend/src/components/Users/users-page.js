@@ -19,6 +19,7 @@ import {
   Calendar,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import { userAPI, authAPI } from '../../services/api';
 import LoadingSpinner from '../UI/loading-spinner';
 import ErrorMessage from '../UI/error-message';
@@ -75,6 +76,8 @@ const fallbackUsers = [
 ];
 
 const UsersPage = () => {
+  const { t } = useTranslation(['users', 'common']);
+  
   // State Management
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -206,17 +209,17 @@ const UsersPage = () => {
     e.preventDefault();
 
     if (!formData.email) {
-      toast.error('Email is required');
+      toast.error(t('validation.required'));
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
-      toast.error('Passwords do not match');
+      toast.error(t('auth.passwordsDoNotMatch'));
       return;
     }
 
     if (formData.password.length < 6) {
-      toast.error('Password must be at least 6 characters long');
+      toast.error(t('auth.passwordRequirements'));
       return;
     }
 
@@ -231,13 +234,13 @@ const UsersPage = () => {
       };
 
       await authAPI.register(userData);
-      toast.success('User created successfully');
+      toast.success(t('users.createUserSuccess'));
       setShowModal(false);
       resetForm();
       fetchUsers();
     } catch (err) {
       console.error('Error creating user:', err);
-      toast.error(err.response?.data?.message || 'Failed to create user');
+      toast.error(err.response?.data?.message || t('error'));
       
       // For demo purposes, simulate successful creation with fallback data
       if (!err.response?.data?.message?.includes('already exists')) {
@@ -251,17 +254,17 @@ const UsersPage = () => {
         setUsers(prev => [newUser, ...prev]);
         setShowModal(false);
         resetForm();
-        toast.success('Demo mode: User created successfully');
+        toast.success(t('users.createUserSuccess') + ' (Demo)');
       }
     }
   };
 
-  // Handle Update User Profile
+  // Handle Update User
   const handleUpdateUser = async e => {
     e.preventDefault();
 
     if (!formData.email) {
-      toast.error('Email is required');
+      toast.error(t('validation.required'));
       return;
     }
 
@@ -280,13 +283,13 @@ const UsersPage = () => {
         await userAPI.updateRole(selectedUser._id, formData.role);
       }
 
-      toast.success('User updated successfully');
+      toast.success(t('users.updateUserSuccess'));
       setShowModal(false);
       resetForm();
       fetchUsers();
     } catch (err) {
       console.error('Error updating user:', err);
-      toast.error(err.response?.data?.message || 'Failed to update user');
+      toast.error(err.response?.data?.message || t('error'));
       
       // For demo purposes, simulate successful update with fallback data
       setUsers(prev => 
@@ -301,7 +304,7 @@ const UsersPage = () => {
       );
       setShowModal(false);
       resetForm();
-      toast.success('Demo mode: User updated successfully');
+      toast.success(t('users.updateUserSuccess') + ' (Demo)');
     }
   };
 
@@ -310,12 +313,12 @@ const UsersPage = () => {
     e.preventDefault();
 
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error('New passwords do not match');
+      toast.error(t('auth.passwordsDoNotMatch'));
       return;
     }
 
     if (passwordData.newPassword.length < 6) {
-      toast.error('New password must be at least 6 characters long');
+      toast.error(t('auth.passwordRequirements'));
       return;
     }
 
@@ -326,18 +329,18 @@ const UsersPage = () => {
         confirmPassword: passwordData.confirmPassword,
       });
 
-      toast.success('Password changed successfully');
+      toast.success(t('users.passwordChanged'));
       setShowPasswordModal(false);
       resetPasswordForm();
     } catch (err) {
       console.error('Error changing password:', err);
-      toast.error(err.response?.data?.message || 'Failed to change password');
+      toast.error(err.response?.data?.message || t('error'));
       
       // For demo purposes, simulate successful password change
       if (passwordData.currentPassword === 'password123') {
         setShowPasswordModal(false);
         resetPasswordForm();
-        toast.success('Demo mode: Password changed successfully');
+        toast.success(t('users.passwordChanged') + ' (Demo)');
       }
     }
   };
@@ -345,51 +348,51 @@ const UsersPage = () => {
   // Handle Role Change
   const handleRoleChange = async (userId, newRole) => {
     if (userId === currentUser?._id && newRole !== 'admin') {
-      toast.error('You cannot change your own admin role');
+      toast.error(t('users.cannotDeactivateOwn'));
       return;
     }
 
     try {
       await userAPI.updateRole(userId, newRole);
-      toast.success('User role updated successfully');
+      toast.success(t('users.updateUserSuccess'));
       fetchUsers();
     } catch (err) {
       console.error('Error updating user role:', err);
-      toast.error(err.response?.data?.message || 'Failed to update user role');
+      toast.error(err.response?.data?.message || t('error'));
     }
   };
 
   // Handle Deactivate User
   const handleDeactivateUser = async userId => {
     if (userId === currentUser?._id) {
-      toast.error('You cannot deactivate your own account');
+      toast.error(t('users.cannotDeactivateOwn'));
       return;
     }
 
-    if (!window.confirm('Are you sure you want to deactivate this user?')) {
+    if (!window.confirm(t('users.deactivateWarning'))) {
       return;
     }
 
     try {
       await userAPI.deactivate(userId);
-      toast.success('User deactivated successfully');
+      toast.success(t('users.userDeactivated'));
       fetchUsers();
     } catch (err) {
       console.error('Error deactivating user:', err);
-      toast.error(err.response?.data?.message || 'Failed to deactivate user');
+      toast.error(err.response?.data?.message || t('error'));
     }
   };
 
   // Handle Delete User
   const handleDeleteUser = async userId => {
     if (userId === currentUser?._id) {
-      toast.error('You cannot delete your own account');
+      toast.error(t('users.cannotDeleteOwn'));
       return;
     }
 
     if (
       !window.confirm(
-        'Are you sure you want to delete this user? This action cannot be undone.'
+        t('users.deleteWarning')
       )
     ) {
       return;
@@ -397,11 +400,11 @@ const UsersPage = () => {
 
     try {
       await userAPI.delete(userId);
-      toast.success('User deleted successfully');
+      toast.success(t('users.userDeleted'));
       fetchUsers();
     } catch (err) {
       console.error('Error deleting user:', err);
-      toast.error(err.response?.data?.message || 'Failed to delete user');
+      toast.error(err.response?.data?.message || t('error'));
     }
   };
 
@@ -452,13 +455,20 @@ const UsersPage = () => {
       deliverer: 'outline',
     };
 
+    const roleTranslations = {
+      admin: t('users.admin'),
+      user: t('users.user'),
+      manager: t('users.manager'),
+      deliverer: t('users.deliverer')
+    };
+
     return (
       <Badge
         variant={variantMap[role] || 'secondary'}
         className='flex items-center gap-1'
       >
         {getRoleIcon(role)}
-        {role.charAt(0).toUpperCase() + role.slice(1)}
+        {roleTranslations[role] || role.charAt(0).toUpperCase() + role.slice(1)}
       </Badge>
     );
   };
@@ -478,10 +488,10 @@ const UsersPage = () => {
         <div>
           <h1 className='flex items-center gap-2 text-2xl font-bold'>
             <User className='h-6 w-6 text-primary' />
-            User Management
+            {t('users.title')}
           </h1>
           <p className='text-muted-foreground'>
-            Manage system users and permissions
+            {t('users.subtitle')}
           </p>
         </div>
         <div className='flex gap-2'>
@@ -495,7 +505,7 @@ const UsersPage = () => {
             <RefreshCw
               className={loading ? 'h-4 w-4 animate-spin' : 'h-4 w-4'}
             />
-            Refresh
+            {t('common.refresh')}
           </Button>
           <Button
             onClick={handleCreateNewUser}
@@ -503,7 +513,7 @@ const UsersPage = () => {
             className='flex items-center gap-2'
           >
             <Plus className='h-4 w-4' />
-            New User
+            {t('users.newUser')}
           </Button>
         </div>
       </div>
@@ -514,7 +524,7 @@ const UsersPage = () => {
           <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
           <Input
             type='text'
-            placeholder='Search by name or email...'
+            placeholder={t('users.searchPlaceholder')}
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             className='pl-10'
@@ -529,7 +539,7 @@ const UsersPage = () => {
             onClick={() => setShowFilters(!showFilters)}
           >
             <Filter className='h-4 w-4' />
-            Filters
+            {t('common.filters')}
           </Button>
 
           {roleFilter && (
@@ -540,7 +550,7 @@ const UsersPage = () => {
               onClick={() => setRoleFilter('')}
             >
               <X className='h-4 w-4' />
-              Clear
+              {t('common.clear')}
             </Button>
           )}
         </div>
@@ -550,16 +560,16 @@ const UsersPage = () => {
       {showFilters && (
         <div className='mb-6 rounded-xl bg-card p-6 shadow'>
           <div className='max-w-xs space-y-2'>
-            <label className='text-sm font-medium'>Role</label>
+            <label className='text-sm font-medium'>{t('common.role')}</label>
             <Select
               value={roleFilter}
               onChange={e => setRoleFilter(e.target.value)}
             >
-              <option value=''>All Roles</option>
-              <option value='admin'>Admin</option>
-              <option value='manager'>Manager</option>
-              <option value='user'>User</option>
-              <option value='deliverer'>Deliverer</option>
+              <option value=''>{t('users.allRoles')}</option>
+              <option value='admin'>{t('users.admin')}</option>
+              <option value='manager'>{t('users.manager')}</option>
+              <option value='user'>{t('users.user')}</option>
+              <option value='deliverer'>{t('users.deliverer')}</option>
             </Select>
           </div>
         </div>
@@ -570,27 +580,27 @@ const UsersPage = () => {
         <Card>
           <CardContent className='flex flex-col items-center justify-center pt-6'>
             <span className='text-3xl font-bold'>{totalDocs}</span>
-            <span className='text-sm text-muted-foreground'>Total Users</span>
+            <span className='text-sm text-muted-foreground'>{t('users.totalUsers')}</span>
           </CardContent>
         </Card>
         <Card>
           <CardContent className='flex flex-col items-center justify-center pt-6'>
             <span className='text-3xl font-bold'>{adminCount}</span>
             <span className='text-sm text-muted-foreground'>
-              Administrators
+              {t('users.administrators')}
             </span>
           </CardContent>
         </Card>
         <Card>
           <CardContent className='flex flex-col items-center justify-center pt-6'>
             <span className='text-3xl font-bold'>{userCount}</span>
-            <span className='text-sm text-muted-foreground'>Regular Users</span>
+            <span className='text-sm text-muted-foreground'>{t('users.regularUsers')}</span>
           </CardContent>
         </Card>
         <Card>
           <CardContent className='flex flex-col items-center justify-center pt-6'>
             <span className='text-3xl font-bold'>{activeCount}</span>
-            <span className='text-sm text-muted-foreground'>Active Users</span>
+            <span className='text-sm text-muted-foreground'>{t('users.activeUsers')}</span>
           </CardContent>
         </Card>
       </div>
@@ -600,12 +610,12 @@ const UsersPage = () => {
         <Table>
           <THead>
             <TR className='bg-muted/50'>
-              <TH>User</TH>
-              <TH>Contact</TH>
-              <TH>Role</TH>
-              <TH>Status</TH>
-              <TH>Created</TH>
-              <TH className='text-right'>Actions</TH>
+              <TH>{t('common.user')}</TH>
+              <TH>{t('common.contact')}</TH>
+              <TH>{t('common.role')}</TH>
+              <TH>{t('common.status')}</TH>
+              <TH>{t('common.created')}</TH>
+              <TH className='text-right'>{t('common.actions')}</TH>
             </TR>
           </THead>
           <TBody>
@@ -646,10 +656,10 @@ const UsersPage = () => {
                       onChange={e => handleRoleChange(user._id, e.target.value)}
                       className='w-32'
                     >
-                      <option value='user'>User</option>
-                      <option value='admin'>Admin</option>
-                      <option value='manager'>Manager</option>
-                      <option value='deliverer'>Deliverer</option>
+                      <option value='user'>{t('users.user')}</option>
+                      <option value='admin'>{t('users.admin')}</option>
+                      <option value='manager'>{t('users.manager')}</option>
+                      <option value='deliverer'>{t('users.deliverer')}</option>
                     </Select>
                   )}
                 </TD>
@@ -661,12 +671,12 @@ const UsersPage = () => {
                     {user.isActive ? (
                       <>
                         <CheckCircle className='h-3 w-3' />
-                        Active
+                        {t('users.active')}
                       </>
                     ) : (
                       <>
                         <UserX className='h-3 w-3' />
-                        Inactive
+                        {t('users.inactive')}
                       </>
                     )}
                   </Badge>
@@ -726,16 +736,16 @@ const UsersPage = () => {
         {users.length === 0 && !loading && (
           <div className='flex flex-col items-center justify-center py-12'>
             <User className='mb-4 h-12 w-12 text-muted-foreground' />
-            <h3 className='mb-2 text-lg font-medium'>No users found</h3>
+            <h3 className='mb-2 text-lg font-medium'>{t('users.noUsersFound')}</h3>
             <p className='mb-4 text-sm text-muted-foreground'>
-              Get started by adding your first user to the system.
+              {t('users.noUsersFoundDescription')}
             </p>
             <Button
               onClick={handleCreateNewUser}
               className='flex items-center gap-2'
             >
               <Plus className='h-4 w-4' />
-              Add User
+              {t('users.addUser')}
             </Button>
           </div>
         )}
@@ -752,11 +762,11 @@ const UsersPage = () => {
             className='flex items-center gap-1'
           >
             <ChevronLeft className='h-4 w-4' />
-            Previous
+            {t('common.previous')}
           </Button>
 
           <div className='text-sm text-muted-foreground'>
-            Page {currentPage} of {totalPages} ({totalDocs} total)
+            {t('common.page')} {currentPage} {t('common.of')} {totalPages} ({totalDocs} {t('common.total')})
           </div>
 
           <Button
@@ -768,7 +778,7 @@ const UsersPage = () => {
             disabled={currentPage === totalPages}
             className='flex items-center gap-1'
           >
-            Next
+            {t('common.next')}
             <ChevronRight className='h-4 w-4' />
           </Button>
         </div>
@@ -780,7 +790,7 @@ const UsersPage = () => {
           <div className='w-full max-w-lg rounded-lg bg-card shadow-lg'>
             <div className='flex items-center justify-between border-b p-6'>
               <h2 className='text-xl font-semibold'>
-                {modalMode === 'create' ? 'Add New User' : 'Edit User'}
+                {modalMode === 'create' ? t('users.newUser') : t('users.editUser')}
               </h2>
               <Button
                 variant='ghost'
@@ -799,10 +809,10 @@ const UsersPage = () => {
               className='space-y-6 p-6'
             >
               <div className='space-y-4'>
-                <h3 className='text-lg font-medium'>User Information</h3>
+                <h3 className='text-lg font-medium'>{t('users.userDetails')}</h3>
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>Email *</label>
+                    <label className='text-sm font-medium'>{t('users.email')} *</label>
                     <Input
                       type='email'
                       value={formData.email}
@@ -811,22 +821,22 @@ const UsersPage = () => {
                     />
                   </div>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>Role</label>
+                    <label className='text-sm font-medium'>{t('users.role')}</label>
                     <Select
                       value={formData.role}
                       onChange={e => handleFormChange('role', e.target.value)}
                     >
-                      <option value='user'>User</option>
-                      <option value='admin'>Administrator</option>
-                      <option value='manager'>Manager</option>
-                      <option value='deliverer'>Deliverer</option>
+                      <option value='user'>{t('users.user')}</option>
+                      <option value='admin'>{t('users.admin')}</option>
+                      <option value='manager'>{t('users.manager')}</option>
+                      <option value='deliverer'>{t('users.deliverer')}</option>
                     </Select>
                   </div>
                 </div>
 
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>First Name</label>
+                    <label className='text-sm font-medium'>{t('users.firstName')}</label>
                     <Input
                       type='text'
                       value={formData.firstName}
@@ -836,7 +846,7 @@ const UsersPage = () => {
                     />
                   </div>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>Last Name</label>
+                    <label className='text-sm font-medium'>{t('users.lastName')}</label>
                     <Input
                       type='text'
                       value={formData.lastName}
@@ -848,7 +858,7 @@ const UsersPage = () => {
                 </div>
 
                 <div className='space-y-2'>
-                  <label className='text-sm font-medium'>Phone</label>
+                  <label className='text-sm font-medium'>{t('users.phone')}</label>
                   <Input
                     type='tel'
                     value={formData.phone}
@@ -859,10 +869,10 @@ const UsersPage = () => {
 
               {modalMode === 'create' && (
                 <div className='space-y-4'>
-                  <h3 className='text-lg font-medium'>Security</h3>
+                  <h3 className='text-lg font-medium'>{t('settings.security')}</h3>
                   <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                     <div className='space-y-2'>
-                      <label className='text-sm font-medium'>Password *</label>
+                      <label className='text-sm font-medium'>{t('users.password')} *</label>
                       <Input
                         type='password'
                         value={formData.password}
@@ -875,7 +885,7 @@ const UsersPage = () => {
                     </div>
                     <div className='space-y-2'>
                       <label className='text-sm font-medium'>
-                        Confirm Password *
+                        {t('users.confirmPassword')} *
                       </label>
                       <Input
                         type='password'
@@ -897,10 +907,10 @@ const UsersPage = () => {
                   variant='outline'
                   onClick={() => setShowModal(false)}
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </Button>
                 <Button type='submit'>
-                  {modalMode === 'create' ? 'Create User' : 'Update User'}
+                  {modalMode === 'create' ? t('users.addUser') : t('common.save')}
                 </Button>
               </div>
             </form>
@@ -910,158 +920,163 @@ const UsersPage = () => {
 
       {/* View User Modal */}
       {showViewModal && selectedUser && (
-        <div className='modal-overlay'>
-          <div className='modal-content'>
-            <div className='modal-header'>
-              <h2>User Details</h2>
-              <button
-                onClick={() => setShowViewModal(false)}
-                className='btn-close'
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className='user-details'>
-              <div className='details-section'>
-                <h3>Basic Information</h3>
-                <div className='details-grid'>
-                  <div className='detail-item'>
-                    <label>Full Name</label>
-                    <span>
-                      {selectedUser.firstName && selectedUser.lastName
-                        ? `${selectedUser.firstName} ${selectedUser.lastName}`
-                        : selectedUser.firstName ||
-                          selectedUser.lastName ||
-                          'Not provided'}
-                    </span>
-                  </div>
-                  <div className='detail-item'>
-                    <label>Email</label>
-                    <span>{selectedUser.email}</span>
-                  </div>
-                  <div className='detail-item'>
-                    <label>Phone</label>
-                    <span>{selectedUser.phone || 'Not provided'}</span>
-                  </div>
-                  <div className='detail-item'>
-                    <label>Role</label>
-                    <span>{getRoleBadge(selectedUser.role)}</span>
-                  </div>
-                </div>
+        <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
+          <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
+            <div className='w-full max-w-lg rounded-lg bg-card shadow-lg'>
+              <div className='flex items-center justify-between border-b p-6'>
+                <h2 className='text-xl font-semibold'>{t('users.userDetails')}</h2>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  className='h-8 w-8 p-0'
+                  onClick={() => setShowViewModal(false)}
+                >
+                  <X className='h-4 w-4' />
+                </Button>
               </div>
 
-              <div className='details-section'>
-                <h3>Account Status</h3>
-                <div className='details-grid'>
-                  <div className='detail-item'>
-                    <label>Status</label>
-                    <span
-                      className={`status-badge ${selectedUser.isActive ? 'active' : 'inactive'}`}
-                    >
-                      {selectedUser.isActive ? (
-                        <>
-                          <CheckCircle size={14} />
-                          Active
-                        </>
-                      ) : (
-                        <>
-                          <UserX size={14} />
-                          Inactive
-                        </>
-                      )}
-                    </span>
+              <div className='space-y-6 p-6'>
+                <div className='space-y-4'>
+                  <h3 className='text-lg font-medium'>{t('users.userDetails')}</h3>
+                  <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+                    <div className='space-y-1'>
+                      <label className='text-sm font-medium text-muted-foreground'>{t('users.firstName')} {t('users.lastName')}</label>
+                      <p>
+                        {selectedUser.firstName && selectedUser.lastName
+                          ? `${selectedUser.firstName} ${selectedUser.lastName}`
+                          : selectedUser.firstName ||
+                            selectedUser.lastName ||
+                            t('common.noResults')}
+                      </p>
+                    </div>
+                    <div className='space-y-1'>
+                      <label className='text-sm font-medium text-muted-foreground'>{t('users.email')}</label>
+                      <p>{selectedUser.email}</p>
+                    </div>
+                    <div className='space-y-1'>
+                      <label className='text-sm font-medium text-muted-foreground'>{t('users.phone')}</label>
+                      <p>{selectedUser.phone || t('common.noResults')}</p>
+                    </div>
+                    <div className='space-y-1'>
+                      <label className='text-sm font-medium text-muted-foreground'>{t('users.role')}</label>
+                      <div>{getRoleBadge(selectedUser.role)}</div>
+                    </div>
                   </div>
-                  <div className='detail-item'>
-                    <label>Created Date</label>
-                    <span>
-                      {new Date(selectedUser.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                  <div className='detail-item'>
-                    <label>Last Updated</label>
-                    <span>
-                      {new Date(selectedUser.updatedAt).toLocaleDateString()}
-                    </span>
+                </div>
+
+                <div className='space-y-4'>
+                  <h3 className='text-lg font-medium'>{t('common.status')}</h3>
+                  <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+                    <div className='space-y-1'>
+                      <label className='text-sm font-medium text-muted-foreground'>{t('common.status')}</label>
+                      <div>
+                        <Badge
+                          variant={selectedUser.isActive ? 'success' : 'destructive'}
+                          className='flex items-center gap-1'
+                        >
+                          {selectedUser.isActive ? (
+                            <>
+                              <CheckCircle className='h-3 w-3' />
+                              {t('users.active')}
+                            </>
+                          ) : (
+                            <>
+                              <UserX className='h-3 w-3' />
+                              {t('users.inactive')}
+                            </>
+                          )}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className='space-y-1'>
+                      <label className='text-sm font-medium text-muted-foreground'>{t('common.created')}</label>
+                      <p>
+                        {new Date(selectedUser.createdAt).toLocaleDateString()}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </Dialog>
       )}
 
       {/* Change Password Modal */}
       {showPasswordModal && (
-        <div className='modal-overlay'>
-          <div className='modal-content'>
-            <div className='modal-header'>
-              <h2>Change Password</h2>
-              <button
-                onClick={() => setShowPasswordModal(false)}
-                className='btn-close'
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <form onSubmit={handleChangePassword} className='modal-form'>
-              <div className='form-section'>
-                <h3>Password Security</h3>
-                <div className='form-group'>
-                  <label>Current Password *</label>
-                  <input
-                    type='password'
-                    value={passwordData.currentPassword}
-                    onChange={e =>
-                      handlePasswordChange('currentPassword', e.target.value)
-                    }
-                    required
-                  />
-                </div>
-                <div className='form-row'>
-                  <div className='form-group'>
-                    <label>New Password *</label>
-                    <input
-                      type='password'
-                      value={passwordData.newPassword}
-                      onChange={e =>
-                        handlePasswordChange('newPassword', e.target.value)
-                      }
-                      required
-                      minLength={6}
-                    />
-                  </div>
-                  <div className='form-group'>
-                    <label>Confirm New Password *</label>
-                    <input
-                      type='password'
-                      value={passwordData.confirmPassword}
-                      onChange={e =>
-                        handlePasswordChange('confirmPassword', e.target.value)
-                      }
-                      required
-                      minLength={6}
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className='modal-actions'>
-                <button
-                  type='button'
+        <Dialog open={showPasswordModal} onOpenChange={setShowPasswordModal}>
+          <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
+            <div className='w-full max-w-lg rounded-lg bg-card shadow-lg'>
+              <div className='flex items-center justify-between border-b p-6'>
+                <h2 className='text-xl font-semibold'>{t('users.changePassword')}</h2>
+                <Button
+                  variant='ghost'
+                  size='sm'
+                  className='h-8 w-8 p-0'
                   onClick={() => setShowPasswordModal(false)}
-                  className='btn btn-secondary'
                 >
-                  Cancel
-                </button>
-                <button type='submit' className='btn btn-primary'>
-                  Change Password
-                </button>
+                  <X className='h-4 w-4' />
+                </Button>
               </div>
-            </form>
+
+              <form onSubmit={handleChangePassword} className='space-y-6 p-6'>
+                <div className='space-y-4'>
+                  <h3 className='text-lg font-medium'>{t('settings.security')}</h3>
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>{t('users.currentPassword')} *</label>
+                    <Input
+                      type='password'
+                      value={passwordData.currentPassword}
+                      onChange={e =>
+                        handlePasswordChange('currentPassword', e.target.value)
+                      }
+                      required
+                    />
+                  </div>
+                  <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+                    <div className='space-y-2'>
+                      <label className='text-sm font-medium'>{t('users.newPassword')} *</label>
+                      <Input
+                        type='password'
+                        value={passwordData.newPassword}
+                        onChange={e =>
+                          handlePasswordChange('newPassword', e.target.value)
+                        }
+                        required
+                        minLength={6}
+                      />
+                    </div>
+                    <div className='space-y-2'>
+                      <label className='text-sm font-medium'>{t('users.confirmPassword')} *</label>
+                      <Input
+                        type='password'
+                        value={passwordData.confirmPassword}
+                        onChange={e =>
+                          handlePasswordChange('confirmPassword', e.target.value)
+                        }
+                        required
+                        minLength={6}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className='flex justify-end gap-2 border-t pt-4'>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    onClick={() => setShowPasswordModal(false)}
+                  >
+                    {t('common.cancel')}
+                  </Button>
+                  <Button type='submit'>
+                    {t('users.changePassword')}
+                  </Button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
+        </Dialog>
       )}
     </div>
   );

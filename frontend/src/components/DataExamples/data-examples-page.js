@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '../UI/card';
 import { Alert, InfoAlert } from '../UI/alert';
 import { Grid, GridItem } from '../UI/grid';
@@ -18,6 +19,8 @@ import { Eye, Edit, Trash } from 'lucide-react';
 import Pagination from '../UI/pagination';
 
 const DataExamplesPage = () => {
+  const { t } = useTranslation(['dataExamples', 'common']);
+  
   // Sample data for the table
   const allData = [
     { id: 1, name: 'John Doe', status: 'active', role: 'Admin', lastLogin: '2023-06-15' },
@@ -74,22 +77,22 @@ const DataExamplesPage = () => {
   const getStatusBadge = (status) => {
     switch (status) {
       case 'active':
-        return <Badge variant="success">{status}</Badge>;
+        return <Badge variant="success">{t(`statuses.${status}`)}</Badge>;
       case 'inactive':
-        return <Badge variant="secondary">{status}</Badge>;
+        return <Badge variant="secondary">{t(`statuses.${status}`)}</Badge>;
       case 'pending':
-        return <Badge variant="warning">{status}</Badge>;
+        return <Badge variant="warning">{t(`statuses.${status}`)}</Badge>;
       default:
-        return <Badge>{status}</Badge>;
+        return <Badge>{t(`statuses.${status}`)}</Badge>;
     }
   };
 
   return (
     <div className="space-y-6">
-      <h1>Data Examples</h1>
+      <h1>{t('title')}</h1>
       
       <InfoAlert>
-        This page demonstrates various data presentation examples using our enhanced UI components.
+        {t('description')}
       </InfoAlert>
       
       <Grid cols={1} gap={6}>
@@ -97,20 +100,20 @@ const DataExamplesPage = () => {
         <GridItem>
           <Card>
             <CardHeader>
-              <CardTitle>Basic Table</CardTitle>
+              <CardTitle>{t('basicTable.title')}</CardTitle>
               <CardDescription>
-                A simple table displaying user data.
+                {t('basicTable.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Last Login</TableHead>
+                    <TableHead>{t('columns.id')}</TableHead>
+                    <TableHead>{t('columns.name')}</TableHead>
+                    <TableHead>{t('columns.status')}</TableHead>
+                    <TableHead>{t('columns.role')}</TableHead>
+                    <TableHead>{t('columns.lastLogin')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -119,7 +122,7 @@ const DataExamplesPage = () => {
                       <TableCell>{user.id}</TableCell>
                       <TableCell>{user.name}</TableCell>
                       <TableCell>{getStatusBadge(user.status)}</TableCell>
-                      <TableCell>{user.role}</TableCell>
+                      <TableCell>{t(`roles.${user.role.toLowerCase()}`)}</TableCell>
                       <TableCell>{user.lastLogin}</TableCell>
                     </TableRow>
                   ))}
@@ -133,9 +136,9 @@ const DataExamplesPage = () => {
         <GridItem>
           <Card>
             <CardHeader>
-              <CardTitle>Sortable Table with Pagination</CardTitle>
+              <CardTitle>{t('sortableTable.title')}</CardTitle>
               <CardDescription>
-                A table with sortable columns and pagination.
+                {t('sortableTable.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -147,35 +150,35 @@ const DataExamplesPage = () => {
                       active={sortField === 'id'} 
                       direction={sortDirection}
                     >
-                      ID
+                      {t('columns.id')}
                     </TableSortableHead>
                     <TableSortableHead 
                       onClick={() => handleSort('name')} 
                       active={sortField === 'name'} 
                       direction={sortDirection}
                     >
-                      Name
+                      {t('columns.name')}
                     </TableSortableHead>
                     <TableSortableHead 
                       onClick={() => handleSort('status')} 
                       active={sortField === 'status'} 
                       direction={sortDirection}
                     >
-                      Status
+                      {t('columns.status')}
                     </TableSortableHead>
                     <TableSortableHead 
                       onClick={() => handleSort('role')} 
                       active={sortField === 'role'} 
                       direction={sortDirection}
                     >
-                      Role
+                      {t('columns.role')}
                     </TableSortableHead>
                     <TableSortableHead 
                       onClick={() => handleSort('lastLogin')} 
                       active={sortField === 'lastLogin'} 
                       direction={sortDirection}
                     >
-                      Last Login
+                      {t('columns.lastLogin')}
                     </TableSortableHead>
                   </TableRow>
                 </TableHeader>
@@ -185,7 +188,7 @@ const DataExamplesPage = () => {
                       <TableCell>{user.id}</TableCell>
                       <TableCell>{user.name}</TableCell>
                       <TableCell>{getStatusBadge(user.status)}</TableCell>
-                      <TableCell>{user.role}</TableCell>
+                      <TableCell>{t(`roles.${user.role.toLowerCase()}`)}</TableCell>
                       <TableCell>{user.lastLogin}</TableCell>
                     </TableRow>
                   ))}
@@ -209,20 +212,20 @@ const DataExamplesPage = () => {
         <GridItem>
           <Card>
             <CardHeader>
-              <CardTitle>Styled Tables</CardTitle>
+              <CardTitle>{t('styledTables.title')}</CardTitle>
               <CardDescription>
-                Tables with different styles and variants.
+                {t('styledTables.description')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div>
-                <h4 className="mb-2 text-lg font-medium">Striped Table</h4>
+                <h4 className="mb-2 text-lg font-medium">{t('styledTables.striped')}</h4>
                 <StyledTable striped>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead>{t('columns.id')}</TableHead>
+                      <TableHead>{t('columns.name')}</TableHead>
+                      <TableHead>{t('columns.status')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -238,13 +241,13 @@ const DataExamplesPage = () => {
               </div>
 
               <div>
-                <h4 className="mb-2 text-lg font-medium">Bordered Table</h4>
+                <h4 className="mb-2 text-lg font-medium">{t('styledTables.bordered')}</h4>
                 <StyledTable bordered>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Status</TableHead>
+                      <TableHead>{t('columns.id')}</TableHead>
+                      <TableHead>{t('columns.name')}</TableHead>
+                      <TableHead>{t('columns.status')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -260,15 +263,15 @@ const DataExamplesPage = () => {
               </div>
 
               <div>
-                <h4 className="mb-2 text-lg font-medium">Dense Table</h4>
+                <h4 className="mb-2 text-lg font-medium">{t('styledTables.dense')}</h4>
                 <StyledTable dense>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Name</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Role</TableHead>
-                      <TableHead>Last Login</TableHead>
+                      <TableHead>{t('columns.id')}</TableHead>
+                      <TableHead>{t('columns.name')}</TableHead>
+                      <TableHead>{t('columns.status')}</TableHead>
+                      <TableHead>{t('columns.role')}</TableHead>
+                      <TableHead>{t('columns.lastLogin')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -277,7 +280,7 @@ const DataExamplesPage = () => {
                         <TableCell>{user.id}</TableCell>
                         <TableCell>{user.name}</TableCell>
                         <TableCell>{getStatusBadge(user.status)}</TableCell>
-                        <TableCell>{user.role}</TableCell>
+                        <TableCell>{t(`roles.${user.role.toLowerCase()}`)}</TableCell>
                         <TableCell>{user.lastLogin}</TableCell>
                       </TableRow>
                     ))}
@@ -292,20 +295,20 @@ const DataExamplesPage = () => {
         <GridItem>
           <Card>
             <CardHeader>
-              <CardTitle>Table with Actions</CardTitle>
+              <CardTitle>{t('actionsTable.title')}</CardTitle>
               <CardDescription>
-                A table with action buttons.
+                {t('actionsTable.description')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
+                    <TableHead>{t('columns.id')}</TableHead>
+                    <TableHead>{t('columns.name')}</TableHead>
+                    <TableHead>{t('columns.status')}</TableHead>
+                    <TableHead>{t('columns.role')}</TableHead>
+                    <TableHead className="text-right">{t('columns.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -314,16 +317,16 @@ const DataExamplesPage = () => {
                       <TableCell>{user.id}</TableCell>
                       <TableCell>{user.name}</TableCell>
                       <TableCell>{getStatusBadge(user.status)}</TableCell>
-                      <TableCell>{user.role}</TableCell>
+                      <TableCell>{t(`roles.${user.role.toLowerCase()}`)}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">
-                          <Button variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm" title={t('actions.view')}>
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm" title={t('actions.edit')}>
                             <Edit className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="sm">
+                          <Button variant="ghost" size="sm" title={t('actions.delete')}>
                             <Trash className="h-4 w-4" />
                           </Button>
                         </div>

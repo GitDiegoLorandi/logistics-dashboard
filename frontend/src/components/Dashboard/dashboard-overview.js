@@ -18,7 +18,7 @@ import ErrorMessage from '../UI/error-message';
  * Dashboard overview component
  */
 const DashboardOverview = () => {
-  const { t } = useTranslation(['dashboard', 'common']);
+  const { t } = useTranslation(['dashboard', 'common', 'navigation']);
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -131,35 +131,35 @@ const DashboardOverview = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold tracking-tight">{t('title', { ns: 'dashboard' })}</h1>
-        <p className="text-muted-foreground">{t('summary', { ns: 'dashboard' })}</p>
+        <h1 className="text-2xl font-bold tracking-tight">{t('title')}</h1>
+        <p className="text-muted-foreground">{t('summary')}</p>
       </div>
 
       {/* Stats cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard 
-          title={t('deliveriesTotal', { ns: 'dashboard' })}
+          title={t('deliveriesTotal')}
           value={deliveries.total}
           icon={<Package className="h-5 w-5" />}
           className="bg-blue-50 dark:bg-blue-950"
           iconClassName="text-blue-600 dark:text-blue-400"
         />
         <StatCard 
-          title={t('deliveriesPending', { ns: 'dashboard' })}
+          title={t('deliveriesPending')}
           value={deliveries.pending}
           icon={<Clock className="h-5 w-5" />}
           className="bg-amber-50 dark:bg-amber-950"
           iconClassName="text-amber-600 dark:text-amber-400"
         />
         <StatCard 
-          title={t('deliveriesCompleted', { ns: 'dashboard' })}
+          title={t('deliveriesCompleted')}
           value={deliveries.completed}
           icon={<CheckCircle className="h-5 w-5" />}
           className="bg-green-50 dark:bg-green-950"
           iconClassName="text-green-600 dark:text-green-400"
         />
         <StatCard 
-          title={t('deliveriesFailed', { ns: 'dashboard' })}
+          title={t('deliveriesFailed')}
           value={deliveries.failed}
           icon={<AlertTriangle className="h-5 w-5" />}
           className="bg-red-50 dark:bg-red-950"
@@ -170,26 +170,26 @@ const DashboardOverview = () => {
       {/* Charts */}
       <div className="grid gap-4 md:grid-cols-2">
         <ResponsiveChartCard
-          title={t('deliveryTrends', { ns: 'dashboard' })}
-          subtitle="Daily delivery completion trends"
+          title={t('deliveryTrends')}
+          subtitle={t('chartLabels.dailyDeliveryTrends')}
         >
           {/* Chart would go here - using placeholder for now */}
           <div className="flex items-center justify-center h-full bg-muted/20 rounded-md">
             <div className="text-center p-4">
               <TrendingUp className="h-10 w-10 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">Line chart showing completed vs pending deliveries</p>
+              <p className="text-sm text-muted-foreground">{t('chartLabels.completedVsPending')}</p>
             </div>
           </div>
         </ResponsiveChartCard>
         <ResponsiveChartCard
-          title={t('deliveryStatus', { ns: 'dashboard' })}
-          subtitle="Current delivery status distribution"
+          title={t('deliveryStatus')}
+          subtitle={t('chartLabels.statusDistribution')}
         >
           {/* Chart would go here - using placeholder for now */}
           <div className="flex items-center justify-center h-full bg-muted/20 rounded-md">
             <div className="text-center p-4">
               <Package className="h-10 w-10 mx-auto mb-2 text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">Pie chart showing delivery status breakdown</p>
+              <p className="text-sm text-muted-foreground">{t('chartLabels.statusBreakdown')}</p>
             </div>
           </div>
         </ResponsiveChartCard>
@@ -200,7 +200,7 @@ const DashboardOverview = () => {
         <StatCard 
           title={t('deliverers.title', { ns: 'navigation' })}
           value={deliverers.total}
-          subvalue={`${deliverers.active} ${t('deliverers.statuses.active', { ns: 'deliverers' })}`}
+          subvalue={`${deliverers.active} ${t('statuses.active', { ns: 'deliverers' })}`}
           icon={<Truck className="h-5 w-5" />}
           className="bg-purple-50 dark:bg-purple-950"
           iconClassName="text-purple-600 dark:text-purple-400"
@@ -214,9 +214,9 @@ const DashboardOverview = () => {
           iconClassName="text-indigo-600 dark:text-indigo-400"
         />
         <StatCard 
-          title={t('performance', { ns: 'dashboard' })}
+          title={t('performance')}
           value={`${performance.onTimeDeliveryRate}%`}
-          subvalue={`${t('onTime', { ns: 'dashboard' })}`}
+          subvalue={t('onTime')}
           icon={<TrendingUp className="h-5 w-5" />}
           className="bg-emerald-50 dark:bg-emerald-950"
           iconClassName="text-emerald-600 dark:text-emerald-400"

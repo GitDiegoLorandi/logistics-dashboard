@@ -15,7 +15,18 @@
     "confirm": "Confirm",
     "back": "Back",
     "next": "Next",
-    "submit": "Submit"
+    "submit": "Submit",
+    "commandPalette": {
+      "searchPlaceholder": "Search commands...",
+      "noResults": "No results found."
+    },
+    "tour": {
+      "back": "Back",
+      "close": "Close",
+      "finish": "Finish",
+      "next": "Next",
+      "skip": "Skip"
+    }
   },
   "auth": {
     "login": "Login",
@@ -63,7 +74,27 @@
     "performance": "Performance",
     "onTime": "On-time delivery rate",
     "lastSevenDays": "Last 7 days",
-    "currentStatus": "Current status"
+    "currentStatus": "Current status",
+    "chartLabels": {
+      "dailyDeliveryTrends": "Daily delivery trends",
+      "statusDistribution": "Current delivery status distribution",
+      "completedVsPending": "Line chart showing completed vs pending deliveries",
+      "statusBreakdown": "Pie chart showing delivery status breakdown"
+    },
+    "tour": {
+      "welcome": "Welcome to your logistics dashboard! This is where you can monitor all your delivery operations.",
+      "overviewTitle": "Dashboard Overview",
+      "statsContent": "Here you can see key metrics about your deliveries at a glance.",
+      "statsTitle": "Delivery Statistics",
+      "chartsContent": "These charts show your delivery trends and performance over time.",
+      "chartsTitle": "Performance Charts",
+      "recentContent": "View your most recent deliveries and their status here.",
+      "recentTitle": "Recent Deliveries",
+      "navigationContent": "Use this navigation menu to access different sections of the application.",
+      "navigationTitle": "Navigation Menu",
+      "userMenuContent": "Access your profile, settings, and logout from here.",
+      "userMenuTitle": "User Menu"
+    }
   },
   "deliveries": {
     "title": "Deliveries",
@@ -112,6 +143,7 @@
   },
   "deliverers": {
     "title": "Deliverers",
+    "subtitle": "Manage deliverers and their assigned deliveries",
     "newDeliverer": "New Deliverer",
     "editDeliverer": "Edit Deliverer",
     "viewDeliverer": "View Deliverer",
@@ -123,18 +155,99 @@
     "phone": "Phone",
     "status": "Status",
     "vehicle": "Vehicle",
-    "capacity": "Capacity",
+    "vehicleType": "Vehicle Type",
+    "licenseNumber": "License Number",
     "currentLocation": "Current Location",
     "availableFrom": "Available From",
     "availableTo": "Available To",
     "activeDeliveries": "Active Deliveries",
     "completedDeliveries": "Completed Deliveries",
     "rating": "Rating",
+    "refresh": "Refresh",
+    "totalDeliverers": "Total Deliverers",
+    "available": "Available",
+    "onDelivery": "On Delivery",
+    "offline": "Offline",
+    "searchPlaceholder": "Search by name, email, phone...",
+    "notSpecified": "Not specified",
+    "notAvailable": "N/A",
+    "notProvided": "Not provided",
+    "noDeliverersFound": "No deliverers found",
+    "getStarted": "Get started by adding your first deliverer to the team.",
+    "confirmDelete": "Are you sure you want to delete this deliverer?",
+    "deleteSuccess": "Deliverer deleted successfully",
+    "deleteError": "Failed to delete deliverer",
+    "addNewDeliverer": "Add New Deliverer",
+    "createDeliverer": "Create Deliverer",
+    "updateDeliverer": "Update Deliverer",
+    "basicInfo": "Basic Information",
+    "vehicleInfo": "Vehicle Information",
+    "address": "Address",
+    "street": "Street",
+    "city": "City",
+    "state": "State",
+    "zipCode": "ZIP Code",
+    "emergencyContact": "Emergency Contact",
+    "relationship": "Relationship",
+    "emergencyRelationshipPlaceholder": "e.g., Spouse, Parent, Sibling",
+    "cancel": "Cancel",
+    "activity": "Activity",
+    "totalDeliveries": "Total Deliveries",
+    "memberSince": "Member Since",
+    "performanceStats": "Performance Statistics - {name}",
+    "completed": "Completed",
+    "pending": "Pending",
+    "inTransit": "In Transit",
+    "successRate": "Success Rate",
+    "averageDeliveryTime": "Average Delivery Time",
+    "days": "days",
+    "na": "N/A",
+    "noStatsAvailable": "No statistics available for this deliverer",
+    "assignDeliveryTo": "Assign Delivery to {name}",
+    "selectDelivery": "Select Delivery",
+    "noAvailableDeliveriesFound": "No available deliveries found",
+    "availableDeliveries": "Available Deliveries",
+    "assignDelivery": "Assign Delivery",
+    "pagination": "Page {currentPage} of {totalPages} ({totalDocs} total)",
+    "tablePagination": "Page {page} of {totalPages}",
+    "exportCSV": "Export CSV",
+    "selectVehicleType": "Select vehicle type",
+    "columns": {
+      "deliverer": "Deliverer",
+      "contact": "Contact",
+      "status": "Status",
+      "vehicle": "Vehicle",
+      "license": "License",
+      "deliveries": "Deliveries",
+      "actions": "Actions",
+      "id": "ID"
+    },
     "statuses": {
       "active": "Active",
       "inactive": "Inactive",
+      "available": "Available",
+      "busy": "Busy",
+      "offline": "Offline",
       "onDelivery": "On Delivery",
       "onBreak": "On Break"
+    },
+    "vehicles": {
+      "car": "Car",
+      "motorcycle": "Motorcycle",
+      "bicycle": "Bicycle",
+      "van": "Van",
+      "truck": "Truck"
+    },
+    "filters": {
+      "allStatuses": "All Statuses",
+      "allVehicles": "All Vehicles"
+    },
+    "actions": {
+      "view": "View",
+      "viewStats": "View Stats",
+      "assign": "Assign Delivery",
+      "edit": "Edit",
+      "delete": "Delete"
     }
   },
   "settings": {
@@ -168,6 +281,77 @@
       "deliveryUpdates": "Delivery Updates",
       "systemAlerts": "System Alerts",
       "weeklyReports": "Weekly Reports"
+    }
+  },
+  "dataExamples": {
+    "title": "Data Examples",
+    "description": "This page demonstrates various data presentation examples using our enhanced UI components.",
+    "basicTable": {
+      "title": "Basic Table",
+      "description": "A simple table displaying user data."
+    },
+    "sortableTable": {
+      "title": "Sortable Table with Pagination",
+      "description": "A table with sortable columns and pagination."
+    },
+    "styledTables": {
+      "title": "Styled Tables",
+      "description": "Tables with different styles and variants.",
+      "striped": "Striped Table",
+      "bordered": "Bordered Table",
+      "dense": "Dense Table"
+    },
+    "actionsTable": {
+      "title": "Table with Actions",
+      "description": "A table with action buttons."
+    },
+    "columns": {
+      "id": "ID",
+      "name": "Name",
+      "status": "Status",
+      "role": "Role",
+      "lastLogin": "Last Login",
+      "actions": "Actions"
+    },
+    "statuses": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "pending": "Pending"
+    },
+    "roles": {
+      "admin": "Admin",
+      "user": "User",
+      "manager": "Manager",
+      "developer": "Developer"
+    },
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete"
+    }
+  },
+  "welcome": {
+    "skip": "Skip",
+    "next": "Next",
+    "getStarted": "Get Started",
+    "footer": "© {year} Logistics Dashboard. All rights reserved.",
+    "steps": {
+      "welcome": {
+        "title": "Welcome to Logistics Dashboard",
+        "description": "Your complete solution for managing deliveries and logistics operations."
+      },
+      "track": {
+        "title": "Track Deliveries",
+        "description": "Monitor all your deliveries in real-time with detailed status updates and location tracking."
+      },
+      "manage": {
+        "title": "Manage Resources",
+        "description": "Efficiently manage your deliverers, vehicles, and other resources to optimize operations."
+      },
+      "analyze": {
+        "title": "Analyze Performance",
+        "description": "Get comprehensive analytics and reports to improve your logistics operations."
+      }
     }
   }
 } 

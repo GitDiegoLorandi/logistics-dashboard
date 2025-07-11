@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   Search,
   Plus,
@@ -100,6 +101,8 @@ const fallbackDeliverers = [
 ];
 
 const DeliverersPage = () => {
+  const { t } = useTranslation(['deliverers', 'common']);
+  
   // State Management
   const [deliverers, setDeliverers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -344,17 +347,17 @@ const DeliverersPage = () => {
 
   // Handle Delete Deliverer
   const handleDeleteDeliverer = async delivererId => {
-    if (!window.confirm('Are you sure you want to delete this deliverer?')) {
+    if (!window.confirm(t('confirmDelete'))) {
       return;
     }
 
     try {
       await delivererAPI.delete(delivererId);
-      toast.success('Deliverer deleted successfully');
+      toast.success(t('deleteSuccess'));
       fetchDeliverers();
     } catch (err) {
       console.error('Error deleting deliverer:', err);
-      toast.error(err.response?.data?.message || 'Failed to delete deliverer');
+      toast.error(err.response?.data?.message || t('deleteError'));
     }
   };
 
@@ -446,7 +449,7 @@ const DeliverersPage = () => {
     };
     return (
       <Badge className={statusColors[status] || 'bg-gray-100 text-gray-800'}>
-        {status}
+        {t(`statuses.${status.toLowerCase()}`)}
       </Badge>
     );
   };
@@ -467,10 +470,10 @@ const DeliverersPage = () => {
         <div>
           <h1 className='flex items-center gap-2 text-2xl font-bold'>
             <Car className='h-6 w-6 text-primary' />
-            Deliverers
+            {t('title')}
           </h1>
           <p className='text-muted-foreground'>
-            Manage deliverers and their assigned deliveries
+            {t('subtitle')}
           </p>
         </div>
         <div className='flex gap-2'>
@@ -484,7 +487,7 @@ const DeliverersPage = () => {
             <RefreshCw
               className={loading ? 'h-4 w-4 animate-spin' : 'h-4 w-4'}
             />
-            Refresh
+            {t('refresh')}
           </Button>
           <Button
             onClick={handleCreateDeliverer}
@@ -492,7 +495,7 @@ const DeliverersPage = () => {
             className='flex items-center gap-2'
           >
             <Plus className='h-4 w-4' />
-            Add Deliverer
+            {t('newDeliverer')}
           </Button>
         </div>
       </div>
@@ -503,7 +506,7 @@ const DeliverersPage = () => {
           <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
           <Input
             type='text'
-            placeholder='Search by name, email, phone...'
+            placeholder={t('searchPlaceholder')}
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             className='pl-10'
@@ -518,7 +521,7 @@ const DeliverersPage = () => {
             onClick={() => setShowFilters(!showFilters)}
           >
             <Filter className='h-4 w-4' />
-            Filters
+            {t('filters', { ns: 'common' })}
           </Button>
 
           {(statusFilter || vehicleTypeFilter) && (
@@ -532,7 +535,7 @@ const DeliverersPage = () => {
               }}
             >
               <X className='h-4 w-4' />
-              Clear
+              {t('clear', { ns: 'common' })}
             </Button>
           )}
         </div>
@@ -543,31 +546,31 @@ const DeliverersPage = () => {
         <div className='mb-6 rounded-xl bg-card p-6 shadow'>
           <div className='grid grid-cols-1 gap-6 sm:grid-cols-2'>
             <div className='space-y-2'>
-              <label className='text-sm font-medium'>Status</label>
+              <label className='text-sm font-medium'>{t('status', { ns: 'common' })}</label>
               <Select
                 value={statusFilter}
                 onChange={e => setStatusFilter(e.target.value)}
                 className="w-full"
               >
-                <option value="">All Statuses</option>
-                <option value="Available">Available</option>
-                <option value="Busy">Busy</option>
-                <option value="Offline">Offline</option>
+                <option value="">{t('filters.allStatuses')}</option>
+                <option value="Available">{t('statuses.available')}</option>
+                <option value="Busy">{t('statuses.busy')}</option>
+                <option value="Offline">{t('statuses.offline')}</option>
               </Select>
             </div>
 
             <div className='space-y-2'>
-              <label className='text-sm font-medium'>Vehicle Type</label>
+              <label className='text-sm font-medium'>{t('vehicle')}</label>
               <Select
                 value={vehicleTypeFilter}
                 onChange={e => setVehicleTypeFilter(e.target.value)}
               >
-                <option value=''>All Vehicles</option>
-                <option value='Car'>Car</option>
-                <option value='Motorcycle'>Motorcycle</option>
-                <option value='Bicycle'>Bicycle</option>
-                <option value='Van'>Van</option>
-                <option value='Truck'>Truck</option>
+                <option value=''>{t('filters.allVehicles')}</option>
+                <option value='Car'>{t('vehicles.car')}</option>
+                <option value='Motorcycle'>{t('vehicles.motorcycle')}</option>
+                <option value='Bicycle'>{t('vehicles.bicycle')}</option>
+                <option value='Van'>{t('vehicles.van')}</option>
+                <option value='Truck'>{t('vehicles.truck')}</option>
               </Select>
             </div>
           </div>
@@ -580,7 +583,7 @@ const DeliverersPage = () => {
           <CardContent className='flex flex-col items-center justify-center pt-6'>
             <span className='text-3xl font-bold'>{totalDocs}</span>
             <span className='text-sm text-muted-foreground'>
-              Total Deliverers
+              {t('totalDeliverers')}
             </span>
           </CardContent>
         </Card>
@@ -589,7 +592,7 @@ const DeliverersPage = () => {
             <span className='text-3xl font-bold text-success'>
               {availableCount}
             </span>
-            <span className='text-sm text-muted-foreground'>Available</span>
+            <span className='text-sm text-muted-foreground'>{t('available')}</span>
           </CardContent>
         </Card>
         <Card>
@@ -597,7 +600,7 @@ const DeliverersPage = () => {
             <span className='text-3xl font-bold text-status-in-transit'>
               {busyCount}
             </span>
-            <span className='text-sm text-muted-foreground'>On Delivery</span>
+            <span className='text-sm text-muted-foreground'>{t('onDelivery')}</span>
           </CardContent>
         </Card>
         <Card>
@@ -605,7 +608,7 @@ const DeliverersPage = () => {
             <span className='text-status-offline text-3xl font-bold'>
               {offlineCount}
             </span>
-            <span className='text-sm text-muted-foreground'>Offline</span>
+            <span className='text-sm text-muted-foreground'>{t('offline')}</span>
           </CardContent>
         </Card>
       </div>
@@ -615,13 +618,13 @@ const DeliverersPage = () => {
         <Table>
           <THead>
             <TR className='bg-muted/50'>
-              <TH>Deliverer</TH>
-              <TH>Contact</TH>
-              <TH>Status</TH>
-              <TH>Vehicle</TH>
-              <TH>License</TH>
-              <TH>Deliveries</TH>
-              <TH className='text-right'>Actions</TH>
+              <TH>{t('columns.deliverer')}</TH>
+              <TH>{t('columns.contact')}</TH>
+              <TH>{t('columns.status')}</TH>
+              <TH>{t('columns.vehicle')}</TH>
+              <TH>{t('columns.license')}</TH>
+              <TH>{t('columns.deliveries')}</TH>
+              <TH className='text-right'>{t('columns.actions')}</TH>
             </TR>
           </THead>
           <TBody>
@@ -659,12 +662,12 @@ const DeliverersPage = () => {
                 <TD>
                   <div className='flex items-center gap-1 text-sm'>
                     {getVehicleIcon(deliverer.vehicleType)}
-                    <span>{deliverer.vehicleType || 'Not specified'}</span>
+                    <span>{deliverer.vehicleType ? t(`vehicles.${deliverer.vehicleType.toLowerCase()}`) : t('notSpecified')}</span>
                   </div>
                 </TD>
                 <TD>
                   <span className='text-sm'>
-                    {deliverer.licenseNumber || 'N/A'}
+                    {deliverer.licenseNumber || t('notAvailable')}
                   </span>
                 </TD>
                 <TD>
@@ -680,6 +683,7 @@ const DeliverersPage = () => {
                       size='sm'
                       className='h-8 w-8 p-0'
                       onClick={() => handleViewDeliverer(deliverer)}
+                      title={t('actions.view', { ns: 'common' })}
                     >
                       <Eye className='h-4 w-4' />
                     </Button>
@@ -688,6 +692,7 @@ const DeliverersPage = () => {
                       size='sm'
                       className='h-8 w-8 p-0'
                       onClick={() => handleViewStats(deliverer)}
+                      title={t('actions.viewStats')}
                     >
                       <BarChart3 className='h-4 w-4' />
                     </Button>
@@ -697,6 +702,7 @@ const DeliverersPage = () => {
                         size='sm'
                         className='h-8 w-8 p-0 text-info hover:text-info/80'
                         onClick={() => handleOpenAssignModal(deliverer)}
+                        title={t('actions.assign')}
                       >
                         <Link className='h-4 w-4' />
                       </Button>
@@ -708,6 +714,7 @@ const DeliverersPage = () => {
                           size='sm'
                           className='h-8 w-8 p-0'
                           onClick={() => handleEditDeliverer(deliverer)}
+                          title={t('actions.edit')}
                         >
                           <Edit3 className='h-4 w-4' />
                         </Button>
@@ -716,6 +723,7 @@ const DeliverersPage = () => {
                           size='sm'
                           className='h-8 w-8 p-0 text-destructive hover:text-destructive/80'
                           onClick={() => handleDeleteDeliverer(deliverer._id)}
+                          title={t('actions.delete')}
                         >
                           <Trash2 className='h-4 w-4' />
                         </Button>
@@ -731,9 +739,9 @@ const DeliverersPage = () => {
         {deliverers.length === 0 && !loading && (
           <div className='flex flex-col items-center justify-center py-12'>
             <Car className='mb-4 h-12 w-12 text-muted-foreground' />
-            <h3 className='mb-2 text-lg font-medium'>No deliverers found</h3>
+            <h3 className='mb-2 text-lg font-medium'>{t('noDeliverersFound')}</h3>
             <p className='mb-4 text-sm text-muted-foreground'>
-              Get started by adding your first deliverer to the team.
+              {t('getStarted')}
             </p>
             {isAdmin && (
               <Button
@@ -741,7 +749,7 @@ const DeliverersPage = () => {
                 className='flex items-center gap-2'
               >
                 <Plus className='h-4 w-4' />
-                Add Deliverer
+                {t('newDeliverer')}
               </Button>
             )}
           </div>
@@ -763,7 +771,7 @@ const DeliverersPage = () => {
           </Button>
 
           <div className='text-sm text-muted-foreground'>
-            Page {currentPage} of {totalPages} ({totalDocs} total)
+            {t('pagination', { currentPage, totalPages, totalDocs })}
           </div>
 
           <Button
@@ -788,8 +796,8 @@ const DeliverersPage = () => {
             <div className='modal-header'>
               <h2>
                 {modalMode === 'create'
-                  ? 'Add New Deliverer'
-                  : 'Edit Deliverer'}
+                  ? t('addNewDeliverer')
+                  : t('editDeliverer')}
               </h2>
               <button onClick={() => setShowModal(false)} className='btn-close'>
                 <X size={20} />
@@ -798,10 +806,10 @@ const DeliverersPage = () => {
 
             <form onSubmit={handleSaveDeliverer} className='modal-form'>
               <div className='form-section'>
-                <h3>Basic Information</h3>
+                <h3>{t('basicInfo')}</h3>
                 <div className='form-row'>
                   <div className='form-group'>
-                    <label>Name *</label>
+                    <label>{t('name')}</label>
                     <input
                       type='text'
                       value={formData.name}
@@ -810,7 +818,7 @@ const DeliverersPage = () => {
                     />
                   </div>
                   <div className='form-group'>
-                    <label>Email *</label>
+                    <label>{t('email')}</label>
                     <input
                       type='email'
                       value={formData.email}
@@ -822,7 +830,7 @@ const DeliverersPage = () => {
 
                 <div className='form-row'>
                   <div className='form-group'>
-                    <label>Phone</label>
+                    <label>{t('phone')}</label>
                     <input
                       type='tel'
                       value={formData.phone}
@@ -830,7 +838,7 @@ const DeliverersPage = () => {
                     />
                   </div>
                   <div className='form-group'>
-                    <label>Status</label>
+                    <label>{t('status')}</label>
                     <Select
                       id="status"
                       name="status"
@@ -838,35 +846,35 @@ const DeliverersPage = () => {
                       onChange={e => handleFormChange('status', e.target.value)}
                       required
                     >
-                      <option value="Available">Available</option>
-                      <option value="Busy">Busy</option>
-                      <option value="Offline">Offline</option>
+                      <option value="Available">{t('statuses.available')}</option>
+                      <option value="Busy">{t('statuses.busy')}</option>
+                      <option value="Offline">{t('statuses.offline')}</option>
                     </Select>
                   </div>
                 </div>
               </div>
 
               <div className='form-section'>
-                <h3>Vehicle Information</h3>
+                <h3>{t('vehicleInfo')}</h3>
                 <div className='form-row'>
                   <div className='form-group'>
-                    <label>Vehicle Type</label>
+                    <label>{t('vehicleType')}</label>
                     <select
                       value={formData.vehicleType}
                       onChange={e =>
                         handleFormChange('vehicleType', e.target.value)
                       }
                     >
-                      <option value=''>Select vehicle type</option>
-                      <option value='Car'>Car</option>
-                      <option value='Motorcycle'>Motorcycle</option>
-                      <option value='Van'>Van</option>
-                      <option value='Truck'>Truck</option>
-                      <option value='Bicycle'>Bicycle</option>
+                      <option value=''>{t('selectVehicleType')}</option>
+                      <option value='Car'>{t('vehicles.car')}</option>
+                      <option value='Motorcycle'>{t('vehicles.motorcycle')}</option>
+                      <option value='Van'>{t('vehicles.van')}</option>
+                      <option value='Truck'>{t('vehicles.truck')}</option>
+                      <option value='Bicycle'>{t('vehicles.bicycle')}</option>
                     </select>
                   </div>
                   <div className='form-group'>
-                    <label>License Number</label>
+                    <label>{t('licenseNumber')}</label>
                     <input
                       type='text'
                       value={formData.licenseNumber}
@@ -879,9 +887,9 @@ const DeliverersPage = () => {
               </div>
 
               <div className='form-section'>
-                <h3>Address</h3>
+                <h3>{t('address')}</h3>
                 <div className='form-group'>
-                  <label>Street</label>
+                  <label>{t('street')}</label>
                   <input
                     type='text'
                     value={formData.address.street}
@@ -892,7 +900,7 @@ const DeliverersPage = () => {
                 </div>
                 <div className='form-row'>
                   <div className='form-group'>
-                    <label>City</label>
+                    <label>{t('city')}</label>
                     <input
                       type='text'
                       value={formData.address.city}
@@ -902,7 +910,7 @@ const DeliverersPage = () => {
                     />
                   </div>
                   <div className='form-group'>
-                    <label>State</label>
+                    <label>{t('state')}</label>
                     <input
                       type='text'
                       value={formData.address.state}
@@ -912,7 +920,7 @@ const DeliverersPage = () => {
                     />
                   </div>
                   <div className='form-group'>
-                    <label>ZIP Code</label>
+                    <label>{t('zipCode')}</label>
                     <input
                       type='text'
                       value={formData.address.zipCode}
@@ -925,10 +933,10 @@ const DeliverersPage = () => {
               </div>
 
               <div className='form-section'>
-                <h3>Emergency Contact</h3>
+                <h3>{t('emergencyContact')}</h3>
                 <div className='form-row'>
                   <div className='form-group'>
-                    <label>Name</label>
+                    <label>{t('name')}</label>
                     <input
                       type='text'
                       value={formData.emergencyContact.name}
@@ -941,7 +949,7 @@ const DeliverersPage = () => {
                     />
                   </div>
                   <div className='form-group'>
-                    <label>Phone</label>
+                    <label>{t('phone')}</label>
                     <input
                       type='tel'
                       value={formData.emergencyContact.phone}
@@ -954,7 +962,7 @@ const DeliverersPage = () => {
                     />
                   </div>
                   <div className='form-group'>
-                    <label>Relationship</label>
+                    <label>{t('relationship')}</label>
                     <input
                       type='text'
                       value={formData.emergencyContact.relationship}
@@ -964,7 +972,7 @@ const DeliverersPage = () => {
                           e.target.value
                         )
                       }
-                      placeholder='e.g., Spouse, Parent, Sibling'
+                      placeholder={t('emergencyRelationshipPlaceholder')}
                     />
                   </div>
                 </div>
@@ -976,12 +984,12 @@ const DeliverersPage = () => {
                   onClick={() => setShowModal(false)}
                   className='btn btn-secondary'
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button type='submit' className='btn btn-primary'>
                   {modalMode === 'create'
-                    ? 'Create Deliverer'
-                    : 'Update Deliverer'}
+                    ? t('createDeliverer')
+                    : t('updateDeliverer')}
                 </button>
               </div>
             </form>
@@ -994,7 +1002,7 @@ const DeliverersPage = () => {
         <div className='modal-overlay'>
           <div className='modal-content'>
             <div className='modal-header'>
-              <h2>Deliverer Details</h2>
+              <h2>{t('delivererDetails')}</h2>
               <button
                 onClick={() => setShowViewModal(false)}
                 className='btn-close'
@@ -1005,45 +1013,45 @@ const DeliverersPage = () => {
 
             <div className='deliverer-details'>
               <div className='details-section'>
-                <h3>Basic Information</h3>
+                <h3>{t('basicInfo')}</h3>
                 <div className='details-grid'>
                   <div className='detail-item'>
-                    <label>Name</label>
+                    <label>{t('name')}</label>
                     <span>{selectedDeliverer.name}</span>
                   </div>
                   <div className='detail-item'>
-                    <label>Email</label>
+                    <label>{t('email')}</label>
                     <span>{selectedDeliverer.email}</span>
                   </div>
                   <div className='detail-item'>
-                    <label>Phone</label>
-                    <span>{selectedDeliverer.phone || 'Not provided'}</span>
+                    <label>{t('phone')}</label>
+                    <span>{selectedDeliverer.phone || t('notProvided')}</span>
                   </div>
                   <div className='detail-item'>
-                    <label>Status</label>
+                    <label>{t('status')}</label>
                     <span
                       className={`status-badge status-${selectedDeliverer.status.toLowerCase()}`}
                     >
                       {getStatusIcon(selectedDeliverer.status)}
-                      {selectedDeliverer.status}
+                      {t(`statuses.${selectedDeliverer.status.toLowerCase()}`)}
                     </span>
                   </div>
                 </div>
               </div>
 
               <div className='details-section'>
-                <h3>Vehicle Information</h3>
+                <h3>{t('vehicleInfo')}</h3>
                 <div className='details-grid'>
                   <div className='detail-item'>
-                    <label>Vehicle Type</label>
+                    <label>{t('vehicleType')}</label>
                     <span>
-                      {selectedDeliverer.vehicleType || 'Not specified'}
+                      {selectedDeliverer.vehicleType ? t(`vehicles.${selectedDeliverer.vehicleType.toLowerCase()}`) : t('notSpecified')}
                     </span>
                   </div>
                   <div className='detail-item'>
-                    <label>License Number</label>
+                    <label>{t('licenseNumber')}</label>
                     <span>
-                      {selectedDeliverer.licenseNumber || 'Not provided'}
+                      {selectedDeliverer.licenseNumber || t('notProvided')}
                     </span>
                   </div>
                 </div>
@@ -1051,7 +1059,7 @@ const DeliverersPage = () => {
 
               {selectedDeliverer.address && (
                 <div className='details-section'>
-                  <h3>Address</h3>
+                  <h3>{t('address')}</h3>
                   <div className='address-info'>
                     {selectedDeliverer.address.street && (
                       <div>{selectedDeliverer.address.street}</div>
@@ -1071,27 +1079,27 @@ const DeliverersPage = () => {
 
               {selectedDeliverer.emergencyContact && (
                 <div className='details-section'>
-                  <h3>Emergency Contact</h3>
+                  <h3>{t('emergencyContact')}</h3>
                   <div className='details-grid'>
                     <div className='detail-item'>
-                      <label>Name</label>
+                      <label>{t('name')}</label>
                       <span>
                         {selectedDeliverer.emergencyContact.name ||
-                          'Not provided'}
+                          t('notProvided')}
                       </span>
                     </div>
                     <div className='detail-item'>
-                      <label>Phone</label>
+                      <label>{t('phone')}</label>
                       <span>
                         {selectedDeliverer.emergencyContact.phone ||
-                          'Not provided'}
+                          t('notProvided')}
                       </span>
                     </div>
                     <div className='detail-item'>
-                      <label>Relationship</label>
+                      <label>{t('relationship')}</label>
                       <span>
                         {selectedDeliverer.emergencyContact.relationship ||
-                          'Not provided'}
+                          t('notProvided')}
                       </span>
                     </div>
                   </div>
@@ -1099,14 +1107,14 @@ const DeliverersPage = () => {
               )}
 
               <div className='details-section'>
-                <h3>Activity</h3>
+                <h3>{t('activity')}</h3>
                 <div className='details-grid'>
                   <div className='detail-item'>
-                    <label>Total Deliveries</label>
+                    <label>{t('totalDeliveries')}</label>
                     <span>{selectedDeliverer.deliveries?.length || 0}</span>
                   </div>
                   <div className='detail-item'>
-                    <label>Member Since</label>
+                    <label>{t('memberSince')}</label>
                     <span>
                       {new Date(
                         selectedDeliverer.createdAt
@@ -1125,7 +1133,7 @@ const DeliverersPage = () => {
         <div className='modal-overlay'>
           <div className='modal-content'>
             <div className='modal-header'>
-              <h2>Performance Statistics - {selectedDeliverer.name}</h2>
+              <h2>{t('performanceStats', { name: selectedDeliverer.name })}</h2>
               <button
                 onClick={() => setShowStatsModal(false)}
                 className='btn-close'
@@ -1144,41 +1152,41 @@ const DeliverersPage = () => {
                       <div className='stat-value'>
                         {delivererStats.totalDeliveries}
                       </div>
-                      <div className='stat-label'>Total Deliveries</div>
+                      <div className='stat-label'>{t('totalDeliveries')}</div>
                     </div>
                     <div className='stat-card'>
                       <div className='stat-value'>
                         {delivererStats.delivered}
                       </div>
-                      <div className='stat-label'>Completed</div>
+                      <div className='stat-label'>{t('completed')}</div>
                     </div>
                     <div className='stat-card'>
                       <div className='stat-value'>{delivererStats.pending}</div>
-                      <div className='stat-label'>Pending</div>
+                      <div className='stat-label'>{t('pending')}</div>
                     </div>
                     <div className='stat-card'>
                       <div className='stat-value'>
                         {delivererStats.inTransit}
                       </div>
-                      <div className='stat-label'>In Transit</div>
+                      <div className='stat-label'>{t('inTransit')}</div>
                     </div>
                   </div>
 
                   <div className='performance-metrics'>
                     <div className='metric-item'>
-                      <label>Success Rate</label>
+                      <label>{t('successRate')}</label>
                       <div className='metric-value'>
                         {delivererStats.totalDeliveries > 0
                           ? `${((delivererStats.delivered / delivererStats.totalDeliveries) * 100).toFixed(1)}%`
-                          : 'N/A'}
+                          : t('na')}
                       </div>
                     </div>
                     <div className='metric-item'>
-                      <label>Average Delivery Time</label>
+                      <label>{t('averageDeliveryTime')}</label>
                       <div className='metric-value'>
                         {delivererStats.avgDeliveryTime
-                          ? `${delivererStats.avgDeliveryTime.toFixed(1)} days`
-                          : 'N/A'}
+                          ? `${delivererStats.avgDeliveryTime.toFixed(1)} ${t('days')}`
+                          : t('na')}
                       </div>
                     </div>
                   </div>
@@ -1186,7 +1194,7 @@ const DeliverersPage = () => {
               ) : (
                 <div className='no-stats'>
                   <BarChart3 size={48} className='no-stats-icon' />
-                  <p>No statistics available for this deliverer</p>
+                  <p>{t('noStatsAvailable')}</p>
                 </div>
               )}
             </div>
@@ -1199,7 +1207,7 @@ const DeliverersPage = () => {
         <div className='modal-overlay'>
           <div className='modal-content'>
             <div className='modal-header'>
-              <h2>Assign Delivery to {selectedDeliverer?.name}</h2>
+              <h2>{t('assignDeliveryTo', { name: selectedDeliverer?.name })}</h2>
               <button
                 onClick={() => setShowAssignModal(false)}
                 className='btn-close'
@@ -1210,24 +1218,24 @@ const DeliverersPage = () => {
 
             <form onSubmit={handleAssignDelivery} className='modal-form'>
               <div className='form-section'>
-                <h3>Select Delivery</h3>
+                <h3>{t('selectDelivery')}</h3>
 
                 {loadingDeliveries ? (
                   <LoadingSpinner />
                 ) : availableDeliveries.length === 0 ? (
                   <div className='empty-message'>
-                    No available deliveries found
+                    {t('noAvailableDeliveriesFound')}
                   </div>
                 ) : (
                   <div className='form-group'>
-                    <label htmlFor='deliverySelect'>Available Deliveries</label>
+                    <label htmlFor='deliverySelect'>{t('availableDeliveries')}</label>
                     <select
                       id='deliverySelect'
                       value={selectedDelivery}
                       onChange={e => setSelectedDelivery(e.target.value)}
                       required
                     >
-                      <option value=''>Select a delivery</option>
+                      <option value=''>{t('selectDelivery')}</option>
                       {availableDeliveries.map(delivery => (
                         <option key={delivery._id} value={delivery._id}>
                           {delivery.orderId || delivery._id} -{' '}
@@ -1245,14 +1253,14 @@ const DeliverersPage = () => {
                   onClick={() => setShowAssignModal(false)}
                   className='btn btn-secondary'
                 >
-                  Cancel
+                  {t('cancel')}
                 </button>
                 <button
                   type='submit'
                   className='btn btn-primary'
                   disabled={!selectedDelivery || loadingDeliveries}
                 >
-                  Assign Delivery
+                  {t('assignDelivery')}
                 </button>
               </div>
             </form>

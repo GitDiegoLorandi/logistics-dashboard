@@ -4,8 +4,11 @@ import LanguageDetector from 'i18next-browser-languagedetector';
 import Backend from 'i18next-http-backend';
 
 // Import translation files directly
-import commonEN from '../locales/en.json';
-import commonES from '../locales/es.json';
+import translationsEN from '../locales/en.json';
+import translationsES from '../locales/es.json';
+import translationsPT from '../locales/pt.json';
+import translationsDE from '../locales/de.json';
+import translationsFR from '../locales/fr.json';
 
 // Initialize i18next
 i18n
@@ -22,7 +25,20 @@ i18n
     // Debug mode in development
     debug: process.env.NODE_ENV === 'development',
     // Namespaces configuration
-    ns: ['common', 'auth', 'dashboard', 'deliveries', 'users', 'settings'],
+    ns: [
+      'common', 
+      'auth', 
+      'dashboard', 
+      'deliveries', 
+      'users', 
+      'settings', 
+      'navigation', 
+      'analytics', 
+      'jobs',
+      'dataExamples',
+      'welcome',
+      'deliverers'
+    ],
     defaultNS: 'common',
     // Interpolation configuration
     interpolation: {
@@ -38,12 +54,11 @@ i18n
     },
     // Add resources directly for fallback
     resources: {
-      en: {
-        common: commonEN
-      },
-      es: {
-        common: commonES
-      }
+      en: translationsEN,
+      es: translationsES,
+      pt: translationsPT,
+      de: translationsDE,
+      fr: translationsFR
     }
   });
 

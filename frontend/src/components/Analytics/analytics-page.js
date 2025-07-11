@@ -1,46 +1,60 @@
 import React, { useState, useEffect } from 'react';
 import {
+  TrendingUp,
+  Calendar,
+  RefreshCw,
+  Download,
+  Package,
+  CheckCircle,
+  Users,
+  Clock,
+  Filter,
+} from 'lucide-react';
+import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
+import { statisticsAPI } from '../../services/api';
+import { Button } from '../UI/button';
+import { Card, CardContent } from '../UI/card';
+import { Badge } from '../UI/badge';
+import { Grid, GridItem } from '../UI/grid';
+import { Input } from '../UI/input';
+import { Select } from '../UI/select';
+import { Label } from '../UI/label';
+import ResponsiveChartCard from '../UI/data-visualization/charts/responsive-chart-card';
+import {
   LineChart,
   Line,
+  BarChart,
+  Bar,
+  PieChart,
+  Pie,
+  Cell,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   Legend,
-  PieChart,
-  Pie,
-  Cell,
-  BarChart,
-  Bar,
   ResponsiveContainer,
-  AreaChart,
-  Area,
 } from 'recharts';
-import {
-  TrendingUp,
-  Package,
-  Users,
-  Clock,
-  CheckCircle,
-  XCircle,
-  AlertCircle,
-  Calendar,
-  RefreshCw,
-  Download,
-  Filter,
-} from 'lucide-react';
-import { statisticsAPI } from '../../services/api';
-import { toast } from 'react-toastify';
-import { Button } from '../UI/button';
-import { Input } from '../UI/input';
-import { Select } from '../UI/select';
-import { Card, CardContent } from '../UI/card';
-import { Badge } from '../UI/badge';
-import { Grid, GridItem } from '../UI/grid';
-import { cn } from '../../lib/utils';
-import { Table, TableHeader as THead, TableRow as TR, TableHead as TH, TableBody as TBody, TableCell as TD } from '../UI/table';
+
+const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className='rounded-lg border bg-card p-3 shadow'>
+        <p className='mb-1 font-medium'>{label}</p>
+        {payload.map((entry, index) => (
+          <p key={`item-${index}`} style={{ color: entry.color }}>
+            {entry.name}: {entry.value}
+          </p>
+        ))}
+      </div>
+    );
+  }
+  return null;
+};
 
 const AnalyticsPage = () => {
+  const { t } = useTranslation(['analytics', 'common', 'deliveries']);
   const [loading, setLoading] = useState(true);
   const [overallStats, setOverallStats] = useState({});
   const [statusStats, setStatusStats] = useState([]);
@@ -105,7 +119,7 @@ const AnalyticsPage = () => {
 
   const fetchDateRangeData = async () => {
     if (!dateRange.startDate || !dateRange.endDate) {
-      toast.error('Please select both start and end dates');
+      toast.error(t('selectDateRange'));
       return;
     }
 
@@ -118,7 +132,7 @@ const AnalyticsPage = () => {
       setDateRangeStats(response.data);
     } catch (error) {
       console.error('Error fetching date range data:', error);
-      toast.error('Failed to load date range data');
+      toast.error(t('failedToLoadDateRange'));
     }
   };
 
@@ -126,7 +140,7 @@ const AnalyticsPage = () => {
     setRefreshing(true);
     await fetchAllData();
     setRefreshing(false);
-    toast.success('Analytics data refreshed');
+    toast.success(t('dataRefreshed'));
   };
 
   const handleExport = () => {
@@ -148,7 +162,7 @@ const AnalyticsPage = () => {
     a.download = `analytics-${new Date().toISOString().split('T')[0]}.json`;
     a.click();
     URL.revokeObjectURL(url);
-    toast.success('Analytics data exported');
+    toast.success(t('dataExported'));
   };
 
   const formatTrendData = trends => {
@@ -196,7 +210,7 @@ const AnalyticsPage = () => {
       <div className='mx-auto flex min-h-[50vh] max-w-7xl items-center justify-center px-4 py-6'>
         <div className='text-center'>
           <div className='mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent'></div>
-          <p className='text-muted-foreground'>Loading analytics data...</p>
+          <p className='text-muted-foreground'>{t('common:loading')}</p>
         </div>
       </div>
     );
@@ -208,10 +222,10 @@ const AnalyticsPage = () => {
         <div>
           <h1 className='flex items-center gap-2 text-2xl font-bold'>
             <TrendingUp className='h-6 w-6 text-primary' />
-            Analytics Dashboard
+            {t('title')}
           </h1>
           <p className='text-muted-foreground'>
-            Comprehensive delivery and performance analytics
+            {t('overview')}
           </p>
         </div>
         <div className='flex gap-2'>
@@ -225,7 +239,7 @@ const AnalyticsPage = () => {
             <RefreshCw
               className={refreshing ? 'h-4 w-4 animate-spin' : 'h-4 w-4'}
             />
-            {refreshing ? 'Refreshing...' : 'Refresh'}
+            {refreshing ? t('common:loading') : t('refreshData')}
           </Button>
           <Button
             onClick={handleExport}
@@ -233,7 +247,7 @@ const AnalyticsPage = () => {
             className='flex items-center gap-2'
           >
             <Download className='h-4 w-4' />
-            Export Data
+            {t('exportReport')}
           </Button>
         </div>
       </div>
@@ -254,7 +268,7 @@ const AnalyticsPage = () => {
               <h3 className='text-3xl font-bold'>
                 {overallStats.totalDeliveries || 0}
               </h3>
-              <p className='text-sm text-muted-foreground'>Total Deliveries</p>
+              <p className='text-sm text-muted-foreground'>{t('totalDeliveries')}</p>
             </CardContent>
           </Card>
         </GridItem>
@@ -267,14 +281,14 @@ const AnalyticsPage = () => {
                   <CheckCircle className='h-5 w-5' />
                 </div>
                 <Badge variant='success' className='text-xs'>
-                  {overallStats.deliveryBreakdown?.delivered || 0} successful
+                  {overallStats.deliveryBreakdown?.delivered || 0} {t('deliveries.statuses.delivered', { ns: 'deliveries' })}
                 </Badge>
               </div>
               <h3 className='text-3xl font-bold'>
                 {overallStats.deliveryRate || 0}%
               </h3>
               <p className='text-sm text-muted-foreground'>
-                Delivery Success Rate
+                {t('completionRate')}
               </p>
             </CardContent>
           </Card>
@@ -288,13 +302,13 @@ const AnalyticsPage = () => {
                   <Users className='h-5 w-5' />
                 </div>
                 <Badge variant='outline' className='text-xs'>
-                  of {overallStats.totalDeliverers || 0} total
+                  {t('of')} {overallStats.totalDeliverers || 0} {t('total')}
                 </Badge>
               </div>
               <h3 className='text-3xl font-bold'>
                 {overallStats.activeDeliverers || 0}
               </h3>
-              <p className='text-sm text-muted-foreground'>Active Deliverers</p>
+              <p className='text-sm text-muted-foreground'>{t('deliverers.statuses.active', { ns: 'deliverers' })} {t('deliverers.title', { ns: 'deliverers' })}</p>
             </CardContent>
           </Card>
         </GridItem>
@@ -307,33 +321,28 @@ const AnalyticsPage = () => {
                   <Clock className='h-5 w-5' />
                 </div>
                 <Badge variant='outline' className='text-xs'>
-                  {overallStats.deliveryBreakdown?.inTransit || 0} in transit
+                  {t('avgTime')}
                 </Badge>
               </div>
               <h3 className='text-3xl font-bold'>
-                {overallStats.deliveryBreakdown?.pending || 0}
+                {overallStats.averageDeliveryTime || 0}
               </h3>
               <p className='text-sm text-muted-foreground'>
-                Pending Deliveries
+                {t('averageDeliveryTime')} ({t('minutes')})
               </p>
             </CardContent>
           </Card>
         </GridItem>
       </Grid>
 
-      {/* Charts Grid */}
-      <div className='mb-8 grid grid-cols-1 gap-6 lg:grid-cols-2'>
+      {/* Charts Section */}
+      <Grid className='mb-8 gap-6'>
         {/* Delivery Status Distribution */}
-        <Card className='overflow-hidden'>
-          <div className='p-6 pb-2'>
-            <h3 className='text-lg font-medium'>
-              Delivery Status Distribution
-            </h3>
-            <p className='text-sm text-muted-foreground'>
-              Current breakdown of all deliveries
-            </p>
-          </div>
-          <div className='p-4'>
+        <GridItem colSpan='col-span-12 lg:col-span-6'>
+          <ResponsiveChartCard
+            title={t('deliveryStatusDistribution')}
+            subtitle={t('currentBreakdown')}
+          >
             <ResponsiveContainer width='100%' height={300}>
               <PieChart>
                 <Pie
@@ -341,256 +350,242 @@ const AnalyticsPage = () => {
                   cx='50%'
                   cy='50%'
                   labelLine={false}
-                  label={({ name, percentage }) => `${name}: ${percentage}%`}
-                  outerRadius={80}
+                  outerRadius={100}
                   fill='#8884d8'
                   dataKey='value'
+                  nameKey='name'
+                  label={({ name, percentage }) => `${name}: ${percentage}%`}
                 >
                   {prepareStatusPieData().map((entry, index) => (
                     <Cell
                       key={`cell-${index}`}
-                      fill={statusColors[entry.name]}
+                      fill={statusColors[entry.name] || '#8884d8'}
                     />
                   ))}
                 </Pie>
-                <Tooltip />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend />
               </PieChart>
             </ResponsiveContainer>
-          </div>
-        </Card>
+          </ResponsiveChartCard>
+        </GridItem>
 
         {/* Delivery Trends */}
-        <Card className='col-span-1 overflow-hidden lg:col-span-2'>
-          <div className='p-6 pb-2'>
-            <h3 className='text-lg font-medium'>Delivery Trends</h3>
-            <p className='text-sm text-muted-foreground'>
-              {deliveryTrends.period}
-            </p>
-          </div>
-          <div className='p-4'>
+        <GridItem colSpan='col-span-12 lg:col-span-6'>
+          <ResponsiveChartCard
+            title={t('deliveryTrends')}
+            subtitle={t('dashboard:lastSevenDays', { ns: 'dashboard' })}
+          >
             <ResponsiveContainer width='100%' height={300}>
-              <AreaChart data={formatTrendData(deliveryTrends)}>
+              <LineChart
+                data={formatTrendData(deliveryTrends)}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              >
                 <CartesianGrid strokeDasharray='3 3' />
                 <XAxis dataKey='date' />
                 <YAxis />
-                <Tooltip />
+                <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                <Area
+                <Line
                   type='monotone'
                   dataKey='Delivered'
-                  stackId='1'
-                  stroke={statusColors.Delivered}
-                  fill={statusColors.Delivered}
+                  stroke={statusColors['Delivered']}
+                  activeDot={{ r: 8 }}
                 />
-                <Area
-                  type='monotone'
-                  dataKey='In Transit'
-                  stackId='1'
-                  stroke={statusColors['In Transit']}
-                  fill={statusColors['In Transit']}
-                />
-                <Area
+                <Line
                   type='monotone'
                   dataKey='Pending'
-                  stackId='1'
-                  stroke={statusColors.Pending}
-                  fill={statusColors.Pending}
+                  stroke={statusColors['Pending']}
                 />
-                <Area
+                <Line
                   type='monotone'
-                  dataKey='Cancelled'
-                  stackId='1'
-                  stroke={statusColors.Cancelled}
-                  fill={statusColors.Cancelled}
+                  dataKey='In Transit'
+                  stroke={statusColors['In Transit']}
                 />
-              </AreaChart>
+              </LineChart>
             </ResponsiveContainer>
-          </div>
-        </Card>
+          </ResponsiveChartCard>
+        </GridItem>
 
         {/* Priority Statistics */}
-        <Card className='overflow-hidden'>
-          <div className='p-6 pb-2'>
-            <h3 className='text-lg font-medium'>Priority Statistics</h3>
-            <p className='text-sm text-muted-foreground'>
-              Delivery completion by priority
-            </p>
-          </div>
-          <div className='p-4'>
+        <GridItem colSpan='col-span-12'>
+          <ResponsiveChartCard
+            title={t('priorityStatistics')}
+            subtitle={t('deliveryCompletionByPriority')}
+          >
             <ResponsiveContainer width='100%' height={300}>
-              <BarChart data={preparePriorityBarData()}>
+              <BarChart
+                data={preparePriorityBarData()}
+                margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+              >
                 <CartesianGrid strokeDasharray='3 3' />
                 <XAxis dataKey='priority' />
                 <YAxis />
-                <Tooltip />
+                <Tooltip content={<CustomTooltip />} />
                 <Legend />
-                <Bar dataKey='delivered' fill='#10B981' name='Delivered' />
-                <Bar dataKey='pending' fill='#F59E0B' name='Pending' />
-                <Bar dataKey='inTransit' fill='#3B82F6' name='In Transit' />
-                <Bar dataKey='cancelled' fill='#EF4444' name='Cancelled' />
+                <Bar dataKey='delivered' name={t('deliveries.statuses.delivered', { ns: 'deliveries' })} fill='#10B981' />
+                <Bar dataKey='pending' name={t('deliveries.statuses.pending', { ns: 'deliveries' })} fill='#F59E0B' />
+                <Bar dataKey='inTransit' name={t('deliveries.statuses.inTransit', { ns: 'deliveries' })} fill='#3B82F6' />
               </BarChart>
             </ResponsiveContainer>
-          </div>
-        </Card>
+          </ResponsiveChartCard>
+        </GridItem>
+      </Grid>
 
-        {/* Date Range Filter */}
-        <Card className='overflow-hidden'>
-          <div className='p-6 pb-2'>
-            <h3 className='text-lg font-medium'>Custom Date Range</h3>
-            <p className='text-sm text-muted-foreground'>
-              Filter deliveries by date range
-            </p>
-          </div>
-          <div className='p-6'>
-            <div className='mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4'>
-              <div className='space-y-2'>
-                <label className='text-sm font-medium'>Start Date:</label>
-                <Input
-                  type='date'
-                  value={dateRange.startDate}
-                  onChange={e =>
-                    setDateRange({ ...dateRange, startDate: e.target.value })
-                  }
-                />
-              </div>
-              <div className='space-y-2'>
-                <label className='text-sm font-medium'>End Date:</label>
-                <Input
-                  type='date'
-                  value={dateRange.endDate}
-                  onChange={e =>
-                    setDateRange({ ...dateRange, endDate: e.target.value })
-                  }
-                />
-              </div>
-              <div className='space-y-2'>
-                <label className='text-sm font-medium'>Group by:</label>
-                <Select
-                  value={dateRange.groupBy}
-                  onChange={e =>
-                    setDateRange({ ...dateRange, groupBy: e.target.value })
-                  }
-                >
-                  <option value='day'>Day</option>
-                  <option value='week'>Week</option>
-                  <option value='month'>Month</option>
-                </Select>
-              </div>
-              <div className='flex items-end'>
-                <Button
-                  onClick={fetchDateRangeData}
-                  className='flex w-full items-center gap-2'
-                >
-                  <Filter className='h-4 w-4' />
-                  Apply Filter
-                </Button>
-              </div>
+      {/* Custom Date Range Section */}
+      <Card className='mb-8'>
+        <CardContent className='p-6'>
+          <h3 className='mb-4 text-lg font-medium'>{t('customDateRange')}</h3>
+          <p className='mb-6 text-sm text-muted-foreground'>
+            {t('filterDeliveriesByDateRange')}
+          </p>
+
+          <div className='mb-6 grid grid-cols-1 gap-6 md:grid-cols-3'>
+            <div className='space-y-2'>
+              <Label htmlFor='startDate'>{t('startDate')}</Label>
+              <Input
+                id='startDate'
+                type='date'
+                value={dateRange.startDate}
+                onChange={e =>
+                  setDateRange({ ...dateRange, startDate: e.target.value })
+                }
+              />
             </div>
 
-            {dateRangeStats.data && (
-              <div className='mt-6 border-t pt-6'>
-                <h4 className='mb-4 text-base font-medium'>
-                  Results for {dateRangeStats.dateRange?.startDate} to{' '}
-                  {dateRangeStats.dateRange?.endDate}
-                </h4>
-                <ResponsiveContainer width='100%' height={200}>
-                  <LineChart data={dateRangeStats.data}>
-                    <CartesianGrid strokeDasharray='3 3' />
-                    <XAxis dataKey='_id' />
-                    <YAxis />
-                    <Tooltip />
-                    <Legend />
-                    <Line
-                      type='monotone'
-                      dataKey='count'
-                      stroke='#8884d8'
-                      strokeWidth={2}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            )}
+            <div className='space-y-2'>
+              <Label htmlFor='endDate'>{t('endDate')}</Label>
+              <Input
+                id='endDate'
+                type='date'
+                value={dateRange.endDate}
+                onChange={e =>
+                  setDateRange({ ...dateRange, endDate: e.target.value })
+                }
+              />
+            </div>
+
+            <div className='space-y-2'>
+              <Label htmlFor='groupBy'>{t('groupBy')}</Label>
+              <Select
+                id='groupBy'
+                value={dateRange.groupBy}
+                onChange={e =>
+                  setDateRange({ ...dateRange, groupBy: e.target.value })
+                }
+              >
+                <option value='day'>{t('common:day')}</option>
+                <option value='week'>{t('common:week')}</option>
+                <option value='month'>{t('common:month')}</option>
+              </Select>
+            </div>
           </div>
-        </Card>
-      </div>
+
+          <div className='flex justify-end'>
+            <Button
+              onClick={fetchDateRangeData}
+              className='flex items-center gap-2'
+            >
+              <Filter className='h-4 w-4' />
+              {t('applyFilter')}
+            </Button>
+          </div>
+
+          {Object.keys(dateRangeStats).length > 0 && (
+            <div className='mt-8'>
+              <h4 className='mb-4 text-md font-medium'>
+                {t('resultsFor')} {dateRange.startDate} {t('common:to')} {dateRange.endDate}
+              </h4>
+
+              {/* Date Range Results Chart */}
+              <ResponsiveContainer width='100%' height={300}>
+                <BarChart
+                  data={dateRangeStats.data || []}
+                  margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray='3 3' />
+                  <XAxis dataKey='date' />
+                  <YAxis />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend />
+                  <Bar
+                    dataKey='count'
+                    name={t('deliveries')}
+                    fill='#3B82F6'
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Deliverer Performance Table */}
-      <Card className='mb-8'>
-        <div className='p-6 pb-2'>
-          <h3 className='text-lg font-medium'>Deliverer Performance</h3>
-          <p className='text-sm text-muted-foreground'>
-            Top performing deliverers ranked by total deliveries
+      <Card>
+        <CardContent className='p-6'>
+          <h3 className='mb-4 text-lg font-medium'>{t('delivererPerformance')}</h3>
+          <p className='mb-6 text-sm text-muted-foreground'>
+            {t('topPerformers')}
           </p>
-        </div>
-        <Table>
-          <THead>
-            <TR className='bg-muted/50'>
-              <TH>Rank</TH>
-              <TH>Deliverer</TH>
-              <TH>Total Deliveries</TH>
-              <TH>Success Rate</TH>
-              <TH>Delivered</TH>
-              <TH>Pending</TH>
-              <TH>In Transit</TH>
-              <TH>Cancelled</TH>
-            </TR>
-          </THead>
-          <TBody>
-            {delivererPerformance.slice(0, 10).map((deliverer, index) => (
-              <TR key={deliverer.delivererId}>
-                <TD>
-                  <Badge
-                    variant={index < 3 ? 'default' : 'outline'}
-                    className={cn(
-                      'font-bold',
-                      index === 0 && 'bg-yellow-500',
-                      index === 1 && 'bg-slate-400',
-                      index === 2 && 'bg-amber-700'
-                    )}
+
+          <div className='overflow-x-auto'>
+            <table className='w-full border-collapse'>
+              <thead>
+                <tr className='border-b bg-muted/50'>
+                  <th className='p-3 text-left'>{t('name')}</th>
+                  <th className='p-3 text-left'>{t('deliveries')}</th>
+                  <th className='p-3 text-left'>{t('onTimeRate')}</th>
+                  <th className='p-3 text-left'>{t('avgTime')}</th>
+                  <th className='p-3 text-left'>{t('rating')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {delivererPerformance.map((deliverer, index) => (
+                  <tr
+                    key={deliverer.id || index}
+                    className='border-b hover:bg-muted/50'
                   >
-                    #{index + 1}
-                  </Badge>
-                </TD>
-                <TD>
-                  <div className='flex flex-col'>
-                    <span className='font-medium'>
-                      {deliverer.delivererName}
-                    </span>
-                    <span className='text-xs text-muted-foreground'>
-                      {deliverer.delivererEmail}
-                    </span>
-                  </div>
-                </TD>
-                <TD className='font-medium'>{deliverer.totalDeliveries}</TD>
-                <TD>
-                  <Badge
-                    variant={
-                      deliverer.successRate >= 90
-                        ? 'success'
-                        : deliverer.successRate >= 70
-                          ? 'warning'
-                          : 'destructive'
-                    }
-                  >
-                    {deliverer.successRate}%
-                  </Badge>
-                </TD>
-                <TD>
-                  <Badge variant='success'>{deliverer.delivered}</Badge>
-                </TD>
-                <TD>
-                  <Badge variant='warning'>{deliverer.pending}</Badge>
-                </TD>
-                <TD>
-                  <Badge variant='info'>{deliverer.inTransit}</Badge>
-                </TD>
-                <TD>
-                  <Badge variant='destructive'>{deliverer.cancelled}</Badge>
-                </TD>
-              </TR>
-            ))}
-          </TBody>
-        </Table>
+                    <td className='p-3'>{deliverer.name}</td>
+                    <td className='p-3'>{deliverer.deliveries}</td>
+                    <td className='p-3'>
+                      <Badge
+                        variant={
+                          deliverer.onTimeRate > 90
+                            ? 'success'
+                            : deliverer.onTimeRate > 75
+                            ? 'warning'
+                            : 'destructive'
+                        }
+                      >
+                        {deliverer.onTimeRate}%
+                      </Badge>
+                    </td>
+                    <td className='p-3'>{deliverer.avgTime} {t('minutes')}</td>
+                    <td className='p-3'>
+                      <div className='flex items-center'>
+                        <span className='mr-2'>{deliverer.rating}</span>
+                        <div className='flex'>
+                          {[...Array(5)].map((_, i) => (
+                            <span
+                              key={i}
+                              className={`text-sm ${
+                                i < Math.round(deliverer.rating)
+                                  ? 'text-yellow-500'
+                                  : 'text-gray-300'
+                              }`}
+                            >
+                              ★
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
       </Card>
     </div>
   );

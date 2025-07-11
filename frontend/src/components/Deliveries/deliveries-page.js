@@ -16,6 +16,7 @@ import {
   Package,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import { deliveryAPI, delivererAPI } from '../../services/api';
 import LoadingSpinner from '../UI/loading-spinner';
 import ErrorMessage from '../UI/error-message';
@@ -98,6 +99,8 @@ const fallbackDeliverers = [
 ];
 
 const DeliveriesPage = () => {
+  const { t } = useTranslation(['deliveries', 'common']);
+  
   // State Management
   const [deliveries, setDeliveries] = useState([]);
   const [deliverers, setDeliverers] = useState([]);
@@ -555,10 +558,10 @@ const DeliveriesPage = () => {
         <div className='header-left'>
           <h1 className='page-title flex items-center gap-2 text-2xl font-bold'>
             <Package className='h-6 w-6 text-primary' />
-            Deliveries Management
+            {t('title')}
           </h1>
           <p className='text-muted-foreground'>
-            Manage and track all delivery orders
+            {t('deliveryDetails')}
           </p>
         </div>
         <div className='header-actions flex gap-2'>
@@ -572,14 +575,14 @@ const DeliveriesPage = () => {
             <RefreshCw
               className={loading ? 'h-4 w-4 animate-spin' : 'h-4 w-4'}
             />
-            Refresh
+            {t('common:refresh')}
           </Button>
           <Button
             onClick={openCreateModal}
             size='sm'
             className='flex items-center gap-2'
           >
-            <Plus className='h-4 w-4' /> New Delivery
+            <Plus className='h-4 w-4' /> {t('newDelivery')}
           </Button>
         </div>
       </div>
@@ -590,7 +593,7 @@ const DeliveriesPage = () => {
           <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
           <Input
             type='text'
-            placeholder='Search by Order ID, Customer, or Address...'
+            placeholder={t('destinationPlaceholder')}
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             className='pl-10'
@@ -605,7 +608,7 @@ const DeliveriesPage = () => {
             onClick={() => setShowFilters(!showFilters)}
           >
             <Filter className='h-4 w-4' />
-            Filters
+            {t('common:filter')}
           </Button>
 
           {(statusFilter || priorityFilter || delivererFilter) && (
@@ -616,7 +619,7 @@ const DeliveriesPage = () => {
               onClick={clearFilters}
             >
               <X className='h-4 w-4' />
-              Clear
+              {t('common:clear')}
             </Button>
           )}
         </div>
@@ -626,40 +629,40 @@ const DeliveriesPage = () => {
       {showFilters && (
         <div className='mb-6 grid grid-cols-1 gap-6 rounded-xl bg-card p-6 shadow md:grid-cols-3'>
           <div className='space-y-2'>
-            <label className='text-sm font-medium'>Status</label>
+            <label className='text-sm font-medium'>{t('status')}</label>
             <Select
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value)}
             >
-              <option value=''>All Statuses</option>
-              <option value='PENDING'>Pending</option>
-              <option value='IN_TRANSIT'>In Transit</option>
-              <option value='DELIVERED'>Delivered</option>
-              <option value='CANCELLED'>Cancelled</option>
+              <option value=''>{t('filters.all')}</option>
+              <option value='PENDING'>{t('statuses.pending')}</option>
+              <option value='IN_TRANSIT'>{t('statuses.inTransit')}</option>
+              <option value='DELIVERED'>{t('statuses.delivered')}</option>
+              <option value='CANCELLED'>{t('statuses.cancelled')}</option>
             </Select>
           </div>
 
           <div className='space-y-2'>
-            <label className='text-sm font-medium'>Priority</label>
+            <label className='text-sm font-medium'>{t('priority')}</label>
             <Select
               value={priorityFilter}
               onChange={e => setPriorityFilter(e.target.value)}
             >
-              <option value=''>All Priorities</option>
-              <option value='LOW'>Low</option>
-              <option value='MEDIUM'>Medium</option>
-              <option value='HIGH'>High</option>
-              <option value='URGENT'>Urgent</option>
+              <option value=''>{t('filters.all')}</option>
+              <option value='LOW'>{t('priorities.low')}</option>
+              <option value='MEDIUM'>{t('priorities.medium')}</option>
+              <option value='HIGH'>{t('priorities.high')}</option>
+              <option value='URGENT'>{t('priorities.urgent')}</option>
             </Select>
           </div>
 
           <div className='space-y-2'>
-            <label className='text-sm font-medium'>Deliverer</label>
+            <label className='text-sm font-medium'>{t('deliverer')}</label>
             <Select
               value={delivererFilter}
               onChange={e => setDelivererFilter(e.target.value)}
             >
-              <option value=''>All Deliverers</option>
+              <option value=''>{t('filters.all')}</option>
               {deliverers.map(deliverer => (
                 <option key={deliverer._id} value={deliverer._id}>
                   {deliverer.name}
@@ -676,7 +679,7 @@ const DeliveriesPage = () => {
           <CardContent className='flex flex-col items-center justify-center pt-6'>
             <span className='text-3xl font-bold'>{totalDocs}</span>
             <span className='text-sm text-muted-foreground'>
-              Total Deliveries
+              {t('deliveriesTotal', { ns: 'dashboard' })}
             </span>
           </CardContent>
         </Card>
@@ -685,7 +688,7 @@ const DeliveriesPage = () => {
             <span className='text-3xl font-bold'>
               {filteredDeliveries.filter(d => d.status === 'PENDING').length}
             </span>
-            <span className='text-sm text-muted-foreground'>Pending</span>
+            <span className='text-sm text-muted-foreground'>{t('statuses.pending')}</span>
           </CardContent>
         </Card>
         <Card>
@@ -693,7 +696,7 @@ const DeliveriesPage = () => {
             <span className='text-3xl font-bold'>
               {filteredDeliveries.filter(d => d.status === 'IN_TRANSIT').length}
             </span>
-            <span className='text-sm text-muted-foreground'>In Transit</span>
+            <span className='text-sm text-muted-foreground'>{t('statuses.inTransit')}</span>
           </CardContent>
         </Card>
         <Card>
@@ -701,7 +704,7 @@ const DeliveriesPage = () => {
             <span className='text-3xl font-bold'>
               {filteredDeliveries.filter(d => d.status === 'DELIVERED').length}
             </span>
-            <span className='text-sm text-muted-foreground'>Delivered</span>
+            <span className='text-sm text-muted-foreground'>{t('statuses.delivered')}</span>
           </CardContent>
         </Card>
       </div>
@@ -727,11 +730,11 @@ const DeliveriesPage = () => {
             className='flex items-center gap-1'
           >
             <ChevronLeft className='h-4 w-4' />
-            Previous
+            {t('common:previous')}
           </Button>
 
           <div className='text-sm text-muted-foreground'>
-            Page {currentPage} of {totalPages} ({totalDocs} total)
+            {t('common:page')} {currentPage} {t('common:of')} {totalPages} ({totalDocs} {t('common:total')})
           </div>
 
           <Button
@@ -743,7 +746,7 @@ const DeliveriesPage = () => {
             disabled={currentPage === totalPages}
             className='flex items-center gap-1'
           >
-            Next
+            {t('common:next')}
             <ChevronRight className='h-4 w-4' />
           </Button>
         </div>
@@ -838,10 +841,10 @@ const DeliveriesPage = () => {
                     }
                     disabled={modalMode === 'create'} // Disable status selection for new deliveries
                   >
-                    <option value='PENDING'>Pending</option>
-                    <option value='IN_TRANSIT'>In Transit</option>
-                    <option value='DELIVERED'>Delivered</option>
-                    <option value='CANCELLED'>Cancelled</option>
+                    <option value='PENDING'>{t('statuses.pending')}</option>
+                    <option value='IN_TRANSIT'>{t('statuses.inTransit')}</option>
+                    <option value='DELIVERED'>{t('statuses.delivered')}</option>
+                    <option value='CANCELLED'>{t('statuses.cancelled')}</option>
                   </select>
                   {modalMode === 'create' && (
                     <small className='form-hint'>
@@ -857,10 +860,10 @@ const DeliveriesPage = () => {
                       setFormData({ ...formData, priority: e.target.value })
                     }
                   >
-                    <option value='LOW'>Low</option>
-                    <option value='MEDIUM'>Medium</option>
-                    <option value='HIGH'>High</option>
-                    <option value='URGENT'>Urgent</option>
+                    <option value='LOW'>{t('priorities.low')}</option>
+                    <option value='MEDIUM'>{t('priorities.medium')}</option>
+                    <option value='HIGH'>{t('priorities.high')}</option>
+                    <option value='URGENT'>{t('priorities.urgent')}</option>
                   </select>
                 </div>
               </div>
@@ -890,7 +893,7 @@ const DeliveriesPage = () => {
                         setFormData({ ...formData, deliverer: e.target.value })
                       }
                     >
-                      <option value=''>Select deliverer (optional)</option>
+                      <option value=''>{t('filters.all')}</option>
                       {deliverers.map(deliverer => (
                         <option key={deliverer._id} value={deliverer._id}>
                           {deliverer.name} - {deliverer.email}
