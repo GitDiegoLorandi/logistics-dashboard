@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useTable, useSortBy, useFilters, usePagination } from 'react-table';
 import { LucideChevronDown, LucideChevronUp, LucideDownload } from 'lucide-react';
 import { Button } from '../UI/button';
@@ -7,35 +8,38 @@ import { getStatusColor } from '../../constants/status-colors';
 import { exportToCSV } from '../../utils/export-utils';
 
 const DelivererTable = ({ deliverers }) => {
+  const { t } = useTranslation(['deliverers', 'common']);
+  
   const columns = useMemo(
     () => [
       {
-        Header: 'ID',
+        Header: t('columns.id'),
         accessor: 'id',
       },
       {
-        Header: 'Name',
+        Header: t('name'),
         accessor: 'name',
       },
       {
-        Header: 'Status',
+        Header: t('status'),
         accessor: 'status',
         Cell: ({ value }) => (
           <Badge className={getStatusColor(value, true)}>
-            {value}
+            {t(`statuses.${value.toLowerCase()}`)}
           </Badge>
         ),
       },
       {
-        Header: 'Vehicle',
+        Header: t('vehicle'),
         accessor: 'vehicleType',
+        Cell: ({ value }) => value ? t(`vehicles.${value.toLowerCase()}`) : t('notSpecified'),
       },
       {
-        Header: 'Phone',
+        Header: t('phone'),
         accessor: 'phone',
       },
       {
-        Header: 'Rating',
+        Header: t('rating'),
         accessor: 'rating',
         Cell: ({ value }) => (
           <div className="flex items-center">
@@ -45,11 +49,11 @@ const DelivererTable = ({ deliverers }) => {
         ),
       },
       {
-        Header: 'Deliveries',
+        Header: t('columns.deliveries'),
         accessor: 'deliveryCount',
       },
     ],
-    []
+    [t]
   );
 
   const data = useMemo(() => deliverers, [deliverers]);
@@ -95,7 +99,7 @@ const DelivererTable = ({ deliverers }) => {
   return (
     <div className="w-full">
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="text-xl font-semibold">Deliverers</h2>
+        <h2 className="text-xl font-semibold">{t('title')}</h2>
         <Button 
           variant="outline" 
           size="sm" 
@@ -103,7 +107,7 @@ const DelivererTable = ({ deliverers }) => {
           className="flex items-center gap-2"
         >
           <LucideDownload className="h-4 w-4" />
-          Export CSV
+          {t('exportCSV')}
         </Button>
       </div>
 
@@ -153,7 +157,7 @@ const DelivererTable = ({ deliverers }) => {
 
       <div className="mt-4 flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
-          Page {pageIndex + 1} of {pageOptions.length}
+          {t('tablePagination', { page: pageIndex + 1, totalPages: pageOptions.length })}
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -162,7 +166,7 @@ const DelivererTable = ({ deliverers }) => {
             onClick={() => previousPage()}
             disabled={!canPreviousPage}
           >
-            Previous
+            {t('previous', { ns: 'common' })}
           </Button>
           <Button
             variant="outline"
@@ -170,7 +174,7 @@ const DelivererTable = ({ deliverers }) => {
             onClick={() => nextPage()}
             disabled={!canNextPage}
           >
-            Next
+            {t('next', { ns: 'common' })}
           </Button>
         </div>
       </div>

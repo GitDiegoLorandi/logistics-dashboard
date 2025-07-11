@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import OnboardingTour from '../UI/onboarding-tour';
 
 /**
@@ -10,43 +11,45 @@ import OnboardingTour from '../UI/onboarding-tour';
  * @param {Function} props.onSkip - Callback when tour is skipped
  */
 const DashboardTour = ({ run = false, onFinish, onSkip }) => {
+  const { t } = useTranslation(['dashboard', 'common']);
+  
   const dashboardTourSteps = [
     {
       target: '.dashboard-header',
-      content: 'Welcome to your logistics dashboard! This is where you can monitor all your delivery operations.',
+      content: t('tour.welcome'),
       disableBeacon: true,
       placement: 'bottom',
-      title: 'Dashboard Overview',
+      title: t('tour.overviewTitle'),
     },
     {
       target: '.dashboard-stats',
-      content: 'Here you can see key metrics about your deliveries at a glance.',
+      content: t('tour.statsContent'),
       placement: 'bottom',
-      title: 'Delivery Statistics',
+      title: t('tour.statsTitle'),
     },
     {
       target: '.dashboard-chart',
-      content: 'These charts show your delivery trends and performance over time.',
+      content: t('tour.chartsContent'),
       placement: 'top',
-      title: 'Performance Charts',
+      title: t('tour.chartsTitle'),
     },
     {
       target: '.dashboard-recent',
-      content: 'View your most recent deliveries and their status here.',
+      content: t('tour.recentContent'),
       placement: 'top',
-      title: 'Recent Deliveries',
+      title: t('tour.recentTitle'),
     },
     {
       target: '.main-navigation',
-      content: 'Use this navigation menu to access different sections of the application.',
+      content: t('tour.navigationContent'),
       placement: 'right',
-      title: 'Navigation Menu',
+      title: t('tour.navigationTitle'),
     },
     {
       target: '.user-menu',
-      content: 'Access your profile, settings, and logout from here.',
+      content: t('tour.userMenuContent'),
       placement: 'bottom',
-      title: 'User Menu',
+      title: t('tour.userMenuTitle'),
     },
   ];
 

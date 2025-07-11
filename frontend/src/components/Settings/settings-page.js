@@ -22,6 +22,7 @@ import {
   X,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { useTranslation } from 'react-i18next';
 import { userAPI, authAPI } from '../../services/api';
 import { Button } from '../UI/button';
 import { Input } from '../UI/input';
@@ -34,6 +35,7 @@ import { Label } from '../UI/label';
 import { cn } from '../../lib/utils';
 
 const SettingsPage = () => {
+  const { t } = useTranslation(['settings', 'common']);
   const [activeTab, setActiveTab] = useState('profile');
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -59,57 +61,6 @@ const SettingsPage = () => {
     autoRefresh: true,
     refreshInterval: 30,
   });
-
-  // Language translations
-  const translations = {
-    en: {
-      profile: 'Profile',
-      system: 'System',
-      notifications: 'Notifications',
-      security: 'Security',
-      data: 'Data',
-      appearance: 'Appearance',
-      language: 'Language',
-      localization: 'Localization',
-      timezone: 'Timezone',
-      dateFormat: 'Date Format',
-      currency: 'Currency',
-      dashboardBehavior: 'Dashboard Behavior',
-      autoRefresh: 'Auto-refresh data',
-      refreshInterval: 'Refresh Interval (seconds)',
-      savePreferences: 'Save Preferences',
-      preferencesTitle: 'System Preferences',
-      preferencesSubtitle:
-        'Customize your dashboard experience and system behavior',
-    },
-    pt_BR: {
-      profile: 'Perfil',
-      system: 'Sistema',
-      notifications: 'Notificações',
-      security: 'Segurança',
-      data: 'Dados',
-      appearance: 'Aparência',
-      language: 'Idioma',
-      localization: 'Localização',
-      timezone: 'Fuso Horário',
-      dateFormat: 'Formato de Data',
-      currency: 'Moeda',
-      dashboardBehavior: 'Comportamento do Painel',
-      autoRefresh: 'Atualização automática de dados',
-      refreshInterval: 'Intervalo de Atualização (segundos)',
-      savePreferences: 'Salvar Preferências',
-      preferencesTitle: 'Preferências do Sistema',
-      preferencesSubtitle:
-        'Personalize sua experiência no painel e o comportamento do sistema',
-    },
-  };
-
-  // Get current language translations
-  const getTranslation = key => {
-    const currentLang = systemPrefs.language;
-    const langData = translations[currentLang] || translations.en;
-    return langData[key] || key;
-  };
 
   // Notification Settings
   const [notificationSettings, setNotificationSettings] = useState({
@@ -138,11 +89,11 @@ const SettingsPage = () => {
   });
 
   const tabs = [
-    { id: 'profile', label: getTranslation('profile'), icon: User },
-    { id: 'system', label: getTranslation('system'), icon: Settings },
-    { id: 'notifications', label: getTranslation('notifications'), icon: Bell },
-    { id: 'security', label: getTranslation('security'), icon: Shield },
-    { id: 'data', label: getTranslation('data'), icon: Database },
+    { id: 'profile', label: t('profile'), icon: User },
+    { id: 'system', label: t('system'), icon: Settings },
+    { id: 'notifications', label: t('notifications'), icon: Bell },
+    { id: 'security', label: t('security'), icon: Shield },
+    { id: 'data', label: t('data'), icon: Database },
   ];
 
   useEffect(() => {
@@ -303,180 +254,115 @@ const SettingsPage = () => {
   };
 
   const renderProfileTab = () => (
-    <div>
-      <div className='mb-6'>
-        <h2 className='text-2xl font-bold'>Profile Settings</h2>
-        <p className='text-muted-foreground'>
-          Manage your personal information and preferences
-        </p>
-      </div>
+    <div className='space-y-6'>
+      <div className='flex flex-col gap-6 rounded-xl bg-card p-6 shadow'>
+        <div>
+          <h2 className='text-xl font-bold'>{t('profile')}</h2>
+          <p className='text-muted-foreground'>{t('account')}</p>
+        </div>
 
-      <form onSubmit={handleProfileSubmit} className='space-y-8'>
-        <div className='space-y-4'>
-          <h3 className='text-lg font-medium'>Personal Information</h3>
-
-          <div className='mb-6 flex items-center gap-6'>
-            <div className='flex h-20 w-20 items-center justify-center rounded-full bg-muted'>
-              <User className='h-10 w-10 text-muted-foreground' />
-            </div>
-            <div className='flex flex-wrap gap-3'>
-              <Button
-                variant='outline'
-                className='flex items-center gap-2'
-                type='button'
-                asChild
-              >
-                <label>
-                  <Edit3 className='h-4 w-4' />
-                  Change Avatar
-                  <input type='file' accept='image/*' className='hidden' />
-                </label>
-              </Button>
-              <Button
-                variant='ghost'
-                className='text-destructive hover:text-destructive'
-                type='button'
-              >
-                Remove
-              </Button>
-            </div>
+        <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+          <div className='space-y-2'>
+            <label className='text-sm font-medium'>{t('firstName', { ns: 'users' })}</label>
+            <Input
+              value={profileData.firstName}
+              onChange={e =>
+                setProfileData({ ...profileData, firstName: e.target.value })
+              }
+            />
           </div>
-
-          <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-            <div className='space-y-2'>
-              <Label htmlFor='firstName'>First Name</Label>
-              <Input
-                id='firstName'
-                type='text'
-                value={profileData.firstName}
-                onChange={e =>
-                  setProfileData({ ...profileData, firstName: e.target.value })
-                }
-                placeholder='Enter your first name'
-              />
-            </div>
-            <div className='space-y-2'>
-              <Label htmlFor='lastName'>Last Name</Label>
-              <Input
-                id='lastName'
-                type='text'
-                value={profileData.lastName}
-                onChange={e =>
-                  setProfileData({ ...profileData, lastName: e.target.value })
-                }
-                placeholder='Enter your last name'
-              />
-            </div>
+          <div className='space-y-2'>
+            <label className='text-sm font-medium'>{t('lastName', { ns: 'users' })}</label>
+            <Input
+              value={profileData.lastName}
+              onChange={e =>
+                setProfileData({ ...profileData, lastName: e.target.value })
+              }
+            />
           </div>
+        </div>
 
-          <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-            <div className='space-y-2'>
-              <Label htmlFor='email'>Email Address</Label>
-              <div className='relative'>
-                <Mail className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
-                <Input
-                  id='email'
-                  type='email'
-                  value={profileData.email}
-                  onChange={e =>
-                    setProfileData({ ...profileData, email: e.target.value })
-                  }
-                  placeholder='your.email@example.com'
-                  className='pl-10'
-                />
-              </div>
-            </div>
-            <div className='space-y-2'>
-              <Label htmlFor='phone'>Phone Number</Label>
-              <div className='relative'>
-                <Phone className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
-                <Input
-                  id='phone'
-                  type='tel'
-                  value={profileData.phone}
-                  onChange={e =>
-                    setProfileData({ ...profileData, phone: e.target.value })
-                  }
-                  placeholder='(123) 456-7890'
-                  className='pl-10'
-                />
-              </div>
-            </div>
+        <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+          <div className='space-y-2'>
+            <label className='text-sm font-medium'>{t('email', { ns: 'users' })}</label>
+            <Input
+              type='email'
+              value={profileData.email}
+              onChange={e =>
+                setProfileData({ ...profileData, email: e.target.value })
+              }
+              disabled
+            />
+          </div>
+          <div className='space-y-2'>
+            <label className='text-sm font-medium'>{t('phone', { ns: 'users' })}</label>
+            <Input
+              type='tel'
+              value={profileData.phone}
+              onChange={e =>
+                setProfileData({ ...profileData, phone: e.target.value })
+              }
+            />
           </div>
         </div>
 
         <div className='flex justify-end'>
           <Button
-            type='submit'
+            onClick={handleProfileSubmit}
             disabled={saving}
             className='flex items-center gap-2'
           >
-            {saving ? (
-              <>
-                <RefreshCw className='h-4 w-4 animate-spin' />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className='h-4 w-4' />
-                Save Changes
-              </>
-            )}
+            <Save className='h-4 w-4' />
+            {saving ? t('common:loading') : t('common:save')}
           </Button>
         </div>
-      </form>
+      </div>
     </div>
   );
 
   const renderSystemTab = () => (
-    <div>
-      <div className='mb-6'>
-        <h2 className='text-2xl font-bold'>
-          {getTranslation('preferencesTitle')}
-        </h2>
-        <p className='text-muted-foreground'>
-          {getTranslation('preferencesSubtitle')}
-        </p>
-      </div>
+    <div className='space-y-6'>
+      <div className='flex flex-col gap-6 rounded-xl bg-card p-6 shadow'>
+        <div>
+          <h2 className='text-xl font-bold'>{t('preferencesTitle')}</h2>
+          <p className='text-muted-foreground'>{t('preferencesSubtitle')}</p>
+        </div>
 
-      <form onSubmit={handleSystemPrefsSubmit} className='space-y-8'>
         <div className='space-y-6'>
-          <div className='space-y-4'>
-            <h3 className='text-lg font-medium'>
-              {getTranslation('language')}
-            </h3>
-            <div className='space-y-2'>
-              <Label htmlFor='language'>{getTranslation('language')}</Label>
-              <Select
-                id='language'
-                value={systemPrefs.language}
-                onChange={e =>
-                  setSystemPrefs({ ...systemPrefs, language: e.target.value })
-                }
-                className='w-full'
-              >
-                <option value='en'>English</option>
-                <option value='pt_BR'>Português (Brasil)</option>
-                <option value='es'>Español</option>
-                <option value='fr'>Français</option>
-              </Select>
+          <div>
+            <h3 className='mb-4 text-lg font-medium'>{t('language')}</h3>
+            <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+              <div className='space-y-2'>
+                <label className='text-sm font-medium'>{t('language')}</label>
+                <Select
+                  value={systemPrefs.language}
+                  onChange={e =>
+                    setSystemPrefs({
+                      ...systemPrefs,
+                      language: e.target.value,
+                    })
+                  }
+                >
+                  <option value='en'>{t('languages.en')}</option>
+                  <option value='pt'>{t('languages.pt')}</option>
+                </Select>
+              </div>
             </div>
           </div>
 
-          <div className='space-y-4'>
-            <h3 className='text-lg font-medium'>
-              {getTranslation('localization')}
-            </h3>
-            <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+          <div>
+            <h3 className='mb-4 text-lg font-medium'>{t('localization')}</h3>
+            <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
               <div className='space-y-2'>
-                <Label htmlFor='timezone'>{getTranslation('timezone')}</Label>
+                <label className='text-sm font-medium'>{t('timezone')}</label>
                 <Select
-                  id='timezone'
                   value={systemPrefs.timezone}
                   onChange={e =>
-                    setSystemPrefs({ ...systemPrefs, timezone: e.target.value })
+                    setSystemPrefs({
+                      ...systemPrefs,
+                      timezone: e.target.value,
+                    })
                   }
-                  className='w-full'
                 >
                   <option value='UTC'>UTC</option>
                   <option value='America/New_York'>Eastern Time (ET)</option>
@@ -484,20 +370,11 @@ const SettingsPage = () => {
                   <option value='America/Denver'>Mountain Time (MT)</option>
                   <option value='America/Los_Angeles'>Pacific Time (PT)</option>
                   <option value='America/Sao_Paulo'>Brasília Time (BRT)</option>
-                  <option value='Europe/London'>
-                    Greenwich Mean Time (GMT)
-                  </option>
-                  <option value='Europe/Paris'>
-                    Central European Time (CET)
-                  </option>
                 </Select>
               </div>
               <div className='space-y-2'>
-                <Label htmlFor='dateFormat'>
-                  {getTranslation('dateFormat')}
-                </Label>
+                <label className='text-sm font-medium'>{t('dateFormat')}</label>
                 <Select
-                  id='dateFormat'
                   value={systemPrefs.dateFormat}
                   onChange={e =>
                     setSystemPrefs({
@@ -505,7 +382,6 @@ const SettingsPage = () => {
                       dateFormat: e.target.value,
                     })
                   }
-                  className='w-full'
                 >
                   <option value='MM/DD/YYYY'>MM/DD/YYYY</option>
                   <option value='DD/MM/YYYY'>DD/MM/YYYY</option>
@@ -513,91 +389,64 @@ const SettingsPage = () => {
                 </Select>
               </div>
             </div>
-
-            <div className='space-y-2'>
-              <Label htmlFor='currency'>{getTranslation('currency')}</Label>
-              <Select
-                id='currency'
-                value={systemPrefs.currency}
-                onChange={e =>
-                  setSystemPrefs({ ...systemPrefs, currency: e.target.value })
-                }
-                className='w-full'
-              >
-                <option value='USD'>US Dollar ($)</option>
-                <option value='EUR'>Euro (€)</option>
-                <option value='GBP'>British Pound (£)</option>
-                <option value='BRL'>Brazilian Real (R$)</option>
-                <option value='JPY'>Japanese Yen (¥)</option>
-              </Select>
-            </div>
           </div>
 
-          <div className='space-y-4'>
-            <h3 className='text-lg font-medium'>
-              {getTranslation('dashboardBehavior')}
-            </h3>
-            <div className='flex items-center space-x-2'>
-              <Switch
-                id='autoRefresh'
-                checked={systemPrefs.autoRefresh}
-                onCheckedChange={checked =>
-                  setSystemPrefs({
-                    ...systemPrefs,
-                    autoRefresh: checked,
-                  })
-                }
-              />
-              <Label htmlFor='autoRefresh'>
-                {getTranslation('autoRefresh')}
-              </Label>
-            </div>
+          <div>
+            <h3 className='mb-4 text-lg font-medium'>{t('dashboardBehavior')}</h3>
+            <div className='space-y-4'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <Label htmlFor='auto-refresh'>{t('autoRefresh')}</Label>
+                  <p className='text-sm text-muted-foreground'>
+                    {t('autoRefreshDescription')}
+                  </p>
+                </div>
+                <Switch
+                  id='auto-refresh'
+                  checked={systemPrefs.autoRefresh}
+                  onCheckedChange={checked =>
+                    setSystemPrefs({
+                      ...systemPrefs,
+                      autoRefresh: checked,
+                    })
+                  }
+                />
+              </div>
 
-            <div className='space-y-2'>
-              <Label htmlFor='refreshInterval'>
-                {getTranslation('refreshInterval')}
-              </Label>
-              <Input
-                id='refreshInterval'
-                type='number'
-                min='15'
-                max='300'
-                value={systemPrefs.refreshInterval}
-                onChange={e =>
-                  setSystemPrefs({
-                    ...systemPrefs,
-                    refreshInterval: parseInt(e.target.value),
-                  })
-                }
-                disabled={!systemPrefs.autoRefresh}
-              />
-              <p className='text-xs text-muted-foreground'>
-                Minimum: 15 seconds, Maximum: 300 seconds
-              </p>
+              {systemPrefs.autoRefresh && (
+                <div className='space-y-2'>
+                  <label className='text-sm font-medium'>
+                    {t('refreshInterval')}
+                  </label>
+                  <Input
+                    type='number'
+                    min='10'
+                    max='300'
+                    value={systemPrefs.refreshInterval}
+                    onChange={e =>
+                      setSystemPrefs({
+                        ...systemPrefs,
+                        refreshInterval: parseInt(e.target.value, 10) || 30,
+                      })
+                    }
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
 
         <div className='flex justify-end'>
           <Button
-            type='submit'
+            onClick={handleSystemPrefsSubmit}
             disabled={saving}
             className='flex items-center gap-2'
           >
-            {saving ? (
-              <>
-                <RefreshCw className='h-4 w-4 animate-spin' />
-                Saving...
-              </>
-            ) : (
-              <>
-                <Save className='h-4 w-4' />
-                {getTranslation('savePreferences')}
-              </>
-            )}
+            <Save className='h-4 w-4' />
+            {saving ? t('common:loading') : t('savePreferences')}
           </Button>
         </div>
-      </form>
+      </div>
     </div>
   );
 
@@ -1081,39 +930,45 @@ const SettingsPage = () => {
 
   return (
     <div className='mx-auto max-w-7xl px-4 py-6'>
-      <div className='flex flex-col gap-8 md:flex-row'>
-        <Card className='h-fit md:w-64'>
-          <CardContent className='p-4'>
-            <h2 className='mb-4 text-xl font-semibold'>Settings</h2>
-            <div className='flex flex-col gap-1'>
-              {tabs.map(tab => {
-                const IconComponent = tab.icon;
-                return (
-                  <Button
+      <div className='mb-8 flex flex-col gap-6 rounded-xl bg-card p-6 shadow md:flex-row md:items-start md:justify-between'>
+        <div>
+          <h1 className='flex items-center gap-2 text-2xl font-bold'>
+            <Settings className='h-6 w-6 text-primary' />
+            {t('title')}
+          </h1>
+          <p className='text-muted-foreground'>
+            {t('preferencesSubtitle')}
+          </p>
+        </div>
+      </div>
+
+      <div className='flex flex-col gap-8 lg:flex-row'>
+        <div className='lg:w-64'>
+          <div className='sticky top-6 space-y-4 rounded-xl bg-card p-4 shadow'>
+            <div className='space-y-1'>
+              <h3 className='text-sm font-medium'>{t('title')}</h3>
+              <nav className='flex flex-col gap-1'>
+                {tabs.map(tab => (
+                  <button
                     key={tab.id}
-                    variant={activeTab === tab.id ? 'default' : 'ghost'}
+                    onClick={() => setActiveTab(tab.id)}
                     className={cn(
-                      'justify-start gap-3 px-3',
+                      'flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium',
                       activeTab === tab.id
                         ? 'bg-primary text-primary-foreground'
-                        : 'text-muted-foreground'
+                        : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                     )}
-                    onClick={() => setActiveTab(tab.id)}
                   >
-                    <IconComponent className='h-4 w-4' />
-                    <span>{tab.label}</span>
-                  </Button>
-                );
-              })}
+                    <tab.icon className='h-4 w-4' />
+                    {tab.label}
+                  </button>
+                ))}
+              </nav>
             </div>
-          </CardContent>
-        </Card>
-
-        <div className='flex-1'>
-          <Card>
-            <CardContent className='p-6'>{renderTabContent()}</CardContent>
-          </Card>
+          </div>
         </div>
+
+        <div className='flex-1'>{renderTabContent()}</div>
       </div>
     </div>
   );

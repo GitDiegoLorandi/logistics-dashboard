@@ -15,7 +15,60 @@
     "confirm": "Confirmar",
     "back": "Voltar",
     "next": "Próximo",
-    "submit": "Enviar"
+    "submit": "Enviar",
+    "app": {
+      "title": "Painel de Logística"
+    },
+    "update": "Atualizar",
+    "logout": {
+      "title": "Sair"
+    },
+    "day": "Dia",
+    "week": "Semana",
+    "month": "Mês",
+    "year": "Ano",
+    "date": "Data",
+    "results": "Resultados",
+    "to": "até",
+    "for": "para",
+    "count": "Contagem",
+    "refresh": "Atualizar",
+    "export": "Exportar",
+    "apply": "Aplicar",
+    "users": {
+      "admin": "Administrador",
+      "manager": "Gerente",
+      "operator": "Operador"
+    },
+    "user": "Usuário",
+    "contact": "Contato",
+    "role": "Função",
+    "status": "Status",
+    "created": "Criado em",
+    "actions": "Ações",
+    "filters": "Filtros",
+    "clear": "Limpar",
+    "previous": "Anterior",
+    "page": "Página",
+    "of": "de",
+    "total": "total",
+    "error": "Ocorreu um erro",
+    "notFound": {
+      "title": "404 - Página Não Encontrada",
+      "message": "A página que você está procurando não existe.",
+      "returnToDashboard": "Voltar ao Painel"
+    },
+    "commandPalette": {
+      "searchPlaceholder": "Pesquisar comandos...",
+      "noResults": "Nenhum resultado encontrado."
+    },
+    "tour": {
+      "back": "Voltar",
+      "close": "Fechar",
+      "finish": "Finalizar",
+      "next": "Próximo",
+      "skip": "Pular"
+    }
   },
   "auth": {
     "login": "Entrar",
@@ -33,7 +86,8 @@
     "forgotPasswordButton": "Enviar link de redefinição",
     "noAccount": "Não tem uma conta?",
     "hasAccount": "Já tem uma conta?",
-    "passwordRequirements": "A senha deve ter pelo menos 8 caracteres"
+    "passwordRequirements": "A senha deve ter pelo menos 8 caracteres",
+    "passwordsDoNotMatch": "As senhas não coincidem"
   },
   "navigation": {
     "dashboard": "Painel",
@@ -46,7 +100,8 @@
     "jobs": "Tarefas em segundo plano",
     "logout": "Sair",
     "dataExamples": "Exemplos de dados",
-    "uiShowcase": "Mostruário de UI"
+    "uiShowcase": "Mostruário de UI",
+    "home": "Início"
   },
   "dashboard": {
     "title": "Painel",
@@ -59,6 +114,435 @@
     "deliveryTrends": "Tendências de entrega",
     "deliveryStatus": "Status de entrega",
     "recentDeliveries": "Entregas recentes",
-    "viewAll": "Ver tudo"
+    "viewAll": "Ver tudo",
+    "performance": "Desempenho",
+    "onTime": "Taxa de entrega no prazo",
+    "lastSevenDays": "Últimos 7 dias",
+    "currentStatus": "Status atual",
+    "chartLabels": {
+      "dailyDeliveryTrends": "Tendências diárias de entregas concluídas",
+      "statusDistribution": "Distribuição atual de status de entregas",
+      "completedVsPending": "Gráfico de linha mostrando entregas concluídas vs pendentes",
+      "statusBreakdown": "Gráfico de pizza mostrando distribuição de status de entregas"
+    },
+    "tour": {
+      "welcome": "Bem-vindo ao seu painel de logística! Aqui você pode monitorar todas as suas operações de entrega.",
+      "overviewTitle": "Visão Geral do Painel",
+      "statsContent": "Aqui você pode ver métricas importantes sobre suas entregas de forma rápida.",
+      "statsTitle": "Estatísticas de Entrega",
+      "chartsContent": "Estes gráficos mostram suas tendências de entrega e desempenho ao longo do tempo.",
+      "chartsTitle": "Gráficos de Desempenho",
+      "recentContent": "Visualize suas entregas mais recentes e seus status aqui.",
+      "recentTitle": "Entregas Recentes",
+      "navigationContent": "Use este menu de navegação para acessar diferentes seções do aplicativo.",
+      "navigationTitle": "Menu de Navegação",
+      "userMenuContent": "Acesse seu perfil, configurações e saia daqui.",
+      "userMenuTitle": "Menu do Usuário"
+    }
+  },
+  "deliveries": {
+    "title": "Entregas",
+    "newDelivery": "Nova Entrega",
+    "editDelivery": "Editar Entrega",
+    "viewDelivery": "Visualizar Entrega",
+    "deleteDelivery": "Excluir Entrega",
+    "deliveryDetails": "Detalhes da Entrega",
+    "deliveryID": "ID da Entrega",
+    "status": "Status",
+    "origin": "Origem",
+    "destination": "Destino",
+    "customer": "Cliente",
+    "customerPlaceholder": "Nome do cliente",
+    "deliverer": "Entregador",
+    "scheduledDate": "Data Agendada",
+    "deliveryDate": "Data de Entrega",
+    "priority": "Prioridade",
+    "weight": "Peso",
+    "dimensions": "Dimensões",
+    "notes": "Observações",
+    "notesPlaceholder": "Adicione observações sobre a entrega",
+    "trackingNumber": "Número de Rastreamento",
+    "statuses": {
+      "pending": "Pendente",
+      "inTransit": "Em Trânsito",
+      "delivered": "Entregue",
+      "failed": "Falha",
+      "cancelled": "Cancelado"
+    },
+    "priorities": {
+      "low": "Baixa",
+      "medium": "Média",
+      "high": "Alta",
+      "urgent": "Urgente"
+    },
+    "filters": {
+      "all": "Todas",
+      "pending": "Pendentes",
+      "inTransit": "Em Trânsito",
+      "delivered": "Entregues",
+      "failed": "Falhas",
+      "cancelled": "Canceladas",
+      "dateRange": "Período",
+      "deliverer": "Entregador",
+      "customer": "Cliente"
+    },
+    "destinationPlaceholder": "Endereço de destino",
+    "selectDeliverer": "Selecione um entregador"
+  },
+  "deliverers": {
+    "title": "Entregadores",
+    "subtitle": "Gerencie entregadores e suas entregas atribuídas",
+    "newDeliverer": "Novo Entregador",
+    "editDeliverer": "Editar Entregador",
+    "viewDeliverer": "Visualizar Entregador",
+    "deleteDeliverer": "Excluir Entregador",
+    "delivererDetails": "Detalhes do Entregador",
+    "delivererID": "ID do Entregador",
+    "name": "Nome",
+    "email": "Email",
+    "phone": "Telefone",
+    "status": "Status",
+    "vehicle": "Veículo",
+    "vehicleType": "Tipo de Veículo",
+    "licenseNumber": "Número da Licença",
+    "currentLocation": "Localização Atual",
+    "availableFrom": "Disponível De",
+    "availableTo": "Disponível Até",
+    "activeDeliveries": "Entregas Ativas",
+    "completedDeliveries": "Entregas Concluídas",
+    "rating": "Avaliação",
+    "refresh": "Atualizar",
+    "totalDeliverers": "Total de Entregadores",
+    "available": "Disponível",
+    "onDelivery": "Em Entrega",
+    "offline": "Offline",
+    "searchPlaceholder": "Buscar por nome, email, telefone...",
+    "notSpecified": "Não especificado",
+    "notAvailable": "N/D",
+    "notProvided": "Não fornecido",
+    "noDeliverersFound": "Nenhum entregador encontrado",
+    "getStarted": "Comece adicionando seu primeiro entregador à equipe.",
+    "confirmDelete": "Tem certeza que deseja excluir este entregador?",
+    "deleteSuccess": "Entregador excluído com sucesso",
+    "deleteError": "Falha ao excluir entregador",
+    "addNewDeliverer": "Adicionar Novo Entregador",
+    "createDeliverer": "Criar Entregador",
+    "updateDeliverer": "Atualizar Entregador",
+    "basicInfo": "Informações Básicas",
+    "vehicleInfo": "Informações do Veículo",
+    "address": "Endereço",
+    "street": "Rua",
+    "city": "Cidade",
+    "state": "Estado",
+    "zipCode": "CEP",
+    "emergencyContact": "Contato de Emergência",
+    "relationship": "Parentesco",
+    "emergencyRelationshipPlaceholder": "ex: Cônjuge, Pai/Mãe, Irmão/Irmã",
+    "cancel": "Cancelar",
+    "activity": "Atividade",
+    "totalDeliveries": "Total de Entregas",
+    "memberSince": "Membro Desde",
+    "performanceStats": "Estatísticas de Desempenho - {name}",
+    "completed": "Concluídas",
+    "pending": "Pendentes",
+    "inTransit": "Em Trânsito",
+    "successRate": "Taxa de Sucesso",
+    "averageDeliveryTime": "Tempo Médio de Entrega",
+    "days": "dias",
+    "na": "N/D",
+    "noStatsAvailable": "Nenhuma estatística disponível para este entregador",
+    "assignDeliveryTo": "Atribuir Entrega para {name}",
+    "selectDelivery": "Selecionar Entrega",
+    "noAvailableDeliveriesFound": "Nenhuma entrega disponível encontrada",
+    "availableDeliveries": "Entregas Disponíveis",
+    "assignDelivery": "Atribuir Entrega",
+    "pagination": "Página {currentPage} de {totalPages} ({totalDocs} total)",
+    "tablePagination": "Página {page} de {totalPages}",
+    "exportCSV": "Exportar CSV",
+    "selectVehicleType": "Selecione o tipo de veículo",
+    "columns": {
+      "deliverer": "Entregador",
+      "contact": "Contato",
+      "status": "Status",
+      "vehicle": "Veículo",
+      "license": "Licença",
+      "deliveries": "Entregas",
+      "actions": "Ações",
+      "id": "ID"
+    },
+    "statuses": {
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "available": "Disponível",
+      "busy": "Ocupado",
+      "offline": "Offline",
+      "onDelivery": "Em Entrega",
+      "onBreak": "Em Pausa"
+    },
+    "vehicles": {
+      "car": "Carro",
+      "motorcycle": "Moto",
+      "bicycle": "Bicicleta",
+      "van": "Van",
+      "truck": "Caminhão"
+    },
+    "filters": {
+      "allStatuses": "Todos os Status",
+      "allVehicles": "Todos os Veículos"
+    },
+    "actions": {
+      "view": "Visualizar",
+      "viewStats": "Ver Estatísticas",
+      "assign": "Atribuir Entrega",
+      "edit": "Editar",
+      "delete": "Excluir"
+    }
+  },
+  "users": {
+    "title": "Gerenciamento de Usuários",
+    "subtitle": "Gerencie usuários do sistema e permissões",
+    "newUser": "Novo Usuário",
+    "editUser": "Editar Usuário",
+    "viewUser": "Visualizar Usuário",
+    "deleteUser": "Excluir Usuário",
+    "userDetails": "Detalhes do Usuário",
+    "totalUsers": "Total de Usuários",
+    "administrators": "Administradores",
+    "regularUsers": "Usuários Comuns",
+    "activeUsers": "Usuários Ativos",
+    "searchPlaceholder": "Pesquisar por nome ou email...",
+    "allRoles": "Todas as Funções",
+    "admin": "Administrador",
+    "manager": "Gerente",
+    "user": "Usuário",
+    "deliverer": "Entregador",
+    "firstName": "Nome",
+    "lastName": "Sobrenome",
+    "email": "Email",
+    "phone": "Telefone",
+    "role": "Função",
+    "password": "Senha",
+    "confirmPassword": "Confirmar Senha",
+    "active": "Ativo",
+    "inactive": "Inativo",
+    "noUsersFound": "Nenhum usuário encontrado",
+    "noUsersFoundDescription": "Comece adicionando seu primeiro usuário ao sistema.",
+    "addUser": "Adicionar Usuário",
+    "deactivateUser": "Desativar Usuário",
+    "deactivateWarning": "Tem certeza que deseja desativar este usuário?",
+    "cannotDeactivateOwn": "Você não pode desativar sua própria conta",
+    "userDeactivated": "Usuário desativado com sucesso",
+    "deleteWarning": "Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.",
+    "cannotDeleteOwn": "Você não pode excluir sua própria conta",
+    "userDeleted": "Usuário excluído com sucesso",
+    "createUserSuccess": "Usuário criado com sucesso",
+    "updateUserSuccess": "Usuário atualizado com sucesso",
+    "passwordChanged": "Senha alterada com sucesso",
+    "currentPassword": "Senha Atual",
+    "newPassword": "Nova Senha",
+    "changePassword": "Alterar Senha"
+  },
+  "analytics": {
+    "title": "Análises",
+    "overview": "Visão Geral",
+    "deliveryStatusDistribution": "Distribuição de Status de Entregas",
+    "currentBreakdown": "Distribuição atual de todas as entregas",
+    "deliveryTrends": "Tendências de Entregas",
+    "priorityStatistics": "Estatísticas de Prioridade",
+    "deliveryCompletionByPriority": "Conclusão de entregas por prioridade",
+    "customDateRange": "Período Personalizado",
+    "filterDeliveriesByDateRange": "Filtrar entregas por período",
+    "startDate": "Data Inicial:",
+    "endDate": "Data Final:",
+    "groupBy": "Agrupar por:",
+    "applyFilter": "Aplicar Filtro",
+    "resultsFor": "Resultados para",
+    "delivererPerformance": "Desempenho dos Entregadores",
+    "topPerformers": "Melhores Desempenhos",
+    "name": "Nome",
+    "deliveries": "Entregas",
+    "onTimeRate": "Taxa de Pontualidade",
+    "avgTime": "Tempo Médio",
+    "rating": "Avaliação",
+    "refreshData": "Atualizar Dados",
+    "exportReport": "Exportar Relatório",
+    "overallStatistics": "Estatísticas Gerais",
+    "totalDeliveries": "Total de Entregas",
+    "completionRate": "Taxa de Conclusão",
+    "averageDeliveryTime": "Tempo Médio de Entrega",
+    "minutes": "minutos",
+    "selectDateRange": "Por favor, selecione as datas inicial e final",
+    "failedToLoadDateRange": "Falha ao carregar dados do período selecionado",
+    "dataRefreshed": "Dados de análise atualizados",
+    "dataExported": "Dados de análise exportados",
+    "of": "de"
+  },
+  "settings": {
+    "title": "Configurações",
+    "profile": "Perfil",
+    "account": "Conta",
+    "preferences": "Preferências",
+    "notifications": "Notificações",
+    "security": "Segurança",
+    "appearance": "Aparência",
+    "language": "Idioma",
+    "theme": "Tema",
+    "darkMode": "Modo Escuro",
+    "lightMode": "Modo Claro",
+    "systemDefault": "Padrão do Sistema",
+    "languages": {
+      "en": "Inglês",
+      "es": "Espanhol",
+      "fr": "Francês",
+      "pt": "Português",
+      "de": "Alemão"
+    },
+    "dateFormat": "Formato de Data",
+    "timeFormat": "Formato de Hora",
+    "timezone": "Fuso Horário",
+    "currency": "Moeda",
+    "notifications": {
+      "email": "Notificações por Email",
+      "push": "Notificações Push",
+      "sms": "Notificações SMS",
+      "deliveryUpdates": "Atualizações de Entrega",
+      "systemAlerts": "Alertas do Sistema",
+      "weeklyReports": "Relatórios Semanais"
+    },
+    "preferencesTitle": "Preferências do Sistema",
+    "preferencesSubtitle": "Personalize sua experiência no painel e o comportamento do sistema",
+    "system": "Sistema",
+    "data": "Dados",
+    "localization": "Localização",
+    "dashboardBehavior": "Comportamento do Painel",
+    "autoRefresh": "Atualização automática de dados",
+    "autoRefreshDescription": "Atualizar dados automaticamente no intervalo especificado",
+    "refreshInterval": "Intervalo de Atualização (segundos)",
+    "savePreferences": "Salvar Preferências"
+  },
+  "jobs": {
+    "title": "Tarefas em Segundo Plano",
+    "subtitle": "Gerencie e monitore tarefas em segundo plano",
+    "status": "Status",
+    "lastRun": "Última Execução",
+    "nextRun": "Próxima Execução",
+    "duration": "Duração",
+    "actions": "Ações",
+    "runNow": "Executar Agora",
+    "viewLogs": "Ver Logs",
+    "disable": "Desabilitar",
+    "enable": "Habilitar",
+    "jobTypes": {
+      "dataCleanup": "Limpeza de Dados",
+      "healthCheck": "Verificação de Saúde",
+      "notification": "Processamento de Notificações",
+      "overdueDelivery": "Entregas Atrasadas",
+      "performanceMonitoring": "Monitoramento de Desempenho"
+    },
+    "jobStatuses": {
+      "running": "Em Execução",
+      "idle": "Ocioso",
+      "failed": "Falhou",
+      "disabled": "Desabilitado",
+      "scheduled": "Agendado",
+      "completed": "Concluído"
+    },
+    "confirmDisable": "Tem certeza que deseja desabilitar esta tarefa?",
+    "confirmEnable": "Tem certeza que deseja habilitar esta tarefa?",
+    "confirmRun": "Tem certeza que deseja executar esta tarefa agora?",
+    "jobDisabled": "Tarefa desabilitada com sucesso",
+    "jobEnabled": "Tarefa habilitada com sucesso",
+    "jobStarted": "Tarefa iniciada com sucesso",
+    "logsTitle": "Logs da Tarefa",
+    "noLogs": "Nenhum log disponível para esta tarefa",
+    "timestamp": "Data/Hora",
+    "message": "Mensagem",
+    "level": "Nível",
+    "closeLogs": "Fechar Logs",
+    "refreshLogs": "Atualizar Logs"
+  },
+  "dataExamples": {
+    "title": "Exemplos de Dados",
+    "description": "Esta página demonstra vários exemplos de apresentação de dados usando nossos componentes de UI aprimorados.",
+    "basicTable": {
+      "title": "Tabela Básica",
+      "description": "Uma tabela simples exibindo dados de usuários."
+    },
+    "sortableTable": {
+      "title": "Tabela Ordenável com Paginação",
+      "description": "Uma tabela com colunas ordenáveis e paginação."
+    },
+    "styledTables": {
+      "title": "Tabelas Estilizadas",
+      "description": "Tabelas com diferentes estilos e variantes.",
+      "striped": "Tabela Listrada",
+      "bordered": "Tabela com Bordas",
+      "dense": "Tabela Compacta"
+    },
+    "actionsTable": {
+      "title": "Tabela com Ações",
+      "description": "Uma tabela com botões de ação."
+    },
+    "columns": {
+      "id": "ID",
+      "name": "Nome",
+      "status": "Status",
+      "role": "Função",
+      "lastLogin": "Último Login",
+      "actions": "Ações"
+    },
+    "statuses": {
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "pending": "Pendente"
+    },
+    "roles": {
+      "admin": "Administrador",
+      "user": "Usuário",
+      "manager": "Gerente",
+      "developer": "Desenvolvedor"
+    },
+    "actions": {
+      "view": "Visualizar",
+      "edit": "Editar",
+      "delete": "Excluir"
+    }
+  },
+  "welcome": {
+    "skip": "Pular",
+    "next": "Próximo",
+    "getStarted": "Começar",
+    "footer": "© {year} Painel de Logística. Todos os direitos reservados.",
+    "steps": {
+      "welcome": {
+        "title": "Bem-vindo ao Painel de Logística",
+        "description": "Sua solução completa para gerenciar entregas e operações logísticas."
+      },
+      "track": {
+        "title": "Acompanhe Entregas",
+        "description": "Monitore todas as suas entregas em tempo real com atualizações detalhadas de status e rastreamento de localização."
+      },
+      "manage": {
+        "title": "Gerencie Recursos",
+        "description": "Gerencie eficientemente seus entregadores, veículos e outros recursos para otimizar operações."
+      },
+      "analyze": {
+        "title": "Analise Desempenho",
+        "description": "Obtenha análises e relatórios abrangentes para melhorar suas operações logísticas."
+      }
+    }
+  },
+  "validation": {
+    "required": "Este campo é obrigatório"
+  },
+  "actions": {
+    "search": "Pesquisar",
+    "add": "Adicionar",
+    "edit": "Editar",
+    "refresh": "Atualizar",
+    "filter": "Filtrar",
+    "newUser": "Novo Usuário",
+    "previous": "Anterior",
+    "next": "Próximo"
   }
 } 
