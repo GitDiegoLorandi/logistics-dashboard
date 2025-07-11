@@ -17,6 +17,7 @@ import {
   JobsPage,
   SettingsPage
 } from './components/lazy-components';
+import { useTranslation } from 'react-i18next';
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -24,6 +25,21 @@ const LoadingFallback = () => (
     <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
   </div>
 );
+
+// 404 Not Found Page
+const NotFoundPage = () => {
+  const { t } = useTranslation('common');
+  
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <h1 className="text-4xl font-bold mb-4">{t('notFound.title')}</h1>
+      <p className="mb-8">{t('notFound.message')}</p>
+      <a href="/dashboard" className="text-primary hover:underline">
+        {t('notFound.returnToDashboard')}
+      </a>
+    </div>
+  );
+};
 
 function App() {
   return (
@@ -58,15 +74,7 @@ function App() {
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           
           {/* Catch all - 404 */}
-          <Route path="*" element={
-            <div className="flex flex-col items-center justify-center min-h-screen">
-              <h1 className="text-4xl font-bold mb-4">404 - Page Not Found</h1>
-              <p className="mb-8">The page you are looking for does not exist.</p>
-              <a href="/dashboard" className="text-primary hover:underline">
-                Return to Dashboard
-              </a>
-            </div>
-          } />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </Router>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 import Joyride, { STATUS } from 'react-joyride';
 
@@ -17,6 +18,8 @@ const OnboardingTour = ({
   tourId = 'app-tour',
   ...props
 }) => {
+  const { t } = useTranslation('common');
+  
   const handleCallback = (data) => {
     const { status, type } = data;
     
@@ -40,6 +43,13 @@ const OnboardingTour = ({
       callback={handleCallback}
       disableScrolling={true}
       disableOverlayClose={true}
+      locale={{
+        back: t('tour.back'),
+        close: t('tour.close'),
+        last: t('tour.finish'),
+        next: t('tour.next'),
+        skip: t('tour.skip')
+      }}
       styles={{
         options: {
           primaryColor: 'var(--color-primary)',

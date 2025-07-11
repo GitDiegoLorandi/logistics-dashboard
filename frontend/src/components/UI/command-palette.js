@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 import { useNavigate } from 'react-router-dom';
 import { Dialog } from './dialog';
@@ -8,6 +9,7 @@ import { LucideSearch, LucideCommand } from 'lucide-react';
  * Command palette component for quick navigation
  */
 export const CommandPalette = ({ open, onOpenChange, navItems = [] }) => {
+  const { t } = useTranslation('common');
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredItems, setFilteredItems] = useState(navItems);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -92,7 +94,7 @@ export const CommandPalette = ({ open, onOpenChange, navItems = [] }) => {
             ref={inputRef}
             type="text"
             className="flex-1 border-0 bg-transparent py-2 outline-none placeholder:text-muted-foreground focus:ring-0"
-            placeholder="Search commands..."
+            placeholder={t('commandPalette.searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -107,7 +109,7 @@ export const CommandPalette = ({ open, onOpenChange, navItems = [] }) => {
         <div className="max-h-72 overflow-y-auto py-2">
           {filteredItems.length === 0 ? (
             <div className="px-4 py-8 text-center text-sm text-muted-foreground">
-              No results found.
+              {t('commandPalette.noResults')}
             </div>
           ) : (
             <div>
