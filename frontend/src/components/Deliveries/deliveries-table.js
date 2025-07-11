@@ -27,7 +27,6 @@ export const DeliveriesTable = ({
   onEdit,
   onView,
   onDelete,
-  onStatusUpdate,
   userRole,
 }) => {
   const { t } = useTranslation(['deliveries', 'common']);
@@ -293,7 +292,6 @@ DeliveriesTable.propTypes = {
   onEdit: PropTypes.func,
   onView: PropTypes.func,
   onDelete: PropTypes.func,
-  onStatusUpdate: PropTypes.func,
   userRole: PropTypes.string
 };
 

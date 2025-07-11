@@ -151,7 +151,6 @@ export const delivererAPI = {
       // Handle both paginated and non-paginated responses
       return response || [];
     } catch (error) {
-      console.error('Error in delivererAPI.getAll:', error);
       throw error;
     }
   },
