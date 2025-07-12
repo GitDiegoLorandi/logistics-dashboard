@@ -182,7 +182,9 @@ const DeliveriesPage = () => {
   const fetchDeliverers = useCallback(async () => {
     try {
       const response = await delivererAPI.getAll();
-      setDeliverers(response.docs || response || []);
+      // Store all deliverers
+      const allDeliverers = response.docs || response || [];
+      setDeliverers(allDeliverers);
     } catch (err) {
       console.error('Error fetching deliverers:', err);
       toast.error('Failed to fetch deliverers. Using demo data instead.');
@@ -249,14 +251,35 @@ const DeliveriesPage = () => {
         return;
       }
 
+      // Convert status and priority to the format expected by the backend
+      const convertStatus = (status) => {
+        switch(status) {
+          case 'PENDING': return 'Pending';
+          case 'IN_TRANSIT': return 'In Transit';
+          case 'DELIVERED': return 'Delivered';
+          case 'CANCELLED': return 'Cancelled';
+          default: return status;
+        }
+      };
+
+      const convertPriority = (priority) => {
+        switch(priority) {
+          case 'LOW': return 'Low';
+          case 'MEDIUM': return 'Medium';
+          case 'HIGH': return 'High';
+          case 'URGENT': return 'Urgent';
+          default: return priority;
+        }
+      };
+
       // Create submission data - omit orderId for new deliveries
       const submissionData =
         modalMode === 'create'
           ? {
               customer: formData.customer,
               deliveryAddress: formData.deliveryAddress,
-              status: formData.status,
-              priority: formData.priority,
+              status: convertStatus(formData.status), // Convert to format expected by backend
+              priority: convertPriority(formData.priority), // Convert to format expected by backend
               estimatedDeliveryDate: formData.estimatedDeliveryDate
                 ? new Date(formData.estimatedDeliveryDate).toISOString()
                 : undefined,
@@ -265,6 +288,8 @@ const DeliveriesPage = () => {
             }
           : {
               ...formData,
+              status: convertStatus(formData.status), // Convert to format expected by backend
+              priority: convertPriority(formData.priority), // Convert to format expected by backend
               estimatedDeliveryDate: formData.estimatedDeliveryDate
                 ? new Date(formData.estimatedDeliveryDate).toISOString()
                 : undefined,
@@ -398,10 +423,23 @@ const DeliveriesPage = () => {
   // Handle Status Update
   const handleStatusUpdate = async (deliveryId, newStatus) => {
     try {
+      // Convert status to the format expected by the backend
+      const convertStatus = (status) => {
+        switch(status) {
+          case 'PENDING': return 'Pending';
+          case 'IN_TRANSIT': return 'In Transit';
+          case 'DELIVERED': return 'Delivered';
+          case 'CANCELLED': return 'Cancelled';
+          default: return status;
+        }
+      };
+      
+      const backendStatus = convertStatus(newStatus.toUpperCase().replace(' ', '_'));
+      
       // Prevent users from changing status to "Delivered" or "In Transit"
       if (
         userRole !== 'admin' &&
-        (newStatus === 'Delivered' || newStatus === 'In Transit')
+        (backendStatus === 'Delivered' || backendStatus === 'In Transit')
       ) {
         toast.error(
           'Only administrators can mark deliveries as Delivered or In Transit'
@@ -412,7 +450,7 @@ const DeliveriesPage = () => {
       // Get the delivery to check if it has a deliverer assigned
       const deliveryToUpdate = deliveries.find(d => d._id === deliveryId);
       if (
-        (newStatus === 'In Transit' || newStatus === 'Delivered') &&
+        (backendStatus === 'In Transit' || backendStatus === 'Delivered') &&
         !deliveryToUpdate.deliverer
       ) {
         toast.error(
@@ -421,12 +459,37 @@ const DeliveriesPage = () => {
         return;
       }
 
+      // Store the deliverer ID if the delivery is being marked as delivered
+      const delivererId = 
+        backendStatus === 'Delivered' && deliveryToUpdate.deliverer 
+          ? deliveryToUpdate.deliverer._id 
+          : null;
+
       setLoading(true);
-      console.log(`Updating delivery ${deliveryId} status to ${newStatus}`);
-      const response = await deliveryAPI.updateStatus(deliveryId, newStatus);
+      console.log(`Updating delivery ${deliveryId} status to ${backendStatus}`);
+      const response = await deliveryAPI.updateStatus(deliveryId, backendStatus);
       console.log('Status update response:', response);
-      toast.success(`Status updated to ${newStatus}`);
-      fetchDeliveries();
+      
+      // If the delivery was marked as delivered and had a deliverer assigned,
+      // the backend should have updated the deliverer status to "Available"
+      if (backendStatus === 'Delivered' && delivererId) {
+        console.log(`Delivery marked as delivered. Deliverer ${delivererId} should be available now.`);
+        toast.success(`Status updated to ${newStatus} and deliverer is now Available`);
+      } else {
+        toast.success(`Status updated to ${newStatus}`);
+      }
+      
+      // Refresh both deliveries and deliverers lists
+      await fetchDeliveries();
+      
+      // If we're updating to Delivered, also refresh the deliverers list
+      if (backendStatus === 'Delivered' && delivererId) {
+        try {
+          await fetchDeliverers();
+        } catch (err) {
+          console.error('Error refreshing deliverers after status update:', err);
+        }
+      }
     } catch (err) {
       console.error('Error updating status:', err);
       console.error('Error details:', err.response?.data || err.message);
@@ -455,7 +518,7 @@ const DeliveriesPage = () => {
     setFormData(prev => ({
       ...prev,
       estimatedDeliveryDate: tomorrowStr,
-      status: 'Pending', // Always set to Pending for new deliveries
+      status: 'PENDING', // Keep as uppercase for UI consistency, will be converted during submission
     }));
 
     setShowModal(true);
@@ -464,12 +527,26 @@ const DeliveriesPage = () => {
   const openEditModal = delivery => {
     setModalMode('edit');
     setSelectedDelivery(delivery);
+    
+    // Normalize status and priority to uppercase format for UI consistency
+    const normalizedStatus = delivery.status === 'Pending' ? 'PENDING' :
+                            delivery.status === 'In Transit' ? 'IN_TRANSIT' :
+                            delivery.status === 'Delivered' ? 'DELIVERED' :
+                            delivery.status === 'Cancelled' ? 'CANCELLED' :
+                            delivery.status?.toUpperCase() || 'PENDING';
+                            
+    const normalizedPriority = delivery.priority === 'Low' ? 'LOW' :
+                              delivery.priority === 'Medium' ? 'MEDIUM' :
+                              delivery.priority === 'High' ? 'HIGH' :
+                              delivery.priority === 'Urgent' ? 'URGENT' :
+                              delivery.priority?.toUpperCase() || 'MEDIUM';
+    
     setFormData({
       orderId: delivery.orderId || '',
       customer: delivery.customer || '',
       deliveryAddress: delivery.deliveryAddress || '',
-      status: delivery.status || 'Pending',
-      priority: delivery.priority || 'Medium',
+      status: normalizedStatus,
+      priority: normalizedPriority,
       estimatedDeliveryDate: delivery.estimatedDeliveryDate
         ? new Date(delivery.estimatedDeliveryDate).toISOString().split('T')[0]
         : '',
@@ -495,8 +572,8 @@ const DeliveriesPage = () => {
       orderId: '', // This will be auto-generated by the backend
       customer: '',
       deliveryAddress: '',
-      status: 'Pending',
-      priority: 'Medium',
+      status: 'PENDING', // Keep as uppercase for UI consistency, will be converted during submission
+      priority: 'MEDIUM', // Keep as uppercase for UI consistency, will be converted during submission
       estimatedDeliveryDate: tomorrowStr,
       notes: '',
       deliverer: '',
@@ -515,30 +592,54 @@ const DeliveriesPage = () => {
 
   // Status Badge Component
   const StatusBadge = ({ status }) => {
+    // Map backend status values to UI display values
+    const normalizedStatus = status === 'PENDING' ? 'Pending' :
+                            status === 'IN_TRANSIT' ? 'In Transit' :
+                            status === 'DELIVERED' ? 'Delivered' :
+                            status === 'CANCELLED' ? 'Cancelled' :
+                            status; // Use as-is if not matching
+
     const statusColors = {
       'Pending': 'bg-yellow-100 text-yellow-800',
       'In Transit': 'bg-blue-100 text-blue-800',
       'Delivered': 'bg-green-100 text-green-800',
       'Cancelled': 'bg-red-100 text-red-800',
+      'PENDING': 'bg-yellow-100 text-yellow-800',
+      'IN_TRANSIT': 'bg-blue-100 text-blue-800',
+      'DELIVERED': 'bg-green-100 text-green-800',
+      'CANCELLED': 'bg-red-100 text-red-800',
     };
+    
     return (
-      <Badge className={statusColors[status] || 'bg-gray-100 text-gray-800'}>
-        {status}
+      <Badge className={statusColors[normalizedStatus] || 'bg-gray-100 text-gray-800'}>
+        {normalizedStatus}
       </Badge>
     );
   };
 
   // Priority Badge Component
   const PriorityBadge = ({ priority }) => {
+    // Map backend priority values to UI display values
+    const normalizedPriority = priority === 'HIGH' ? 'High' :
+                              priority === 'MEDIUM' ? 'Medium' :
+                              priority === 'LOW' ? 'Low' :
+                              priority === 'URGENT' ? 'Urgent' :
+                              priority; // Use as-is if not matching
+
     const priorityColors = {
       'Low': 'bg-blue-100 text-blue-800',
       'Medium': 'bg-yellow-100 text-yellow-800',
       'High': 'bg-orange-100 text-orange-800',
       'Urgent': 'bg-red-100 text-red-800',
+      'LOW': 'bg-blue-100 text-blue-800',
+      'MEDIUM': 'bg-yellow-100 text-yellow-800',
+      'HIGH': 'bg-orange-100 text-orange-800',
+      'URGENT': 'bg-red-100 text-red-800',
     };
+    
     return (
-      <Badge className={priorityColors[priority] || 'bg-gray-100 text-gray-800'}>
-        {priority}
+      <Badge className={priorityColors[normalizedPriority] || 'bg-gray-100 text-gray-800'}>
+        {normalizedPriority}
       </Badge>
     );
   };
@@ -637,10 +738,10 @@ const DeliveriesPage = () => {
               onChange={e => setStatusFilter(e.target.value)}
             >
               <option value=''>{t('filters.all')}</option>
-              <option value='PENDING'>{t('statuses.pending')}</option>
-              <option value='IN_TRANSIT'>{t('statuses.inTransit')}</option>
-              <option value='DELIVERED'>{t('statuses.delivered')}</option>
-              <option value='CANCELLED'>{t('statuses.cancelled')}</option>
+              <option value='Pending'>{t('statuses.pending')}</option>
+              <option value='In Transit'>{t('statuses.inTransit')}</option>
+              <option value='Delivered'>{t('statuses.delivered')}</option>
+              <option value='Cancelled'>{t('statuses.cancelled')}</option>
             </Select>
           </div>
 
@@ -688,7 +789,7 @@ const DeliveriesPage = () => {
         <Card>
           <CardContent className='flex flex-col items-center justify-center pt-6'>
             <span className='text-3xl font-bold'>
-              {filteredDeliveries.filter(d => d.status === 'PENDING').length}
+              {filteredDeliveries.filter(d => d.status === 'PENDING' || d.status === 'Pending').length}
             </span>
             <span className='text-sm text-muted-foreground'>{t('statuses.pending')}</span>
           </CardContent>
@@ -696,7 +797,7 @@ const DeliveriesPage = () => {
         <Card>
           <CardContent className='flex flex-col items-center justify-center pt-6'>
             <span className='text-3xl font-bold'>
-              {filteredDeliveries.filter(d => d.status === 'IN_TRANSIT').length}
+              {filteredDeliveries.filter(d => d.status === 'IN_TRANSIT' || d.status === 'In Transit').length}
             </span>
             <span className='text-sm text-muted-foreground'>{t('statuses.inTransit')}</span>
           </CardContent>
@@ -704,7 +805,7 @@ const DeliveriesPage = () => {
         <Card>
           <CardContent className='flex flex-col items-center justify-center pt-6'>
             <span className='text-3xl font-bold'>
-              {filteredDeliveries.filter(d => d.status === 'DELIVERED').length}
+              {filteredDeliveries.filter(d => d.status === 'DELIVERED' || d.status === 'Delivered').length}
             </span>
             <span className='text-sm text-muted-foreground'>{t('statuses.delivered')}</span>
           </CardContent>
@@ -837,27 +938,24 @@ const DeliveriesPage = () => {
               </div>
 
               <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                <div className='space-y-2'>
-                  <label className='text-sm font-medium'>Status</label>
-                  <select
-                    value={formData.status}
-                    onChange={e =>
-                      setFormData({ ...formData, status: e.target.value })
-                    }
-                    disabled={modalMode === 'create'}
-                    className='w-full rounded-md border border-gray-300 px-3 py-2'
-                  >
-                    <option value='PENDING'>{t('statuses.pending')}</option>
-                    <option value='IN_TRANSIT'>{t('statuses.inTransit')}</option>
-                    <option value='DELIVERED'>{t('statuses.delivered')}</option>
-                    <option value='CANCELLED'>{t('statuses.cancelled')}</option>
-                  </select>
-                  {modalMode === 'create' && (
-                    <small className='text-xs text-gray-500'>
-                      New deliveries are always set to "Pending" status
-                    </small>
-                  )}
-                </div>
+                {/* Only show Status field in edit mode */}
+                {modalMode === 'edit' && (
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>Status</label>
+                    <select
+                      value={formData.status}
+                      onChange={e =>
+                        setFormData({ ...formData, status: e.target.value })
+                      }
+                      className='w-full rounded-md border border-gray-300 px-3 py-2'
+                    >
+                      <option value='PENDING'>{t('statuses.pending')}</option>
+                      <option value='IN_TRANSIT'>{t('statuses.inTransit')}</option>
+                      <option value='DELIVERED'>{t('statuses.delivered')}</option>
+                      <option value='CANCELLED'>{t('statuses.cancelled')}</option>
+                    </select>
+                  </div>
+                )}
                 <div className='space-y-2'>
                   <label className='text-sm font-medium'>Priority</label>
                   <select
@@ -867,10 +965,10 @@ const DeliveriesPage = () => {
                     }
                     className='w-full rounded-md border border-gray-300 px-3 py-2'
                   >
-                    <option value='Low'>{t('priorities.low')}</option>
-                    <option value='Medium'>{t('priorities.medium')}</option>
-                    <option value='High'>{t('priorities.high')}</option>
-                    <option value='Urgent'>{t('priorities.urgent')}</option>
+                    <option value='LOW'>{t('priorities.low')}</option>
+                    <option value='MEDIUM'>{t('priorities.medium')}</option>
+                    <option value='HIGH'>{t('priorities.high')}</option>
+                    <option value='URGENT'>{t('priorities.urgent')}</option>
                   </select>
                 </div>
               </div>
@@ -887,6 +985,7 @@ const DeliveriesPage = () => {
                         estimatedDeliveryDate: e.target.value,
                       })
                     }
+                    min={new Date().toISOString().split('T')[0]} // Set minimum date to today
                     required
                     className='w-full rounded-md border border-gray-300 px-3 py-2'
                   />
@@ -902,13 +1001,21 @@ const DeliveriesPage = () => {
                       }
                       className='w-full rounded-md border border-gray-300 px-3 py-2'
                     >
-                      <option value=''>{t('filters.all')}</option>
-                      {deliverers.map(deliverer => (
-                        <option key={deliverer._id} value={deliverer._id}>
-                          {deliverer.name} - {deliverer.email}
-                        </option>
-                      ))}
+                      <option value=''>{t('unassigned')}</option>
+                      {/* Filter to only show available deliverers */}
+                      {deliverers
+                        .filter(deliverer => deliverer.status === 'Available')
+                        .map(deliverer => (
+                          <option key={deliverer._id} value={deliverer._id}>
+                            {deliverer.name} - {deliverer.email}
+                          </option>
+                        ))}
                     </select>
+                    {deliverers.filter(deliverer => deliverer.status === 'Available').length === 0 && (
+                      <small className='text-xs text-amber-500'>
+                        No available deliverers at the moment
+                      </small>
+                    )}
                   </div>
                 )}
               </div>

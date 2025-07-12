@@ -28,6 +28,7 @@ import { toast } from 'react-toastify';
 import { delivererAPI } from '../../services/api';
 import LoadingSpinner from '../UI/loading-spinner';
 import ErrorMessage from '../UI/error-message';
+import AddressAutocomplete from '../UI/address-autocomplete';
 import { Button } from '../UI/button';
 import { Input } from '../UI/input';
 import { Select } from '../UI/select';
@@ -331,8 +332,28 @@ const DeliverersPage = () => {
   const handleSaveDeliverer = async e => {
     e.preventDefault();
 
+    // Validate required fields
     if (!formData.name || !formData.email) {
       toast.error('Name and email are required');
+      return;
+    }
+
+    // Validate name length
+    if (formData.name.length < 2) {
+      toast.error('Name must be at least 2 characters');
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error('Please provide a valid email address');
+      return;
+    }
+
+    // Validate phone number format if provided
+    if (formData.phone && !/^[+]?[1-9][\d]{0,15}$/.test(formData.phone)) {
+      toast.error('Please provide a valid phone number');
       return;
     }
 
@@ -350,7 +371,15 @@ const DeliverersPage = () => {
       fetchDeliverers();
     } catch (err) {
       console.error('Error saving deliverer:', err);
-      toast.error(err.response?.data?.message || 'Failed to save deliverer');
+      
+      // Handle validation errors
+      if (err.data && err.data.errors && Array.isArray(err.data.errors)) {
+        err.data.errors.forEach(error => {
+          toast.error(`${error.field || 'Validation error'}: ${error.message}`);
+        });
+      } else {
+        toast.error(err.message || 'Failed to save deliverer');
+      }
     }
   };
 
@@ -804,60 +833,65 @@ const DeliverersPage = () => {
 
       {/* Create/Edit Modal */}
       {showModal && (
-        <div className='modal-overlay'>
-          <div className='modal-content'>
-            <div className='modal-header'>
-              <h2>
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+          <div className='w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
+            <div className='flex items-center justify-between border-b pb-4 mb-4'>
+              <h3 className='text-xl font-semibold'>
                 {modalMode === 'create'
                   ? t('addNewDeliverer')
                   : t('editDeliverer')}
-              </h2>
-              <button onClick={() => setShowModal(false)} className='btn-close'>
-                <X size={20} />
+              </h3>
+              <button
+                className='rounded-full p-1 hover:bg-gray-100'
+                onClick={() => setShowModal(false)}
+              >
+                <X size={24} />
               </button>
             </div>
 
-            <form onSubmit={handleSaveDeliverer} className='modal-form'>
-              <div className='form-section'>
-                <h3>{t('basicInfo')}</h3>
-                <div className='form-row'>
-                  <div className='form-group'>
-                    <label>{t('name')}</label>
+            <form onSubmit={handleSaveDeliverer} className='space-y-4'>
+              <div className='space-y-4'>
+                <h4 className='font-medium text-lg'>{t('basicInfo')}</h4>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>{t('name')}</label>
                     <input
                       type='text'
                       value={formData.name}
                       onChange={e => handleFormChange('name', e.target.value)}
                       required
+                      className='w-full rounded-md border border-gray-300 px-3 py-2'
                     />
                   </div>
-                  <div className='form-group'>
-                    <label>{t('email')}</label>
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>{t('email')}</label>
                     <input
                       type='email'
                       value={formData.email}
                       onChange={e => handleFormChange('email', e.target.value)}
                       required
+                      className='w-full rounded-md border border-gray-300 px-3 py-2'
                     />
                   </div>
                 </div>
 
-                <div className='form-row'>
-                  <div className='form-group'>
-                    <label>{t('phone')}</label>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>{t('phone')}</label>
                     <input
                       type='tel'
                       value={formData.phone}
                       onChange={e => handleFormChange('phone', e.target.value)}
+                      className='w-full rounded-md border border-gray-300 px-3 py-2'
                     />
                   </div>
-                  <div className='form-group'>
-                    <label>{t('status')}</label>
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>{t('status')}</label>
                     <Select
-                      id="status"
-                      name="status"
                       value={formData.status}
                       onChange={e => handleFormChange('status', e.target.value)}
                       required
+                      className='w-full'
                     >
                       <option value="Available">{t('statuses.available')}</option>
                       <option value="Busy">{t('statuses.busy')}</option>
@@ -867,16 +901,15 @@ const DeliverersPage = () => {
                 </div>
               </div>
 
-              <div className='form-section'>
-                <h3>{t('vehicleInfo')}</h3>
-                <div className='form-row'>
-                  <div className='form-group'>
-                    <label>{t('vehicleType')}</label>
-                    <select
+              <div className='space-y-4'>
+                <h4 className='font-medium text-lg'>{t('vehicleInfo')}</h4>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>{t('vehicleType')}</label>
+                    <Select
                       value={formData.vehicleType}
-                      onChange={e =>
-                        handleFormChange('vehicleType', e.target.value)
-                      }
+                      onChange={e => handleFormChange('vehicleType', e.target.value)}
+                      className='w-full'
                     >
                       <option value=''>{t('selectVehicleType')}</option>
                       <option value='Car'>{t('vehicles.car')}</option>
@@ -884,126 +917,119 @@ const DeliverersPage = () => {
                       <option value='Van'>{t('vehicles.van')}</option>
                       <option value='Truck'>{t('vehicles.truck')}</option>
                       <option value='Bicycle'>{t('vehicles.bicycle')}</option>
-                    </select>
+                    </Select>
                   </div>
-                  <div className='form-group'>
-                    <label>{t('licenseNumber')}</label>
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>{t('licenseNumber')}</label>
                     <input
                       type='text'
                       value={formData.licenseNumber}
-                      onChange={e =>
-                        handleFormChange('licenseNumber', e.target.value)
-                      }
+                      onChange={e => handleFormChange('licenseNumber', e.target.value)}
+                      className='w-full rounded-md border border-gray-300 px-3 py-2'
                     />
                   </div>
                 </div>
               </div>
 
-              <div className='form-section'>
-                <h3>{t('address')}</h3>
-                <div className='form-group'>
-                  <label>{t('street')}</label>
-                  <input
-                    type='text'
+              <div className='space-y-4'>
+                <h4 className='font-medium text-lg'>{t('address')}</h4>
+                <div className='space-y-2'>
+                  <label className='text-sm font-medium'>{t('address')}</label>
+                  <AddressAutocomplete
                     value={formData.address.street}
-                    onChange={e =>
-                      handleFormChange('address.street', e.target.value)
-                    }
+                    onChange={address => handleFormChange('address.street', address)}
+                    onSelect={suggestion => {
+                      // When a suggestion is selected, update all address fields
+                      handleFormChange('address.street', suggestion.formattedAddress);
+                      handleFormChange('address.city', suggestion.city || '');
+                      handleFormChange('address.state', suggestion.state || '');
+                      handleFormChange('address.zipCode', suggestion.postcode || '');
+                    }}
+                    placeholder={t('enterAddress')}
+                    disabled={false}
                   />
+                  <small className='text-xs text-gray-500'>
+                    {t('startTypingForSuggestions')}
+                  </small>
                 </div>
-                <div className='form-row'>
-                  <div className='form-group'>
-                    <label>{t('city')}</label>
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>{t('city')}</label>
                     <input
                       type='text'
                       value={formData.address.city}
-                      onChange={e =>
-                        handleFormChange('address.city', e.target.value)
-                      }
+                      onChange={e => handleFormChange('address.city', e.target.value)}
+                      className='w-full rounded-md border border-gray-300 px-3 py-2'
                     />
                   </div>
-                  <div className='form-group'>
-                    <label>{t('state')}</label>
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>{t('state')}</label>
                     <input
                       type='text'
                       value={formData.address.state}
-                      onChange={e =>
-                        handleFormChange('address.state', e.target.value)
-                      }
+                      onChange={e => handleFormChange('address.state', e.target.value)}
+                      className='w-full rounded-md border border-gray-300 px-3 py-2'
                     />
                   </div>
-                  <div className='form-group'>
-                    <label>{t('zipCode')}</label>
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>{t('zipCode')}</label>
                     <input
                       type='text'
                       value={formData.address.zipCode}
-                      onChange={e =>
-                        handleFormChange('address.zipCode', e.target.value)
-                      }
+                      onChange={e => handleFormChange('address.zipCode', e.target.value)}
+                      className='w-full rounded-md border border-gray-300 px-3 py-2'
                     />
                   </div>
                 </div>
               </div>
 
-              <div className='form-section'>
-                <h3>{t('emergencyContact')}</h3>
-                <div className='form-row'>
-                  <div className='form-group'>
-                    <label>{t('name')}</label>
+              <div className='space-y-4'>
+                <h4 className='font-medium text-lg'>{t('emergencyContact')}</h4>
+                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>{t('name')}</label>
                     <input
                       type='text'
                       value={formData.emergencyContact.name}
-                      onChange={e =>
-                        handleFormChange(
-                          'emergencyContact.name',
-                          e.target.value
-                        )
-                      }
+                      onChange={e => handleFormChange('emergencyContact.name', e.target.value)}
+                      className='w-full rounded-md border border-gray-300 px-3 py-2'
                     />
                   </div>
-                  <div className='form-group'>
-                    <label>{t('phone')}</label>
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>{t('phone')}</label>
                     <input
                       type='tel'
                       value={formData.emergencyContact.phone}
-                      onChange={e =>
-                        handleFormChange(
-                          'emergencyContact.phone',
-                          e.target.value
-                        )
-                      }
+                      onChange={e => handleFormChange('emergencyContact.phone', e.target.value)}
+                      className='w-full rounded-md border border-gray-300 px-3 py-2'
                     />
                   </div>
-                  <div className='form-group'>
-                    <label>{t('relationship')}</label>
+                  <div className='space-y-2'>
+                    <label className='text-sm font-medium'>{t('relationship')}</label>
                     <input
                       type='text'
                       value={formData.emergencyContact.relationship}
-                      onChange={e =>
-                        handleFormChange(
-                          'emergencyContact.relationship',
-                          e.target.value
-                        )
-                      }
+                      onChange={e => handleFormChange('emergencyContact.relationship', e.target.value)}
                       placeholder={t('emergencyRelationshipPlaceholder')}
+                      className='w-full rounded-md border border-gray-300 px-3 py-2'
                     />
                   </div>
                 </div>
               </div>
 
-              <div className='modal-actions'>
-                <button
+              <div className='flex justify-end space-x-3 pt-4 border-t'>
+                <Button
                   type='button'
+                  variant='outline'
                   onClick={() => setShowModal(false)}
-                  className='btn btn-secondary'
                 >
                   {t('cancel')}
-                </button>
-                <button type='submit' className='btn btn-primary'>
+                </Button>
+                <Button type='submit'>
                   {modalMode === 'create'
                     ? t('createDeliverer')
                     : t('updateDeliverer')}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
@@ -1012,72 +1038,70 @@ const DeliverersPage = () => {
 
       {/* View Details Modal */}
       {showViewModal && selectedDeliverer && (
-        <div className='modal-overlay'>
-          <div className='modal-content'>
-            <div className='modal-header'>
-              <h2>{t('delivererDetails')}</h2>
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+          <div className='w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
+            <div className='flex items-center justify-between border-b pb-4 mb-4'>
+              <h3 className='text-xl font-semibold'>{t('delivererDetails')}</h3>
               <button
+                className='rounded-full p-1 hover:bg-gray-100'
                 onClick={() => setShowViewModal(false)}
-                className='btn-close'
               >
-                <X size={20} />
+                <X size={24} />
               </button>
             </div>
 
-            <div className='deliverer-details'>
-              <div className='details-section'>
-                <h3>{t('basicInfo')}</h3>
-                <div className='details-grid'>
-                  <div className='detail-item'>
-                    <label>{t('name')}</label>
-                    <span>{selectedDeliverer.name}</span>
+            <div className='space-y-6'>
+              <div className='space-y-3'>
+                <h4 className='font-medium text-lg'>{t('basicInfo')}</h4>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='space-y-1'>
+                    <label className='text-sm text-gray-500'>{t('name')}</label>
+                    <p className='font-medium'>{selectedDeliverer.name}</p>
                   </div>
-                  <div className='detail-item'>
-                    <label>{t('email')}</label>
-                    <span>{selectedDeliverer.email}</span>
+                  <div className='space-y-1'>
+                    <label className='text-sm text-gray-500'>{t('email')}</label>
+                    <p className='font-medium'>{selectedDeliverer.email}</p>
                   </div>
-                  <div className='detail-item'>
-                    <label>{t('phone')}</label>
-                    <span>{selectedDeliverer.phone || t('notProvided')}</span>
+                  <div className='space-y-1'>
+                    <label className='text-sm text-gray-500'>{t('phone')}</label>
+                    <p className='font-medium'>{selectedDeliverer.phone || t('notProvided')}</p>
                   </div>
-                  <div className='detail-item'>
-                    <label>{t('status')}</label>
-                    <span
-                      className={`status-badge status-${selectedDeliverer.status.toLowerCase()}`}
-                    >
+                  <div className='space-y-1'>
+                    <label className='text-sm text-gray-500'>{t('status')}</label>
+                    <div className='flex items-center gap-1'>
                       {getStatusIcon(selectedDeliverer.status)}
-                      {t(`statuses.${selectedDeliverer.status.toLowerCase()}`)}
-                    </span>
+                      <StatusBadge status={selectedDeliverer.status} />
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div className='details-section'>
-                <h3>{t('vehicleInfo')}</h3>
-                <div className='details-grid'>
-                  <div className='detail-item'>
-                    <label>{t('vehicleType')}</label>
-                    <span>
+              <div className='space-y-3'>
+                <h4 className='font-medium text-lg'>{t('vehicleInfo')}</h4>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='space-y-1'>
+                    <label className='text-sm text-gray-500'>{t('vehicleType')}</label>
+                    <p className='font-medium'>
                       {selectedDeliverer.vehicleType ? t(`vehicles.${selectedDeliverer.vehicleType.toLowerCase()}`) : t('notSpecified')}
-                    </span>
+                    </p>
                   </div>
-                  <div className='detail-item'>
-                    <label>{t('licenseNumber')}</label>
-                    <span>
+                  <div className='space-y-1'>
+                    <label className='text-sm text-gray-500'>{t('licenseNumber')}</label>
+                    <p className='font-medium'>
                       {selectedDeliverer.licenseNumber || t('notProvided')}
-                    </span>
+                    </p>
                   </div>
                 </div>
               </div>
 
               {selectedDeliverer.address && (
-                <div className='details-section'>
-                  <h3>{t('address')}</h3>
-                  <div className='address-info'>
+                <div className='space-y-3'>
+                  <h4 className='font-medium text-lg'>{t('address')}</h4>
+                  <div className='space-y-1'>
                     {selectedDeliverer.address.street && (
-                      <div>{selectedDeliverer.address.street}</div>
+                      <p className='font-medium'>{selectedDeliverer.address.street}</p>
                     )}
-                    <div>
+                    <p className='font-medium'>
                       {[
                         selectedDeliverer.address.city,
                         selectedDeliverer.address.state,
@@ -1085,56 +1109,57 @@ const DeliverersPage = () => {
                       ]
                         .filter(Boolean)
                         .join(', ')}
-                    </div>
+                    </p>
                   </div>
                 </div>
               )}
 
               {selectedDeliverer.emergencyContact && (
-                <div className='details-section'>
-                  <h3>{t('emergencyContact')}</h3>
-                  <div className='details-grid'>
-                    <div className='detail-item'>
-                      <label>{t('name')}</label>
-                      <span>
-                        {selectedDeliverer.emergencyContact.name ||
-                          t('notProvided')}
-                      </span>
+                <div className='space-y-3'>
+                  <h4 className='font-medium text-lg'>{t('emergencyContact')}</h4>
+                  <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                    <div className='space-y-1'>
+                      <label className='text-sm text-gray-500'>{t('name')}</label>
+                      <p className='font-medium'>
+                        {selectedDeliverer.emergencyContact.name || t('notProvided')}
+                      </p>
                     </div>
-                    <div className='detail-item'>
-                      <label>{t('phone')}</label>
-                      <span>
-                        {selectedDeliverer.emergencyContact.phone ||
-                          t('notProvided')}
-                      </span>
+                    <div className='space-y-1'>
+                      <label className='text-sm text-gray-500'>{t('phone')}</label>
+                      <p className='font-medium'>
+                        {selectedDeliverer.emergencyContact.phone || t('notProvided')}
+                      </p>
                     </div>
-                    <div className='detail-item'>
-                      <label>{t('relationship')}</label>
-                      <span>
-                        {selectedDeliverer.emergencyContact.relationship ||
-                          t('notProvided')}
-                      </span>
+                    <div className='space-y-1'>
+                      <label className='text-sm text-gray-500'>{t('relationship')}</label>
+                      <p className='font-medium'>
+                        {selectedDeliverer.emergencyContact.relationship || t('notProvided')}
+                      </p>
                     </div>
                   </div>
                 </div>
               )}
 
-              <div className='details-section'>
-                <h3>{t('activity')}</h3>
-                <div className='details-grid'>
-                  <div className='detail-item'>
-                    <label>{t('totalDeliveries')}</label>
-                    <span>{selectedDeliverer.deliveries?.length || 0}</span>
+              <div className='space-y-3'>
+                <h4 className='font-medium text-lg'>{t('activity')}</h4>
+                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='space-y-1'>
+                    <label className='text-sm text-gray-500'>{t('totalDeliveries')}</label>
+                    <p className='font-medium'>{selectedDeliverer.deliveries?.length || 0}</p>
                   </div>
-                  <div className='detail-item'>
-                    <label>{t('memberSince')}</label>
-                    <span>
-                      {new Date(
-                        selectedDeliverer.createdAt
-                      ).toLocaleDateString()}
-                    </span>
+                  <div className='space-y-1'>
+                    <label className='text-sm text-gray-500'>{t('memberSince')}</label>
+                    <p className='font-medium'>
+                      {new Date(selectedDeliverer.createdAt).toLocaleDateString()}
+                    </p>
                   </div>
                 </div>
+              </div>
+              
+              <div className='flex justify-end space-x-3 pt-4 border-t'>
+                <Button onClick={() => setShowViewModal(false)}>
+                  {t('close')}
+                </Button>
               </div>
             </div>
           </div>
@@ -1143,73 +1168,84 @@ const DeliverersPage = () => {
 
       {/* Statistics Modal */}
       {showStatsModal && selectedDeliverer && (
-        <div className='modal-overlay'>
-          <div className='modal-content'>
-            <div className='modal-header'>
-              <h2>{t('performanceStats', { name: selectedDeliverer.name })}</h2>
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+          <div className='w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
+            <div className='flex items-center justify-between border-b pb-4 mb-4'>
+              <h3 className='text-xl font-semibold'>{t('performanceStats', { name: selectedDeliverer.name })}</h3>
               <button
+                className='rounded-full p-1 hover:bg-gray-100'
                 onClick={() => setShowStatsModal(false)}
-                className='btn-close'
               >
-                <X size={20} />
+                <X size={24} />
               </button>
             </div>
 
-            <div className='stats-content'>
+            <div className='space-y-6'>
               {statsLoading ? (
-                <LoadingSpinner />
+                <div className='flex justify-center py-8'>
+                  <LoadingSpinner />
+                </div>
               ) : delivererStats ? (
-                <div className='performance-stats'>
-                  <div className='stats-grid'>
-                    <div className='stat-card'>
-                      <div className='stat-value'>
-                        {delivererStats.totalDeliveries}
-                      </div>
-                      <div className='stat-label'>{t('totalDeliveries')}</div>
-                    </div>
-                    <div className='stat-card'>
-                      <div className='stat-value'>
-                        {delivererStats.delivered}
-                      </div>
-                      <div className='stat-label'>{t('completed')}</div>
-                    </div>
-                    <div className='stat-card'>
-                      <div className='stat-value'>{delivererStats.pending}</div>
-                      <div className='stat-label'>{t('pending')}</div>
-                    </div>
-                    <div className='stat-card'>
-                      <div className='stat-value'>
-                        {delivererStats.inTransit}
-                      </div>
-                      <div className='stat-label'>{t('inTransit')}</div>
-                    </div>
+                <div className='space-y-8'>
+                  <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+                    <Card>
+                      <CardContent className='flex flex-col items-center justify-center pt-6'>
+                        <span className='text-3xl font-bold'>{delivererStats.totalDeliveries}</span>
+                        <span className='text-sm text-muted-foreground'>{t('totalDeliveries')}</span>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className='flex flex-col items-center justify-center pt-6'>
+                        <span className='text-3xl font-bold text-success'>{delivererStats.delivered}</span>
+                        <span className='text-sm text-muted-foreground'>{t('completed')}</span>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className='flex flex-col items-center justify-center pt-6'>
+                        <span className='text-3xl font-bold text-status-pending'>{delivererStats.pending}</span>
+                        <span className='text-sm text-muted-foreground'>{t('pending')}</span>
+                      </CardContent>
+                    </Card>
+                    <Card>
+                      <CardContent className='flex flex-col items-center justify-center pt-6'>
+                        <span className='text-3xl font-bold text-status-in-transit'>{delivererStats.inTransit}</span>
+                        <span className='text-sm text-muted-foreground'>{t('inTransit')}</span>
+                      </CardContent>
+                    </Card>
                   </div>
 
-                  <div className='performance-metrics'>
-                    <div className='metric-item'>
-                      <label>{t('successRate')}</label>
-                      <div className='metric-value'>
+                  <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+                    <div className='space-y-2 p-4 border rounded-lg'>
+                      <h4 className='font-medium'>{t('successRate')}</h4>
+                      <p className='text-2xl font-bold'>
                         {delivererStats.totalDeliveries > 0
                           ? `${((delivererStats.delivered / delivererStats.totalDeliveries) * 100).toFixed(1)}%`
                           : t('na')}
-                      </div>
+                      </p>
                     </div>
-                    <div className='metric-item'>
-                      <label>{t('averageDeliveryTime')}</label>
-                      <div className='metric-value'>
+                    <div className='space-y-2 p-4 border rounded-lg'>
+                      <h4 className='font-medium'>{t('averageDeliveryTime')}</h4>
+                      <p className='text-2xl font-bold'>
                         {delivererStats.avgDeliveryTime
                           ? `${delivererStats.avgDeliveryTime.toFixed(1)} ${t('days')}`
                           : t('na')}
-                      </div>
+                      </p>
                     </div>
                   </div>
                 </div>
               ) : (
-                <div className='no-stats'>
-                  <BarChart3 size={48} className='no-stats-icon' />
-                  <p>{t('noStatsAvailable')}</p>
+                <div className='flex flex-col items-center justify-center py-12 text-center'>
+                  <BarChart3 size={48} className='text-muted-foreground mb-4' />
+                  <p className='text-lg font-medium'>{t('noStatsAvailable')}</p>
+                  <p className='text-sm text-muted-foreground mt-2'>{t('statsWillAppearHere')}</p>
                 </div>
               )}
+              
+              <div className='flex justify-end space-x-3 pt-4 border-t'>
+                <Button onClick={() => setShowStatsModal(false)}>
+                  {t('close')}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -1217,36 +1253,41 @@ const DeliverersPage = () => {
 
       {/* Assign Delivery Modal */}
       {showAssignModal && (
-        <div className='modal-overlay'>
-          <div className='modal-content'>
-            <div className='modal-header'>
-              <h2>{t('assignDeliveryTo', { name: selectedDeliverer?.name })}</h2>
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+          <div className='w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
+            <div className='flex items-center justify-between border-b pb-4 mb-4'>
+              <h3 className='text-xl font-semibold'>{t('assignDeliveryTo', { name: selectedDeliverer?.name })}</h3>
               <button
+                className='rounded-full p-1 hover:bg-gray-100'
                 onClick={() => setShowAssignModal(false)}
-                className='btn-close'
               >
-                <X size={20} />
+                <X size={24} />
               </button>
             </div>
 
-            <form onSubmit={handleAssignDelivery} className='modal-form'>
-              <div className='form-section'>
-                <h3>{t('selectDelivery')}</h3>
+            <form onSubmit={handleAssignDelivery} className='space-y-6'>
+              <div className='space-y-4'>
+                <h4 className='font-medium text-lg'>{t('selectDelivery')}</h4>
 
                 {loadingDeliveries ? (
-                  <LoadingSpinner />
+                  <div className='flex justify-center py-4'>
+                    <LoadingSpinner />
+                  </div>
                 ) : availableDeliveries.length === 0 ? (
-                  <div className='empty-message'>
-                    {t('noAvailableDeliveriesFound')}
+                  <div className='flex flex-col items-center justify-center py-8 text-center'>
+                    <Package size={32} className='text-muted-foreground mb-2' />
+                    <p className='text-lg font-medium'>{t('noAvailableDeliveriesFound')}</p>
+                    <p className='text-sm text-muted-foreground mt-2'>{t('createDeliveryFirst')}</p>
                   </div>
                 ) : (
-                  <div className='form-group'>
-                    <label htmlFor='deliverySelect'>{t('availableDeliveries')}</label>
-                    <select
+                  <div className='space-y-2'>
+                    <label htmlFor='deliverySelect' className='text-sm font-medium'>{t('availableDeliveries')}</label>
+                    <Select
                       id='deliverySelect'
                       value={selectedDelivery}
                       onChange={e => setSelectedDelivery(e.target.value)}
                       required
+                      className='w-full'
                     >
                       <option value=''>{t('selectDelivery')}</option>
                       {availableDeliveries.map(delivery => (
@@ -1255,26 +1296,25 @@ const DeliverersPage = () => {
                           {delivery.deliveryAddress}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </div>
                 )}
               </div>
 
-              <div className='modal-footer'>
-                <button
+              <div className='flex justify-end space-x-3 pt-4 border-t'>
+                <Button
                   type='button'
+                  variant='outline'
                   onClick={() => setShowAssignModal(false)}
-                  className='btn btn-secondary'
                 >
                   {t('cancel')}
-                </button>
-                <button
+                </Button>
+                <Button
                   type='submit'
-                  className='btn btn-primary'
                   disabled={!selectedDelivery || loadingDeliveries}
                 >
                   {t('assignDelivery')}
-                </button>
+                </Button>
               </div>
             </form>
           </div>
