@@ -35,18 +35,27 @@ export const DeliveriesTable = ({
    * StatusBadge component for delivery status
    */
   const StatusBadge = ({ status }) => {
+    // Map backend status values to UI display values
+    const normalizedStatus = status === 'PENDING' ? 'Pending' :
+                            status === 'IN_TRANSIT' ? 'In Transit' :
+                            status === 'DELIVERED' ? 'Delivered' :
+                            status === 'CANCELLED' ? 'Cancelled' :
+                            status; // Use as-is if not matching
+
     const statusMap = {
-      PENDING: { variant: 'warning', label: t('statuses.pending') },
-      IN_TRANSIT: { variant: 'info', label: t('statuses.inTransit') },
-      DELIVERED: { variant: 'success', label: t('statuses.delivered') },
-      CANCELLED: { variant: 'default', label: t('statuses.cancelled') },
-      DELAYED: { variant: 'destructive', label: t('statuses.delayed') },
-      ON_HOLD: { variant: 'outline', label: t('statuses.onHold') },
+      'Pending': { variant: 'warning', label: t('statuses.pending') },
+      'In Transit': { variant: 'info', label: t('statuses.inTransit') },
+      'Delivered': { variant: 'success', label: t('statuses.delivered') },
+      'Cancelled': { variant: 'default', label: t('statuses.cancelled') },
+      'PENDING': { variant: 'warning', label: t('statuses.pending') },
+      'IN_TRANSIT': { variant: 'info', label: t('statuses.inTransit') },
+      'DELIVERED': { variant: 'success', label: t('statuses.delivered') },
+      'CANCELLED': { variant: 'default', label: t('statuses.cancelled') },
     };
 
-    const { variant, label } = statusMap[status] || { 
+    const { variant, label } = statusMap[normalizedStatus] || { 
       variant: 'default', 
-      label: status 
+      label: normalizedStatus 
     };
 
     return <Badge variant={variant}>{label}</Badge>;
@@ -60,15 +69,27 @@ export const DeliveriesTable = ({
    * PriorityBadge component for delivery priority
    */
   const PriorityBadge = ({ priority }) => {
+    // Map backend priority values to UI display values
+    const normalizedPriority = priority === 'HIGH' ? 'High' :
+                              priority === 'MEDIUM' ? 'Medium' :
+                              priority === 'LOW' ? 'Low' :
+                              priority === 'URGENT' ? 'Urgent' :
+                              priority; // Use as-is if not matching
+
     const priorityMap = {
-      HIGH: { variant: 'destructive', label: t('priorities.high') },
-      MEDIUM: { variant: 'warning', label: t('priorities.medium') },
-      LOW: { variant: 'default', label: t('priorities.low') },
+      'High': { variant: 'destructive', label: t('priorities.high') },
+      'Medium': { variant: 'warning', label: t('priorities.medium') },
+      'Low': { variant: 'default', label: t('priorities.low') },
+      'Urgent': { variant: 'destructive', label: t('priorities.urgent') },
+      'HIGH': { variant: 'destructive', label: t('priorities.high') },
+      'MEDIUM': { variant: 'warning', label: t('priorities.medium') },
+      'LOW': { variant: 'default', label: t('priorities.low') },
+      'URGENT': { variant: 'destructive', label: t('priorities.urgent') },
     };
 
-    const { variant, label } = priorityMap[priority] || {
+    const { variant, label } = priorityMap[normalizedPriority] || {
       variant: 'default',
-      label: priority,
+      label: normalizedPriority,
     };
 
     return <Badge variant={variant}>{label}</Badge>;

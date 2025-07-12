@@ -176,8 +176,24 @@ export const delivererAPI = {
     }
   },
   getById: id => api.get(`/deliverers/${id}`),
-  create: data => api.post('/deliverers', data),
-  update: (id, data) => api.put(`/deliverers/${id}`, data),
+  create: async (data) => {
+    try {
+      const response = await api.post('/deliverers', data);
+      return response;
+    } catch (error) {
+      console.error('Error in delivererAPI.create:', error);
+      throw error;
+    }
+  },
+  update: async (id, data) => {
+    try {
+      const response = await api.put(`/deliverers/${id}`, data);
+      return response;
+    } catch (error) {
+      console.error(`Error in delivererAPI.update for ID ${id}:`, error);
+      throw error;
+    }
+  },
   delete: id => api.delete(`/deliverers/${id}`),
   getStats: (id, params) => api.get(`/deliverers/${id}/stats`, { params }),
   updateStatus: (id, status) =>
