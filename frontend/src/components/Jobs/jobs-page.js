@@ -73,10 +73,26 @@ const JobsPage = () => {
     try {
       setLoading(true);
       const response = await jobsAPI.getStatus();
-      setDashboardData(response.data);
+      setDashboardData(response); // Changed from response.data to response
     } catch (error) {
       console.error('Error fetching job status:', error);
       toast.error(t('jobs.errorFetchingStatus'));
+      // Provide fallback data to prevent destructuring errors
+      setDashboardData({
+        jobStatus: { 
+          isRunning: false,
+          activeJobs: 0,
+          totalJobs: 0,
+          successRate: 0,
+          lastRun: null,
+          jobs: []
+        },
+        systemHealth: { 
+          status: 'unknown',
+          issuesCount: 0
+        },
+        recentRuns: []
+      });
     } finally {
       setLoading(false);
     }
@@ -145,7 +161,7 @@ const JobsPage = () => {
     }
   };
 
-  const { jobStatus, systemHealth, recentRuns } = dashboardData;
+  const { jobStatus = {}, systemHealth = {}, recentRuns = [] } = dashboardData || {};
 
   if (loading) {
     return (

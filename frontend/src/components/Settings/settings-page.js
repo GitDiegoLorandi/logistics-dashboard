@@ -934,10 +934,10 @@ const SettingsPage = () => {
         <div>
           <h1 className='flex items-center gap-2 text-2xl font-bold'>
             <Settings className='h-6 w-6 text-primary' />
-            {t('title')}
+            {t('title', { ns: 'settings' })}
           </h1>
           <p className='text-muted-foreground'>
-            {t('preferencesSubtitle')}
+            {t('preferencesSubtitle', { ns: 'settings' })}
           </p>
         </div>
       </div>

@@ -655,11 +655,11 @@ const DeliveriesPage = () => {
   }
 
   return (
-    <div className='deliveries-page mx-auto max-w-7xl px-4 py-6'>
+    <div className='mx-auto max-w-7xl px-4 py-6'>
       {/* Header */}
-      <div className='deliveries-header mb-8 flex flex-col gap-6 rounded-xl bg-card p-6 shadow md:flex-row md:items-start md:justify-between'>
-        <div className='header-left'>
-          <h1 className='page-title flex items-center gap-2 text-2xl font-bold'>
+      <div className='mb-8 flex flex-col gap-6 rounded-xl bg-card p-6 shadow md:flex-row md:items-start md:justify-between'>
+        <div>
+          <h1 className='flex items-center gap-2 text-2xl font-bold'>
             <Package className='h-6 w-6 text-primary' />
             {t('title')}
           </h1>
@@ -667,7 +667,7 @@ const DeliveriesPage = () => {
             {t('deliveryDetails')}
           </p>
         </div>
-        <div className='header-actions flex gap-2'>
+        <div className='flex gap-2'>
           <Button
             variant='outline'
             size='sm'
