@@ -1,0 +1,302 @@
+[
+  {
+    "type": "OVERDUE_DELIVERY",
+    "priority": "HIGH",
+    "title": "Delivery Overdue: TesteUser1",
+    "message": "Delivery for Cladia is 73 hours overdue. Assigned to: Unassigned",
+    "data": {
+      "deliveryId": "68670ea91b0867bf954273af",
+      "orderId": "TesteUser1",
+      "customer": "Cladia",
+      "hoursOverdue": 73,
+      "estimatedDeliveryDate": "2025-07-04T00:00:00.000Z"
+    },
+    "createdAt": "2025-07-07T01:00:00.092Z",
+    "processed": true,
+    "processedAt": "2025-07-07T01:05:00.525Z",
+    "result": {
+      "success": true,
+      "method": "email",
+      "recipient": "admin@logistics.com",
+      "timestamp": "2025-07-07T01:05:00.525Z"
+    }
+  },
+  {
+    "type": "OVERDUE_DELIVERY",
+    "priority": "HIGH",
+    "title": "Delivery Overdue: ORD-002",
+    "message": "Delivery for Sophie Guidry is 4503 hours overdue. Assigned to: Kelly Cristina",
+    "data": {
+      "deliveryId": "6858a7ed73099940fc1c6c17",
+      "orderId": "ORD-002",
+      "customer": "Sophie Guidry",
+      "deliverer": {
+        "_id": "6858eb90b8d7facb9e2b0e67",
+        "name": "Kelly Cristina",
+        "email": "kelly.cristina@logistics.com",
+        "phone": "+1234567890"
+      },
+      "hoursOverdue": 4503,
+      "estimatedDeliveryDate": "2024-12-31T10:00:00.000Z"
+    },
+    "createdAt": "2025-07-07T01:00:00.092Z",
+    "processed": true,
+    "processedAt": "2025-07-07T01:05:00.632Z",
+    "result": {
+      "success": true,
+      "method": "email",
+      "recipient": "admin@logistics.com",
+      "timestamp": "2025-07-07T01:05:00.632Z"
+    }
+  },
+  {
+    "type": "OVERDUE_DELIVERY",
+    "priority": "HIGH",
+    "title": "Delivery Overdue: TesteUser1",
+    "message": "Delivery for Cladia is 74 hours overdue. Assigned to: Unassigned",
+    "data": {
+      "deliveryId": "68670ea91b0867bf954273af",
+      "orderId": "TesteUser1",
+      "customer": "Cladia",
+      "hoursOverdue": 74,
+      "estimatedDeliveryDate": "2025-07-04T00:00:00.000Z"
+    },
+    "createdAt": "2025-07-07T01:30:00.524Z",
+    "processed": true,
+    "processedAt": "2025-07-07T01:35:00.658Z",
+    "result": {
+      "success": true,
+      "method": "email",
+      "recipient": "admin@logistics.com",
+      "timestamp": "2025-07-07T01:35:00.658Z"
+    }
+  },
+  {
+    "type": "OVERDUE_DELIVERY",
+    "priority": "HIGH",
+    "title": "Delivery Overdue: ORD-002",
+    "message": "Delivery for Sophie Guidry is 4504 hours overdue. Assigned to: Kelly Cristina",
+    "data": {
+      "deliveryId": "6858a7ed73099940fc1c6c17",
+      "orderId": "ORD-002",
+      "customer": "Sophie Guidry",
+      "deliverer": {
+        "_id": "6858eb90b8d7facb9e2b0e67",
+        "name": "Kelly Cristina",
+        "email": "kelly.cristina@logistics.com",
+        "phone": "+1234567890"
+      },
+      "hoursOverdue": 4504,
+      "estimatedDeliveryDate": "2024-12-31T10:00:00.000Z"
+    },
+    "createdAt": "2025-07-07T01:30:00.524Z",
+    "processed": true,
+    "processedAt": "2025-07-07T01:35:00.765Z",
+    "result": {
+      "success": true,
+      "method": "email",
+      "recipient": "admin@logistics.com",
+      "timestamp": "2025-07-07T01:35:00.765Z"
+    }
+  },
+  {
+    "type": "OVERDUE_DELIVERY",
+    "priority": "HIGH",
+    "title": "Delivery Overdue: TesteUser1",
+    "message": "Delivery for Cladia is 74 hours overdue. Assigned to: Unassigned",
+    "data": {
+      "deliveryId": "68670ea91b0867bf954273af",
+      "orderId": "TesteUser1",
+      "customer": "Cladia",
+      "hoursOverdue": 74,
+      "estimatedDeliveryDate": "2025-07-04T00:00:00.000Z"
+    },
+    "createdAt": "2025-07-07T02:00:00.531Z",
+    "processed": true,
+    "processedAt": "2025-07-07T02:00:00.714Z",
+    "result": {
+      "success": true,
+      "method": "email",
+      "recipient": "admin@logistics.com",
+      "timestamp": "2025-07-07T02:00:00.714Z"
+    }
+  },
+  {
+    "type": "OVERDUE_DELIVERY",
+    "priority": "HIGH",
+    "title": "Delivery Overdue: ORD-002",
+    "message": "Delivery for Sophie Guidry is 4504 hours overdue. Assigned to: Kelly Cristina",
+    "data": {
+      "deliveryId": "6858a7ed73099940fc1c6c17",
+      "orderId": "ORD-002",
+      "customer": "Sophie Guidry",
+      "deliverer": {
+        "_id": "6858eb90b8d7facb9e2b0e67",
+        "name": "Kelly Cristina",
+        "email": "kelly.cristina@logistics.com",
+        "phone": "+1234567890"
+      },
+      "hoursOverdue": 4504,
+      "estimatedDeliveryDate": "2024-12-31T10:00:00.000Z"
+    },
+    "createdAt": "2025-07-07T02:00:00.531Z",
+    "processed": true,
+    "processedAt": "2025-07-07T02:00:00.821Z",
+    "result": {
+      "success": true,
+      "method": "email",
+      "recipient": "admin@logistics.com",
+      "timestamp": "2025-07-07T02:00:00.821Z"
+    }
+  },
+  {
+    "type": "OVERDUE_DELIVERY",
+    "priority": "HIGH",
+    "title": "Delivery Overdue: TesteUser1",
+    "message": "Delivery for Cladia is 75 hours overdue. Assigned to: Unassigned",
+    "data": {
+      "deliveryId": "68670ea91b0867bf954273af",
+      "orderId": "TesteUser1",
+      "customer": "Cladia",
+      "hoursOverdue": 75,
+      "estimatedDeliveryDate": "2025-07-04T00:00:00.000Z"
+    },
+    "createdAt": "2025-07-07T02:30:00.848Z",
+    "processed": true,
+    "processedAt": "2025-07-07T02:35:00.920Z",
+    "result": {
+      "success": true,
+      "method": "email",
+      "recipient": "admin@logistics.com",
+      "timestamp": "2025-07-07T02:35:00.920Z"
+    }
+  },
+  {
+    "type": "OVERDUE_DELIVERY",
+    "priority": "HIGH",
+    "title": "Delivery Overdue: ORD-002",
+    "message": "Delivery for Sophie Guidry is 4505 hours overdue. Assigned to: Kelly Cristina",
+    "data": {
+      "deliveryId": "6858a7ed73099940fc1c6c17",
+      "orderId": "ORD-002",
+      "customer": "Sophie Guidry",
+      "deliverer": {
+        "_id": "6858eb90b8d7facb9e2b0e67",
+        "name": "Kelly Cristina",
+        "email": "kelly.cristina@logistics.com",
+        "phone": "+1234567890"
+      },
+      "hoursOverdue": 4505,
+      "estimatedDeliveryDate": "2024-12-31T10:00:00.000Z"
+    },
+    "createdAt": "2025-07-07T02:30:00.848Z",
+    "processed": true,
+    "processedAt": "2025-07-07T02:35:01.028Z",
+    "result": {
+      "success": true,
+      "method": "email",
+      "recipient": "admin@logistics.com",
+      "timestamp": "2025-07-07T02:35:01.028Z"
+    }
+  },
+  {
+    "type": "OVERDUE_DELIVERY",
+    "priority": "HIGH",
+    "title": "Delivery Overdue: TesteUser1",
+    "message": "Delivery for Cladia is 75 hours overdue. Assigned to: Unassigned",
+    "data": {
+      "deliveryId": "68670ea91b0867bf954273af",
+      "orderId": "TesteUser1",
+      "customer": "Cladia",
+      "hoursOverdue": 75,
+      "estimatedDeliveryDate": "2025-07-04T00:00:00.000Z"
+    },
+    "createdAt": "2025-07-07T03:00:00.101Z",
+    "processed": true,
+    "processedAt": "2025-07-07T03:05:00.488Z",
+    "result": {
+      "success": true,
+      "method": "email",
+      "recipient": "admin@logistics.com",
+      "timestamp": "2025-07-07T03:05:00.488Z"
+    }
+  },
+  {
+    "type": "OVERDUE_DELIVERY",
+    "priority": "HIGH",
+    "title": "Delivery Overdue: ORD-002",
+    "message": "Delivery for Sophie Guidry is 4505 hours overdue. Assigned to: Kelly Cristina",
+    "data": {
+      "deliveryId": "6858a7ed73099940fc1c6c17",
+      "orderId": "ORD-002",
+      "customer": "Sophie Guidry",
+      "deliverer": {
+        "_id": "6858eb90b8d7facb9e2b0e67",
+        "name": "Kelly Cristina",
+        "email": "kelly.cristina@logistics.com",
+        "phone": "+1234567890"
+      },
+      "hoursOverdue": 4505,
+      "estimatedDeliveryDate": "2024-12-31T10:00:00.000Z"
+    },
+    "createdAt": "2025-07-07T03:00:00.101Z",
+    "processed": true,
+    "processedAt": "2025-07-07T03:05:00.595Z",
+    "result": {
+      "success": true,
+      "method": "email",
+      "recipient": "admin@logistics.com",
+      "timestamp": "2025-07-07T03:05:00.595Z"
+    }
+  },
+  {
+    "type": "OVERDUE_DELIVERY",
+    "priority": "HIGH",
+    "title": "Delivery Overdue: TesteUser1",
+    "message": "Delivery for Cladia is 76 hours overdue. Assigned to: Unassigned",
+    "data": {
+      "deliveryId": "68670ea91b0867bf954273af",
+      "orderId": "TesteUser1",
+      "customer": "Cladia",
+      "hoursOverdue": 76,
+      "estimatedDeliveryDate": "2025-07-04T00:00:00.000Z"
+    },
+    "createdAt": "2025-07-07T03:30:00.350Z",
+    "processed": true,
+    "processedAt": "2025-07-07T03:35:00.571Z",
+    "result": {
+      "success": true,
+      "method": "email",
+      "recipient": "admin@logistics.com",
+      "timestamp": "2025-07-07T03:35:00.571Z"
+    }
+  },
+  {
+    "type": "OVERDUE_DELIVERY",
+    "priority": "HIGH",
+    "title": "Delivery Overdue: ORD-002",
+    "message": "Delivery for Sophie Guidry is 4506 hours overdue. Assigned to: Kelly Cristina",
+    "data": {
+      "deliveryId": "6858a7ed73099940fc1c6c17",
+      "orderId": "ORD-002",
+      "customer": "Sophie Guidry",
+      "deliverer": {
+        "_id": "6858eb90b8d7facb9e2b0e67",
+        "name": "Kelly Cristina",
+        "email": "kelly.cristina@logistics.com",
+        "phone": "+1234567890"
+      },
+      "hoursOverdue": 4506,
+      "estimatedDeliveryDate": "2024-12-31T10:00:00.000Z"
+    },
+    "createdAt": "2025-07-07T03:30:00.350Z",
+    "processed": true,
+    "processedAt": "2025-07-07T03:35:00.681Z",
+    "result": {
+      "success": true,
+      "method": "email",
+      "recipient": "admin@logistics.com",
+      "timestamp": "2025-07-07T03:35:00.681Z"
+    }
+  }
+]

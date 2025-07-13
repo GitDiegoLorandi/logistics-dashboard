@@ -1,0 +1,61 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Build outputs
+build/
+dist/
+*/build/
+*/dist/
+
+# Coverage reports
+coverage/
+*/coverage/
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Git
+.git/
+
+# Package lock files
+package-lock.json
+yarn.lock
+
+# Generated files
+*.min.js
+*.min.css
+
+# Binary files
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.ico
+*.svg
+*.woff
+*.woff2
+*.ttf
+*.eot
+
+# Husky
+.husky/_/
+
+# Markdown that shouldn't be formatted
+CHANGELOG.md
+LICENSE
+
+# SpecStory auto-generated files
+.specstory/ 
