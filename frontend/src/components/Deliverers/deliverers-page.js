@@ -279,14 +279,28 @@ const DeliverersPage = () => {
   // Effects
   useEffect(() => {
     fetchDeliverers();
+    checkUserRole();
+  }, [fetchDeliverers]);
 
+  // Check user role
+  const checkUserRole = () => {
     // Get user data from localStorage
     const userData = localStorage.getItem('user');
     if (userData) {
-      const parsedUser = JSON.parse(userData);
-      setIsAdmin(parsedUser.role?.toLowerCase() === 'admin');
+      try {
+        const parsedUser = JSON.parse(userData);
+        const userRole = parsedUser.role?.toLowerCase();
+        console.log('User role:', userRole);
+        setIsAdmin(userRole === 'admin');
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        setIsAdmin(false);
+      }
+    } else {
+      console.warn('No user data found in localStorage');
+      setIsAdmin(false);
     }
-  }, [fetchDeliverers]);
+  };
 
   // Handle Form Changes
   const handleFormChange = (field, value) => {
@@ -331,6 +345,14 @@ const DeliverersPage = () => {
   // Handle Create/Edit Deliverer
   const handleSaveDeliverer = async e => {
     e.preventDefault();
+    console.log('Form submission triggered');
+    console.log('Form data:', formData);
+
+    // Check if user is admin
+    if (!isAdmin) {
+      toast.error('You need admin privileges to create or edit deliverers');
+      return;
+    }
 
     // Validate required fields
     if (!formData.name || !formData.email) {
@@ -359,10 +381,14 @@ const DeliverersPage = () => {
 
     try {
       if (modalMode === 'create') {
-        await delivererAPI.create(formData);
+        console.log('Creating new deliverer...');
+        const response = await delivererAPI.create(formData);
+        console.log('Create deliverer response:', response);
         toast.success('Deliverer created successfully');
       } else {
-        await delivererAPI.update(selectedDeliverer._id, formData);
+        console.log('Updating deliverer...');
+        const response = await delivererAPI.update(selectedDeliverer._id, formData);
+        console.log('Update deliverer response:', response);
         toast.success('Deliverer updated successfully');
       }
 
@@ -474,7 +500,7 @@ const DeliverersPage = () => {
       case 'Bicycle':
         return <Bike size={16} className='text-status-in-transit' />;
       default:
-        return <Car size={16} className='text-status-default' />;
+        return <Car size={16} className='text-muted-foreground' />;
     }
   };
 
@@ -647,7 +673,7 @@ const DeliverersPage = () => {
         </Card>
         <Card>
           <CardContent className='flex flex-col items-center justify-center pt-6'>
-            <span className='text-status-offline text-3xl font-bold'>
+            <span className='text-muted-foreground text-3xl font-bold'>
               {offlineCount}
             </span>
             <span className='text-sm text-muted-foreground'>{t('offline')}</span>
@@ -855,22 +881,22 @@ const DeliverersPage = () => {
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('name')}</label>
-                    <input
+                    <Input
                       type='text'
                       value={formData.name}
                       onChange={e => handleFormChange('name', e.target.value)}
                       required
-                      className='w-full rounded-md border border-gray-300 px-3 py-2'
+                      className='w-full'
                     />
                   </div>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('email')}</label>
-                    <input
+                    <Input
                       type='email'
                       value={formData.email}
                       onChange={e => handleFormChange('email', e.target.value)}
                       required
-                      className='w-full rounded-md border border-gray-300 px-3 py-2'
+                      className='w-full'
                     />
                   </div>
                 </div>
@@ -878,11 +904,11 @@ const DeliverersPage = () => {
                 <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('phone')}</label>
-                    <input
+                    <Input
                       type='tel'
                       value={formData.phone}
                       onChange={e => handleFormChange('phone', e.target.value)}
-                      className='w-full rounded-md border border-gray-300 px-3 py-2'
+                      className='w-full'
                     />
                   </div>
                   <div className='space-y-2'>
@@ -921,11 +947,11 @@ const DeliverersPage = () => {
                   </div>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('licenseNumber')}</label>
-                    <input
+                    <Input
                       type='text'
                       value={formData.licenseNumber}
                       onChange={e => handleFormChange('licenseNumber', e.target.value)}
-                      className='w-full rounded-md border border-gray-300 px-3 py-2'
+                      className='w-full'
                     />
                   </div>
                 </div>
@@ -955,29 +981,29 @@ const DeliverersPage = () => {
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('city')}</label>
-                    <input
+                    <Input
                       type='text'
                       value={formData.address.city}
                       onChange={e => handleFormChange('address.city', e.target.value)}
-                      className='w-full rounded-md border border-gray-300 px-3 py-2'
+                      className='w-full'
                     />
                   </div>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('state')}</label>
-                    <input
+                    <Input
                       type='text'
                       value={formData.address.state}
                       onChange={e => handleFormChange('address.state', e.target.value)}
-                      className='w-full rounded-md border border-gray-300 px-3 py-2'
+                      className='w-full'
                     />
                   </div>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('zipCode')}</label>
-                    <input
+                    <Input
                       type='text'
                       value={formData.address.zipCode}
                       onChange={e => handleFormChange('address.zipCode', e.target.value)}
-                      className='w-full rounded-md border border-gray-300 px-3 py-2'
+                      className='w-full'
                     />
                   </div>
                 </div>
@@ -988,30 +1014,30 @@ const DeliverersPage = () => {
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('name')}</label>
-                    <input
+                    <Input
                       type='text'
                       value={formData.emergencyContact.name}
                       onChange={e => handleFormChange('emergencyContact.name', e.target.value)}
-                      className='w-full rounded-md border border-gray-300 px-3 py-2'
+                      className='w-full'
                     />
                   </div>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('phone')}</label>
-                    <input
+                    <Input
                       type='tel'
                       value={formData.emergencyContact.phone}
                       onChange={e => handleFormChange('emergencyContact.phone', e.target.value)}
-                      className='w-full rounded-md border border-gray-300 px-3 py-2'
+                      className='w-full'
                     />
                   </div>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('relationship')}</label>
-                    <input
+                    <Input
                       type='text'
                       value={formData.emergencyContact.relationship}
                       onChange={e => handleFormChange('emergencyContact.relationship', e.target.value)}
                       placeholder={t('emergencyRelationshipPlaceholder')}
-                      className='w-full rounded-md border border-gray-300 px-3 py-2'
+                      className='w-full'
                     />
                   </div>
                 </div>

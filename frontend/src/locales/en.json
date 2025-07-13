@@ -20,6 +20,27 @@
     "page": "Page",
     "of": "of",
     "total": "total",
+    "app": {
+      "title": "Logistics Dashboard"
+    },
+    "logout": {
+      "title": "Logout"
+    },
+    "navigation": {
+      "deliveries": "Deliveries",
+      "deliverers": "Deliverers",
+      "users": "Users",
+      "jobs": "Background Jobs",
+      "analytics": "Analytics",
+      "settings": "Settings",
+      "dashboard": "Dashboard",
+      "home": "Home"
+    },
+    "users": {
+      "admin": "Admin",
+      "manager": "Manager",
+      "operator": "Operator"
+    },
     "commandPalette": {
       "searchPlaceholder": "Search commands...",
       "noResults": "No results found."
@@ -53,7 +74,9 @@
   "navigation": {
     "dashboard": "Dashboard",
     "deliveries": "Deliveries",
-    "deliverers": "Deliverers",
+    "deliverers": {
+      "title": "Deliverers"
+    },
     "users": "Users",
     "analytics": "Analytics",
     "settings": "Settings",
@@ -61,7 +84,8 @@
     "jobs": "Background Jobs",
     "logout": "Logout",
     "dataExamples": "Data Examples",
-    "uiShowcase": "UI Showcase"
+    "uiShowcase": "UI Showcase",
+    "home": "Home"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -83,7 +107,9 @@
       "dailyDeliveryTrends": "Daily delivery trends",
       "statusDistribution": "Current delivery status distribution",
       "completedVsPending": "Line chart showing completed vs pending deliveries",
-      "statusBreakdown": "Pie chart showing delivery status breakdown"
+      "statusBreakdown": "Pie chart showing delivery status breakdown",
+      "completed": "Completed",
+      "pending": "Pending"
     },
     "tour": {
       "welcome": "Welcome to your logistics dashboard! This is where you can monitor all your delivery operations.",
@@ -265,6 +291,7 @@
     "profile": "Profile",
     "account": "Account",
     "preferences": "Preferences",
+    "preferencesSubtitle": "Customize your dashboard experience and system behavior",
     "notifications": "Notifications",
     "security": "Security",
     "appearance": "Appearance",
@@ -363,5 +390,80 @@
         "description": "Get comprehensive analytics and reports to improve your logistics operations."
       }
     }
+  },
+  "jobs": {
+    "title": "Background Jobs",
+    "subtitle": "Manage and monitor automated system tasks",
+    "backgroundJobs": "Background Jobs",
+    "manageBackgroundJobs": "Manage and monitor automated system tasks that run in the background",
+    "recentJobRuns": "Recent Job Runs",
+    "recentJobRunsDescription": "View the history of recently executed background jobs",
+    "jobName": "Job Name",
+    "description": "Description",
+    "schedule": "Schedule",
+    "lastRunTime": "Last Run Time",
+    "status": "Status",
+    "result": "Result",
+    "noDescription": "No description available",
+    "manual": "Manual",
+    "never": "Never",
+    "running": "Running",
+    "idle": "Idle",
+    "failed": "Failed",
+    "completed": "Completed",
+    "noResult": "No result",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "duration": "Duration",
+    "start": "Start",
+    "stop": "Stop",
+    "startAll": "Start All",
+    "stopAll": "Stop All",
+    "systemActive": "System Active",
+    "systemInactive": "System Inactive",
+    "activeJobs": "Active Jobs",
+    "successRate": "Success Rate",
+    "lastRun": "Last Run",
+    "lastExecution": "Last Execution",
+    "activeIssues": "Active Issues",
+    "healthy": "Healthy",
+    "warning": "Warning",
+    "critical": "Critical",
+    "errorFetchingStatus": "Error fetching job status",
+    "dataRefreshed": "Data refreshed",
+    "jobStarted": "Job {jobName} started",
+    "errorStartingJob": "Error starting job {jobName}",
+    "jobStopped": "Job {jobName} stopped",
+    "errorStoppingJob": "Error stopping job {jobName}",
+    "allJobsStarted": "All jobs started",
+    "errorStartingAllJobs": "Error starting all jobs",
+    "allJobsStopped": "All jobs stopped",
+    "errorStoppingAllJobs": "Error stopping all jobs",
+    "never": "Never",
+    "activeIssues": "Active Issues",
+    "recentJobRuns": "Recent Job Runs",
+    "backgroundJobs": "Background Jobs",
+    "manageBackgroundJobs": "Manage and monitor automated system tasks",
+    "jobName": "Job Name",
+    "description": "Description",
+    "schedule": "Schedule",
+    "lastRunTime": "Last Run Time",
+    "status": "Status",
+    "healthCheck": "Health Check",
+    "healthCheckDescription": "Monitors system health and reports issues",
+    "notifications": "Notifications",
+    "notificationsDescription": "Processes and sends notifications to users",
+    "performanceMonitoring": "Performance Monitoring",
+    "performanceMonitoringDescription": "Tracks system performance metrics",
+    "overdueDeliveries": "Overdue Deliveries",
+    "overdueDeliveriesDescription": "Identifies and flags overdue deliveries",
+    "dataCleanup": "Data Cleanup",
+    "dataCleanupDescription": "Cleans up old and unnecessary data",
+    "activeIssues": "Active Issues",
+    "recentJobRunsDescription": "View the history of recently executed background jobs",
+    "startTime": "Start Time",
+    "endTime": "End Time",
+    "duration": "Duration",
+    "result": "Result"
   }
 } 

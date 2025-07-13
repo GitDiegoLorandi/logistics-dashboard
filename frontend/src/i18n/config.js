@@ -5,10 +5,7 @@ import Backend from 'i18next-http-backend';
 
 // Import translation files directly
 import translationsEN from '../locales/en.json';
-import translationsES from '../locales/es.json';
 import translationsPT from '../locales/pt.json';
-import translationsDE from '../locales/de.json';
-import translationsFR from '../locales/fr.json';
 
 // Initialize i18next
 i18n
@@ -55,10 +52,7 @@ i18n
     // Add resources directly for fallback
     resources: {
       en: translationsEN,
-      es: translationsES,
-      pt: translationsPT,
-      de: translationsDE,
-      fr: translationsFR
+      pt: translationsPT
     }
   });
 

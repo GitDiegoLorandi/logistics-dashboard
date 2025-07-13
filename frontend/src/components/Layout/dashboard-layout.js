@@ -106,7 +106,7 @@ const DashboardLayout = () => {
             <div className="rounded-md bg-primary p-1">
               <LucideTruck className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="text-lg font-bold">{t('app.title')}</span>
+            <span className="text-lg font-bold">{t('app.title', { ns: 'common' })}</span>
           </Link>
           <Button 
             variant="ghost" 
@@ -154,7 +154,7 @@ const DashboardLayout = () => {
             onClick={handleLogout}
           >
             <LucideLogOut className="h-4 w-4" />
-            {t('logout.title')}
+            {t('logout.title', { ns: 'common' })}
           </Button>
         </div>
       </aside>

@@ -178,10 +178,26 @@ export const delivererAPI = {
   getById: id => api.get(`/deliverers/${id}`),
   create: async (data) => {
     try {
+      console.log('API: Creating deliverer with data:', data);
+      
+      // Check if auth token exists
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        console.error('No authentication token found');
+        throw new Error('Authentication required. Please log in.');
+      }
+      
       const response = await api.post('/deliverers', data);
+      console.log('API: Create deliverer response:', response);
       return response;
     } catch (error) {
       console.error('Error in delivererAPI.create:', error);
+      console.error('Error details:', {
+        message: error.message,
+        status: error.status,
+        data: error.data,
+        stack: error.stack
+      });
       throw error;
     }
   },
@@ -224,13 +240,101 @@ export const statisticsAPI = {
 };
 
 export const jobsAPI = {
-  getStatus: () => api.get('/jobs/status'),
-  getHealth: () => api.get('/jobs/health'),
-  getPerformance: () => api.get('/jobs/performance'),
-  getDashboard: () => api.get('/jobs/dashboard'),
-  runJob: jobName => api.post(`/jobs/run/${jobName}`),
-  startAllJobs: () => api.post('/jobs/start'),
-  stopAllJobs: () => api.post('/jobs/stop'),
+  getStatus: async () => {
+    try {
+      const response = await api.get('/jobs/status');
+      return response || {
+        jobStatus: { 
+          isRunning: false,
+          activeJobs: 0,
+          totalJobs: 0,
+          successRate: 0,
+          lastRun: null,
+          jobs: []
+        },
+        systemHealth: { 
+          status: 'unknown',
+          issuesCount: 0
+        },
+        recentRuns: []
+      };
+    } catch (error) {
+      console.error('Error in jobsAPI.getStatus:', error);
+      throw error;
+    }
+  },
+  getHealth: async () => {
+    try {
+      const response = await api.get('/jobs/health');
+      return response;
+    } catch (error) {
+      console.error('Error in jobsAPI.getHealth:', error);
+      throw error;
+    }
+  },
+  getPerformance: async () => {
+    try {
+      const response = await api.get('/jobs/performance');
+      return response;
+    } catch (error) {
+      console.error('Error in jobsAPI.getPerformance:', error);
+      throw error;
+    }
+  },
+  getDashboard: async () => {
+    try {
+      const response = await api.get('/jobs/dashboard');
+      return response;
+    } catch (error) {
+      console.error('Error in jobsAPI.getDashboard:', error);
+      throw error;
+    }
+  },
+  runJob: async (jobName) => {
+    try {
+      const response = await api.post(`/jobs/run/${jobName}`);
+      return response;
+    } catch (error) {
+      console.error(`Error in jobsAPI.runJob for job ${jobName}:`, error);
+      throw error;
+    }
+  },
+  startJob: async (jobName) => {
+    try {
+      const response = await api.post(`/jobs/run/${jobName}`);
+      return response;
+    } catch (error) {
+      console.error(`Error in jobsAPI.startJob for job ${jobName}:`, error);
+      throw error;
+    }
+  },
+  stopJob: async (jobName) => {
+    try {
+      const response = await api.post(`/jobs/stop/${jobName}`);
+      return response;
+    } catch (error) {
+      console.error(`Error in jobsAPI.stopJob for job ${jobName}:`, error);
+      throw error;
+    }
+  },
+  startAllJobs: async () => {
+    try {
+      const response = await api.post('/jobs/start');
+      return response;
+    } catch (error) {
+      console.error('Error in jobsAPI.startAllJobs:', error);
+      throw error;
+    }
+  },
+  stopAllJobs: async () => {
+    try {
+      const response = await api.post('/jobs/stop');
+      return response;
+    } catch (error) {
+      console.error('Error in jobsAPI.stopAllJobs:', error);
+      throw error;
+    }
+  },
 };
 
 export default api;

@@ -4,16 +4,33 @@ import PropTypes from 'prop-types';
 /**
  * Dialog component for modals
  */
-const Dialog = ({ isOpen, onClose, title, children, className = '', ...props }) => {
+const Dialog = ({ 
+  isOpen = undefined, 
+  open = undefined, 
+  onClose = undefined, 
+  onOpenChange = undefined, 
+  title, 
+  children, 
+  className = '' 
+} = {}) => {
+  // Support both isOpen and open props
+  const isDialogOpen = isOpen !== undefined ? isOpen : open;
+  
+  // Support both onClose and onOpenChange props
+  const handleClose = () => {
+    if (onClose) onClose();
+    if (onOpenChange) onOpenChange(false);
+  };
+
   // Handle escape key to close dialog
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape') {
-        onClose();
+        handleClose();
       }
     };
 
-    if (isOpen) {
+    if (isDialogOpen) {
       document.addEventListener('keydown', handleEscape);
       // Prevent body scrolling when dialog is open
       document.body.style.overflow = 'hidden';
@@ -24,15 +41,15 @@ const Dialog = ({ isOpen, onClose, title, children, className = '', ...props }) 
       // Restore body scrolling when dialog is closed
       document.body.style.overflow = 'auto';
     };
-  }, [isOpen, onClose]);
+  }, [isDialogOpen]);
 
   // If dialog is not open, don't render anything
-  if (!isOpen) return null;
+  if (!isDialogOpen) return null;
 
   // Handle backdrop click to close dialog
   const handleBackdropClick = (e) => {
     if (e.target === e.currentTarget) {
-      onClose();
+      handleClose();
     }
   };
 
@@ -40,7 +57,6 @@ const Dialog = ({ isOpen, onClose, title, children, className = '', ...props }) 
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
       onClick={handleBackdropClick}
-      {...props}
     >
       <div
         className={`max-h-[85vh] w-full max-w-md overflow-auto rounded-lg bg-background shadow-lg ${className}`}
@@ -50,7 +66,7 @@ const Dialog = ({ isOpen, onClose, title, children, className = '', ...props }) 
           <div className="flex items-center justify-between border-b p-4">
             <h2 className="text-lg font-semibold">{title}</h2>
             <button
-              onClick={onClose}
+              onClick={handleClose}
               className="rounded-full p-1 transition-colors hover:bg-gray-200"
               aria-label="Close"
             >
@@ -78,8 +94,10 @@ const Dialog = ({ isOpen, onClose, title, children, className = '', ...props }) 
 };
 
 Dialog.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
+  isOpen: PropTypes.bool,
+  open: PropTypes.bool,
+  onClose: PropTypes.func,
+  onOpenChange: PropTypes.func,
   title: PropTypes.string,
   children: PropTypes.node,
   className: PropTypes.string,
