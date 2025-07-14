@@ -456,10 +456,10 @@ const UsersPage = () => {
     };
 
     const roleTranslations = {
-      admin: t('users.admin'),
-      user: t('users.user'),
-      manager: t('users.manager'),
-      deliverer: t('users.deliverer')
+      admin: t('admin'),
+      user: t('user'),
+      manager: t('manager'),
+      deliverer: t('deliverer')
     };
 
     return (
@@ -488,10 +488,10 @@ const UsersPage = () => {
         <div>
           <h1 className='flex items-center gap-2 text-2xl font-bold'>
             <User className='h-6 w-6 text-primary' />
-            {t('users.title')}
+            {t('title')}
           </h1>
           <p className='text-muted-foreground'>
-            {t('users.subtitle')}
+            {t('subtitle')}
           </p>
         </div>
         <div className='flex gap-2'>
@@ -505,7 +505,7 @@ const UsersPage = () => {
             <RefreshCw
               className={loading ? 'h-4 w-4 animate-spin' : 'h-4 w-4'}
             />
-            {t('common.refresh')}
+            {t('refresh', { ns: 'common' })}
           </Button>
           <Button
             onClick={handleCreateNewUser}
@@ -513,7 +513,7 @@ const UsersPage = () => {
             className='flex items-center gap-2'
           >
             <Plus className='h-4 w-4' />
-            {t('users.newUser')}
+            {t('newUser')}
           </Button>
         </div>
       </div>
@@ -524,7 +524,7 @@ const UsersPage = () => {
           <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
           <Input
             type='text'
-            placeholder={t('users.searchPlaceholder')}
+            placeholder={t('searchPlaceholder')}
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             className='pl-10'
@@ -539,7 +539,7 @@ const UsersPage = () => {
             onClick={() => setShowFilters(!showFilters)}
           >
             <Filter className='h-4 w-4' />
-            {t('common.filters')}
+            {t('filters', { ns: 'common' })}
           </Button>
 
           {roleFilter && (
@@ -550,7 +550,7 @@ const UsersPage = () => {
               onClick={() => setRoleFilter('')}
             >
               <X className='h-4 w-4' />
-              {t('common.clear')}
+              {t('clear', { ns: 'common' })}
             </Button>
           )}
         </div>
@@ -560,16 +560,16 @@ const UsersPage = () => {
       {showFilters && (
         <div className='mb-6 rounded-xl bg-card p-6 shadow'>
           <div className='max-w-xs space-y-2'>
-            <label className='text-sm font-medium'>{t('common.role')}</label>
+            <label className='text-sm font-medium'>{t('role', { ns: 'common' })}</label>
             <Select
               value={roleFilter}
               onChange={e => setRoleFilter(e.target.value)}
             >
-              <option value=''>{t('users.allRoles')}</option>
-              <option value='admin'>{t('users.admin')}</option>
-              <option value='manager'>{t('users.manager')}</option>
-              <option value='user'>{t('users.user')}</option>
-              <option value='deliverer'>{t('users.deliverer')}</option>
+              <option value=''>{t('allRoles')}</option>
+              <option value='admin'>{t('admin')}</option>
+              <option value='manager'>{t('manager')}</option>
+              <option value='user'>{t('user')}</option>
+              <option value='deliverer'>{t('deliverer')}</option>
             </Select>
           </div>
         </div>
@@ -580,27 +580,27 @@ const UsersPage = () => {
         <Card>
           <CardContent className='flex flex-col items-center justify-center pt-6'>
             <span className='text-3xl font-bold'>{totalDocs}</span>
-            <span className='text-sm text-muted-foreground'>{t('users.totalUsers')}</span>
+            <span className='text-sm text-muted-foreground'>{t('totalUsers')}</span>
           </CardContent>
         </Card>
         <Card>
           <CardContent className='flex flex-col items-center justify-center pt-6'>
             <span className='text-3xl font-bold'>{adminCount}</span>
             <span className='text-sm text-muted-foreground'>
-              {t('users.administrators')}
+              {t('administrators')}
             </span>
           </CardContent>
         </Card>
         <Card>
           <CardContent className='flex flex-col items-center justify-center pt-6'>
             <span className='text-3xl font-bold'>{userCount}</span>
-            <span className='text-sm text-muted-foreground'>{t('users.regularUsers')}</span>
+            <span className='text-sm text-muted-foreground'>{t('regularUsers')}</span>
           </CardContent>
         </Card>
         <Card>
           <CardContent className='flex flex-col items-center justify-center pt-6'>
             <span className='text-3xl font-bold'>{activeCount}</span>
-            <span className='text-sm text-muted-foreground'>{t('users.activeUsers')}</span>
+            <span className='text-sm text-muted-foreground'>{t('activeUsers')}</span>
           </CardContent>
         </Card>
       </div>
@@ -610,12 +610,12 @@ const UsersPage = () => {
         <Table>
           <THead>
             <TR className='bg-muted/50'>
-              <TH>{t('common.user')}</TH>
-              <TH>{t('common.contact')}</TH>
-              <TH>{t('common.role')}</TH>
-              <TH>{t('common.status')}</TH>
-              <TH>{t('common.created')}</TH>
-              <TH className='text-right'>{t('common.actions')}</TH>
+              <TH>{t('user', { ns: 'common' })}</TH>
+              <TH>{t('contact', { ns: 'common' })}</TH>
+              <TH>{t('role', { ns: 'common' })}</TH>
+              <TH>{t('status', { ns: 'common' })}</TH>
+              <TH>{t('created', { ns: 'common' })}</TH>
+              <TH className='text-right'>{t('actions', { ns: 'common' })}</TH>
             </TR>
           </THead>
           <TBody>
@@ -736,16 +736,16 @@ const UsersPage = () => {
         {users.length === 0 && !loading && (
           <div className='flex flex-col items-center justify-center py-12'>
             <User className='mb-4 h-12 w-12 text-muted-foreground' />
-            <h3 className='mb-2 text-lg font-medium'>{t('users.noUsersFound')}</h3>
-            <p className='mb-4 text-sm text-muted-foreground'>
-              {t('users.noUsersFoundDescription')}
+                          <h3 className='mb-2 text-lg font-medium'>{t('noUsersFound')}</h3>
+                          <p className='mb-4 text-sm text-muted-foreground'>
+              {t('noUsersFoundDescription')}
             </p>
             <Button
               onClick={handleCreateNewUser}
               className='flex items-center gap-2'
             >
               <Plus className='h-4 w-4' />
-              {t('users.addUser')}
+              {t('addUser')}
             </Button>
           </div>
         )}
@@ -789,8 +789,8 @@ const UsersPage = () => {
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
           <div className='w-full max-w-lg rounded-lg bg-card shadow-lg'>
             <div className='flex items-center justify-between border-b p-6'>
-              <h2 className='text-xl font-semibold'>
-                {modalMode === 'create' ? t('users.newUser') : t('users.editUser')}
+                              <h2 className='text-xl font-semibold'>
+                {modalMode === 'create' ? t('newUser') : t('editUser')}
               </h2>
               <Button
                 variant='ghost'
@@ -809,10 +809,10 @@ const UsersPage = () => {
               className='space-y-6 p-6'
             >
               <div className='space-y-4'>
-                <h3 className='text-lg font-medium'>{t('users.userDetails')}</h3>
+                <h3 className='text-lg font-medium'>{t('userDetails')}</h3>
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('users.email')} *</label>
+                    <label className='text-sm font-medium'>{t('email')} *</label>
                     <Input
                       type='email'
                       value={formData.email}
@@ -821,22 +821,22 @@ const UsersPage = () => {
                     />
                   </div>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('users.role')}</label>
+                    <label className='text-sm font-medium'>{t('role')}</label>
                     <Select
                       value={formData.role}
                       onChange={e => handleFormChange('role', e.target.value)}
                     >
-                      <option value='user'>{t('users.user')}</option>
-                      <option value='admin'>{t('users.admin')}</option>
-                      <option value='manager'>{t('users.manager')}</option>
-                      <option value='deliverer'>{t('users.deliverer')}</option>
+                      <option value='user'>{t('user')}</option>
+                      <option value='admin'>{t('admin')}</option>
+                      <option value='manager'>{t('manager')}</option>
+                      <option value='deliverer'>{t('deliverer')}</option>
                     </Select>
                   </div>
                 </div>
 
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('users.firstName')}</label>
+                    <label className='text-sm font-medium'>{t('firstName')}</label>
                     <Input
                       type='text'
                       value={formData.firstName}
@@ -846,7 +846,7 @@ const UsersPage = () => {
                     />
                   </div>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('users.lastName')}</label>
+                    <label className='text-sm font-medium'>{t('lastName')}</label>
                     <Input
                       type='text'
                       value={formData.lastName}
@@ -858,7 +858,7 @@ const UsersPage = () => {
                 </div>
 
                 <div className='space-y-2'>
-                  <label className='text-sm font-medium'>{t('users.phone')}</label>
+                  <label className='text-sm font-medium'>{t('phone')}</label>
                   <Input
                     type='tel'
                     value={formData.phone}
@@ -869,10 +869,10 @@ const UsersPage = () => {
 
               {modalMode === 'create' && (
                 <div className='space-y-4'>
-                  <h3 className='text-lg font-medium'>{t('settings.security')}</h3>
+                  <h3 className='text-lg font-medium'>{t('security', { ns: 'settings' })}</h3>
                   <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                     <div className='space-y-2'>
-                      <label className='text-sm font-medium'>{t('users.password')} *</label>
+                      <label className='text-sm font-medium'>{t('password')} *</label>
                       <Input
                         type='password'
                         value={formData.password}
@@ -885,7 +885,7 @@ const UsersPage = () => {
                     </div>
                     <div className='space-y-2'>
                       <label className='text-sm font-medium'>
-                        {t('users.confirmPassword')} *
+                        {t('confirmPassword')} *
                       </label>
                       <Input
                         type='password'
@@ -907,10 +907,10 @@ const UsersPage = () => {
                   variant='outline'
                   onClick={() => setShowModal(false)}
                 >
-                  {t('common.cancel')}
+                  {t('cancel', { ns: 'common' })}
                 </Button>
                 <Button type='submit'>
-                  {modalMode === 'create' ? t('users.addUser') : t('common.save')}
+                  {modalMode === 'create' ? t('addUser') : t('save', { ns: 'common' })}
                 </Button>
               </div>
             </form>
@@ -924,7 +924,7 @@ const UsersPage = () => {
           <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
             <div className='w-full max-w-lg rounded-lg bg-card shadow-lg'>
               <div className='flex items-center justify-between border-b p-6'>
-                <h2 className='text-xl font-semibold'>{t('users.userDetails')}</h2>
+                <h2 className='text-xl font-semibold'>{t('userDetails')}</h2>
                 <Button
                   variant='ghost'
                   size='sm'
@@ -937,10 +937,10 @@ const UsersPage = () => {
 
               <div className='space-y-6 p-6'>
                 <div className='space-y-4'>
-                  <h3 className='text-lg font-medium'>{t('users.userDetails')}</h3>
+                  <h3 className='text-lg font-medium'>{t('userDetails')}</h3>
                   <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                     <div className='space-y-1'>
-                      <label className='text-sm font-medium text-muted-foreground'>{t('users.firstName')} {t('users.lastName')}</label>
+                      <label className='text-sm font-medium text-muted-foreground'>{t('firstName')} {t('lastName')}</label>
                       <p>
                         {selectedUser.firstName && selectedUser.lastName
                           ? `${selectedUser.firstName} ${selectedUser.lastName}`
@@ -950,25 +950,25 @@ const UsersPage = () => {
                       </p>
                     </div>
                     <div className='space-y-1'>
-                      <label className='text-sm font-medium text-muted-foreground'>{t('users.email')}</label>
+                      <label className='text-sm font-medium text-muted-foreground'>{t('email')}</label>
                       <p>{selectedUser.email}</p>
                     </div>
                     <div className='space-y-1'>
-                      <label className='text-sm font-medium text-muted-foreground'>{t('users.phone')}</label>
-                      <p>{selectedUser.phone || t('common.noResults')}</p>
+                      <label className='text-sm font-medium text-muted-foreground'>{t('phone')}</label>
+                      <p>{selectedUser.phone || t('noResults', { ns: 'common' })}</p>
                     </div>
                     <div className='space-y-1'>
-                      <label className='text-sm font-medium text-muted-foreground'>{t('users.role')}</label>
+                      <label className='text-sm font-medium text-muted-foreground'>{t('role')}</label>
                       <div>{getRoleBadge(selectedUser.role)}</div>
                     </div>
                   </div>
                 </div>
 
                 <div className='space-y-4'>
-                  <h3 className='text-lg font-medium'>{t('common.status')}</h3>
+                  <h3 className='text-lg font-medium'>{t('status', { ns: 'common' })}</h3>
                   <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                     <div className='space-y-1'>
-                      <label className='text-sm font-medium text-muted-foreground'>{t('common.status')}</label>
+                      <label className='text-sm font-medium text-muted-foreground'>{t('status', { ns: 'common' })}</label>
                       <div>
                         <Badge
                           variant={selectedUser.isActive ? 'success' : 'destructive'}
@@ -977,19 +977,19 @@ const UsersPage = () => {
                           {selectedUser.isActive ? (
                             <>
                               <CheckCircle className='h-3 w-3' />
-                              {t('users.active')}
+                              {t('active')}
                             </>
                           ) : (
                             <>
                               <UserX className='h-3 w-3' />
-                              {t('users.inactive')}
+                              {t('inactive')}
                             </>
                           )}
                         </Badge>
                       </div>
                     </div>
                     <div className='space-y-1'>
-                      <label className='text-sm font-medium text-muted-foreground'>{t('common.created')}</label>
+                      <label className='text-sm font-medium text-muted-foreground'>{t('created', { ns: 'common' })}</label>
                       <p>
                         {new Date(selectedUser.createdAt).toLocaleDateString()}
                       </p>
@@ -1008,7 +1008,7 @@ const UsersPage = () => {
           <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
             <div className='w-full max-w-lg rounded-lg bg-card shadow-lg'>
               <div className='flex items-center justify-between border-b p-6'>
-                <h2 className='text-xl font-semibold'>{t('users.changePassword')}</h2>
+                <h2 className='text-xl font-semibold'>{t('changePassword')}</h2>
                 <Button
                   variant='ghost'
                   size='sm'
@@ -1021,9 +1021,9 @@ const UsersPage = () => {
 
               <form onSubmit={handleChangePassword} className='space-y-6 p-6'>
                 <div className='space-y-4'>
-                  <h3 className='text-lg font-medium'>{t('settings.security')}</h3>
+                  <h3 className='text-lg font-medium'>{t('security', { ns: 'settings' })}</h3>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('users.currentPassword')} *</label>
+                    <label className='text-sm font-medium'>{t('currentPassword')} *</label>
                     <Input
                       type='password'
                       value={passwordData.currentPassword}
@@ -1035,7 +1035,7 @@ const UsersPage = () => {
                   </div>
                   <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                     <div className='space-y-2'>
-                      <label className='text-sm font-medium'>{t('users.newPassword')} *</label>
+                      <label className='text-sm font-medium'>{t('newPassword')} *</label>
                       <Input
                         type='password'
                         value={passwordData.newPassword}
@@ -1047,7 +1047,7 @@ const UsersPage = () => {
                       />
                     </div>
                     <div className='space-y-2'>
-                      <label className='text-sm font-medium'>{t('users.confirmPassword')} *</label>
+                      <label className='text-sm font-medium'>{t('confirmPassword')} *</label>
                       <Input
                         type='password'
                         value={passwordData.confirmPassword}
@@ -1067,10 +1067,10 @@ const UsersPage = () => {
                     variant='outline'
                     onClick={() => setShowPasswordModal(false)}
                   >
-                    {t('common.cancel')}
+                    {t('cancel', { ns: 'common' })}
                   </Button>
                   <Button type='submit'>
-                    {t('users.changePassword')}
+                    {t('changePassword')}
                   </Button>
                 </div>
               </form>
