@@ -20,6 +20,8 @@
     "page": "Page",
     "of": "of",
     "total": "total",
+    "refresh": "Refresh",
+    "previous": "Previous",
     "app": {
       "title": "Logistics Dashboard"
     },
@@ -161,6 +163,7 @@
     "status": "Status",
     "origin": "Origin",
     "destination": "Destination",
+    "destinationPlaceholder": "Search by destination, customer, or ID...",
     "customer": "Customer",
     "deliverer": "Deliverer",
     "scheduledDate": "Scheduled Date",
@@ -247,6 +250,7 @@
     "city": "City",
     "state": "State",
     "zipCode": "ZIP Code",
+    "enterAddress": "Enter address",
     "emergencyContact": "Emergency Contact",
     "relationship": "Relationship",
     "emergencyRelationshipPlaceholder": "e.g., Spouse, Parent, Sibling",

@@ -271,6 +271,7 @@
     "city": "Cidade",
     "state": "Estado",
     "zipCode": "CEP",
+    "enterAddress": "Digite o endereço",
     "emergencyContact": "Contato de Emergência",
     "relationship": "Parentesco",
     "emergencyRelationshipPlaceholder": "ex: Cônjuge, Pai/Mãe, Irmão/Irmã",
