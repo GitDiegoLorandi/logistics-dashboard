@@ -97,7 +97,31 @@
     "noAccount": "Não tem uma conta?",
     "hasAccount": "Já tem uma conta?",
     "passwordRequirements": "A senha deve ter pelo menos 8 caracteres",
-    "passwordsDoNotMatch": "As senhas não coincidem"
+    "passwordsDoNotMatch": "As senhas não coincidem",
+    "login": {
+      "subtitle": "Entre na sua conta",
+      "email": "Endereço de Email",
+      "emailPlaceholder": "Digite seu email",
+      "password": "Senha",
+      "forgotPassword": "Esqueceu a senha?",
+      "passwordPlaceholder": "Digite sua senha",
+      "signIn": "Entrar",
+      "signingIn": "Entrando...",
+      "noAccount": "Não tem uma conta?",
+      "signUp": "Registre-se",
+      "demoCredentials": "Credenciais de Demonstração",
+      "adminCredentials": "Admin: admin@example.com / password123",
+      "userCredentials": "Usuário: user@example.com / senha123",
+      "welcome": "Bem-vindo de volta, {{name}}!",
+      "errors": {
+        "emailRequired": "Email é obrigatório",
+        "emailInvalid": "Por favor, insira um email válido",
+        "passwordRequired": "Senha é obrigatória",
+        "generic": "Falha no login. Por favor, tente novamente.",
+        "server": "Erro no servidor ({{status}}). Por favor, tente novamente mais tarde.",
+        "network": "Erro de rede. Por favor, verifique sua conexão."
+      }
+    }
   },
   "navigation": {
     "dashboard": "Painel",
@@ -575,4 +599,4 @@
     "previous": "Anterior",
     "next": "Próximo"
   }
-} 
+}

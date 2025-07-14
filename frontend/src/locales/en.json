@@ -69,7 +69,31 @@
     "forgotPasswordButton": "Send Reset Link",
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
-    "passwordRequirements": "Password must be at least 8 characters long"
+    "passwordRequirements": "Password must be at least 8 characters long",
+    "login": {
+      "subtitle": "Sign in to your account",
+      "email": "Email Address",
+      "emailPlaceholder": "Enter your email",
+      "password": "Password",
+      "forgotPassword": "Forgot password?",
+      "passwordPlaceholder": "Enter your password",
+      "signIn": "Sign In",
+      "signingIn": "Signing in...",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "demoCredentials": "Demo Credentials",
+      "adminCredentials": "Admin: admin@example.com / password123",
+      "userCredentials": "User: user@example.com / senha123",
+      "welcome": "Welcome back, {{name}}!",
+      "errors": {
+        "emailRequired": "Email is required",
+        "emailInvalid": "Please enter a valid email",
+        "passwordRequired": "Password is required",
+        "generic": "Login failed. Please try again.",
+        "server": "Server error ({{status}}). Please try again later.",
+        "network": "Network error. Please check your connection."
+      }
+    }
   },
   "navigation": {
     "dashboard": "Dashboard",
@@ -466,4 +490,4 @@
     "duration": "Duration",
     "result": "Result"
   }
-} 
+}
