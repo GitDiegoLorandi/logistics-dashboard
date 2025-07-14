@@ -555,7 +555,7 @@ const DeliverersPage = () => {
             <RefreshCw
               className={loading ? 'h-4 w-4 animate-spin' : 'h-4 w-4'}
             />
-            {t('refresh')}
+            {t('common:refresh')}
           </Button>
           <Button
             onClick={handleCreateDeliverer}
@@ -673,7 +673,7 @@ const DeliverersPage = () => {
         </Card>
         <Card>
           <CardContent className='flex flex-col items-center justify-center pt-6'>
-            <span className='text-muted-foreground text-3xl font-bold'>
+            <span className='text-3xl font-bold text-muted-foreground'>
               {offlineCount}
             </span>
             <span className='text-sm text-muted-foreground'>{t('offline')}</span>
@@ -860,8 +860,8 @@ const DeliverersPage = () => {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
-          <div className='w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
-            <div className='flex items-center justify-between border-b pb-4 mb-4'>
+          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
+            <div className='mb-4 flex items-center justify-between border-b pb-4'>
               <h3 className='text-xl font-semibold'>
                 {modalMode === 'create'
                   ? t('addNewDeliverer')
@@ -877,8 +877,8 @@ const DeliverersPage = () => {
 
             <form onSubmit={handleSaveDeliverer} className='space-y-4'>
               <div className='space-y-4'>
-                <h4 className='font-medium text-lg'>{t('basicInfo')}</h4>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <h4 className='text-lg font-medium'>{t('basicInfo')}</h4>
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('name')}</label>
                     <Input
@@ -901,7 +901,7 @@ const DeliverersPage = () => {
                   </div>
                 </div>
 
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('phone')}</label>
                     <Input
@@ -928,8 +928,8 @@ const DeliverersPage = () => {
               </div>
 
               <div className='space-y-4'>
-                <h4 className='font-medium text-lg'>{t('vehicleInfo')}</h4>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <h4 className='text-lg font-medium'>{t('vehicleInfo')}</h4>
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('vehicleType')}</label>
                     <Select
@@ -958,7 +958,7 @@ const DeliverersPage = () => {
               </div>
 
               <div className='space-y-4'>
-                <h4 className='font-medium text-lg'>{t('address')}</h4>
+                <h4 className='text-lg font-medium'>{t('address')}</h4>
                 <div className='space-y-2'>
                   <label className='text-sm font-medium'>{t('address')}</label>
                   <AddressAutocomplete
@@ -978,7 +978,7 @@ const DeliverersPage = () => {
                     {t('startTypingForSuggestions')}
                   </small>
                 </div>
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('city')}</label>
                     <Input
@@ -1010,8 +1010,8 @@ const DeliverersPage = () => {
               </div>
 
               <div className='space-y-4'>
-                <h4 className='font-medium text-lg'>{t('emergencyContact')}</h4>
-                <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                <h4 className='text-lg font-medium'>{t('emergencyContact')}</h4>
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('name')}</label>
                     <Input
@@ -1043,7 +1043,7 @@ const DeliverersPage = () => {
                 </div>
               </div>
 
-              <div className='flex justify-end space-x-3 pt-4 border-t'>
+              <div className='flex justify-end space-x-3 border-t pt-4'>
                 <Button
                   type='button'
                   variant='outline'
@@ -1065,8 +1065,8 @@ const DeliverersPage = () => {
       {/* View Details Modal */}
       {showViewModal && selectedDeliverer && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
-          <div className='w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
-            <div className='flex items-center justify-between border-b pb-4 mb-4'>
+          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
+            <div className='mb-4 flex items-center justify-between border-b pb-4'>
               <h3 className='text-xl font-semibold'>{t('delivererDetails')}</h3>
               <button
                 className='rounded-full p-1 hover:bg-gray-100'
@@ -1078,8 +1078,8 @@ const DeliverersPage = () => {
 
             <div className='space-y-6'>
               <div className='space-y-3'>
-                <h4 className='font-medium text-lg'>{t('basicInfo')}</h4>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <h4 className='text-lg font-medium'>{t('basicInfo')}</h4>
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-1'>
                     <label className='text-sm text-gray-500'>{t('name')}</label>
                     <p className='font-medium'>{selectedDeliverer.name}</p>
@@ -1103,8 +1103,8 @@ const DeliverersPage = () => {
               </div>
 
               <div className='space-y-3'>
-                <h4 className='font-medium text-lg'>{t('vehicleInfo')}</h4>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <h4 className='text-lg font-medium'>{t('vehicleInfo')}</h4>
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-1'>
                     <label className='text-sm text-gray-500'>{t('vehicleType')}</label>
                     <p className='font-medium'>
@@ -1122,7 +1122,7 @@ const DeliverersPage = () => {
 
               {selectedDeliverer.address && (
                 <div className='space-y-3'>
-                  <h4 className='font-medium text-lg'>{t('address')}</h4>
+                  <h4 className='text-lg font-medium'>{t('address')}</h4>
                   <div className='space-y-1'>
                     {selectedDeliverer.address.street && (
                       <p className='font-medium'>{selectedDeliverer.address.street}</p>
@@ -1142,8 +1142,8 @@ const DeliverersPage = () => {
 
               {selectedDeliverer.emergencyContact && (
                 <div className='space-y-3'>
-                  <h4 className='font-medium text-lg'>{t('emergencyContact')}</h4>
-                  <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+                  <h4 className='text-lg font-medium'>{t('emergencyContact')}</h4>
+                  <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
                     <div className='space-y-1'>
                       <label className='text-sm text-gray-500'>{t('name')}</label>
                       <p className='font-medium'>
@@ -1167,8 +1167,8 @@ const DeliverersPage = () => {
               )}
 
               <div className='space-y-3'>
-                <h4 className='font-medium text-lg'>{t('activity')}</h4>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <h4 className='text-lg font-medium'>{t('activity')}</h4>
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-1'>
                     <label className='text-sm text-gray-500'>{t('totalDeliveries')}</label>
                     <p className='font-medium'>{selectedDeliverer.deliveries?.length || 0}</p>
@@ -1182,7 +1182,7 @@ const DeliverersPage = () => {
                 </div>
               </div>
               
-              <div className='flex justify-end space-x-3 pt-4 border-t'>
+              <div className='flex justify-end space-x-3 border-t pt-4'>
                 <Button onClick={() => setShowViewModal(false)}>
                   {t('close')}
                 </Button>
@@ -1195,8 +1195,8 @@ const DeliverersPage = () => {
       {/* Statistics Modal */}
       {showStatsModal && selectedDeliverer && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
-          <div className='w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
-            <div className='flex items-center justify-between border-b pb-4 mb-4'>
+          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
+            <div className='mb-4 flex items-center justify-between border-b pb-4'>
               <h3 className='text-xl font-semibold'>{t('performanceStats', { name: selectedDeliverer.name })}</h3>
               <button
                 className='rounded-full p-1 hover:bg-gray-100'
@@ -1213,7 +1213,7 @@ const DeliverersPage = () => {
                 </div>
               ) : delivererStats ? (
                 <div className='space-y-8'>
-                  <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+                  <div className='grid grid-cols-2 gap-4 md:grid-cols-4'>
                     <Card>
                       <CardContent className='flex flex-col items-center justify-center pt-6'>
                         <span className='text-3xl font-bold'>{delivererStats.totalDeliveries}</span>
@@ -1240,8 +1240,8 @@ const DeliverersPage = () => {
                     </Card>
                   </div>
 
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
-                    <div className='space-y-2 p-4 border rounded-lg'>
+                  <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
+                    <div className='space-y-2 rounded-lg border p-4'>
                       <h4 className='font-medium'>{t('successRate')}</h4>
                       <p className='text-2xl font-bold'>
                         {delivererStats.totalDeliveries > 0
@@ -1249,7 +1249,7 @@ const DeliverersPage = () => {
                           : t('na')}
                       </p>
                     </div>
-                    <div className='space-y-2 p-4 border rounded-lg'>
+                    <div className='space-y-2 rounded-lg border p-4'>
                       <h4 className='font-medium'>{t('averageDeliveryTime')}</h4>
                       <p className='text-2xl font-bold'>
                         {delivererStats.avgDeliveryTime
@@ -1261,13 +1261,13 @@ const DeliverersPage = () => {
                 </div>
               ) : (
                 <div className='flex flex-col items-center justify-center py-12 text-center'>
-                  <BarChart3 size={48} className='text-muted-foreground mb-4' />
+                  <BarChart3 size={48} className='mb-4 text-muted-foreground' />
                   <p className='text-lg font-medium'>{t('noStatsAvailable')}</p>
-                  <p className='text-sm text-muted-foreground mt-2'>{t('statsWillAppearHere')}</p>
+                  <p className='mt-2 text-sm text-muted-foreground'>{t('statsWillAppearHere')}</p>
                 </div>
               )}
               
-              <div className='flex justify-end space-x-3 pt-4 border-t'>
+              <div className='flex justify-end space-x-3 border-t pt-4'>
                 <Button onClick={() => setShowStatsModal(false)}>
                   {t('close')}
                 </Button>
@@ -1280,8 +1280,8 @@ const DeliverersPage = () => {
       {/* Assign Delivery Modal */}
       {showAssignModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
-          <div className='w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
-            <div className='flex items-center justify-between border-b pb-4 mb-4'>
+          <div className='max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
+            <div className='mb-4 flex items-center justify-between border-b pb-4'>
               <h3 className='text-xl font-semibold'>{t('assignDeliveryTo', { name: selectedDeliverer?.name })}</h3>
               <button
                 className='rounded-full p-1 hover:bg-gray-100'
@@ -1293,7 +1293,7 @@ const DeliverersPage = () => {
 
             <form onSubmit={handleAssignDelivery} className='space-y-6'>
               <div className='space-y-4'>
-                <h4 className='font-medium text-lg'>{t('selectDelivery')}</h4>
+                <h4 className='text-lg font-medium'>{t('selectDelivery')}</h4>
 
                 {loadingDeliveries ? (
                   <div className='flex justify-center py-4'>
@@ -1301,9 +1301,9 @@ const DeliverersPage = () => {
                   </div>
                 ) : availableDeliveries.length === 0 ? (
                   <div className='flex flex-col items-center justify-center py-8 text-center'>
-                    <Package size={32} className='text-muted-foreground mb-2' />
+                    <Package size={32} className='mb-2 text-muted-foreground' />
                     <p className='text-lg font-medium'>{t('noAvailableDeliveriesFound')}</p>
-                    <p className='text-sm text-muted-foreground mt-2'>{t('createDeliveryFirst')}</p>
+                    <p className='mt-2 text-sm text-muted-foreground'>{t('createDeliveryFirst')}</p>
                   </div>
                 ) : (
                   <div className='space-y-2'>
@@ -1327,7 +1327,7 @@ const DeliverersPage = () => {
                 )}
               </div>
 
-              <div className='flex justify-end space-x-3 pt-4 border-t'>
+              <div className='flex justify-end space-x-3 border-t pt-4'>
                 <Button
                   type='button'
                   variant='outline'

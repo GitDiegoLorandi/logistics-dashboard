@@ -696,7 +696,7 @@ const DeliveriesPage = () => {
           <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
           <Input
             type='text'
-            placeholder={t('destinationPlaceholder')}
+            placeholder={t('deliveries:destinationPlaceholder')}
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             className='pl-10'
@@ -858,8 +858,8 @@ const DeliveriesPage = () => {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
-          <div className='w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
-            <div className='flex items-center justify-between border-b pb-4 mb-4'>
+          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
+            <div className='mb-4 flex items-center justify-between border-b pb-4'>
               <h3 className='text-xl font-semibold'>
                 {modalMode === 'create'
                   ? t('newDelivery')
@@ -875,7 +875,7 @@ const DeliveriesPage = () => {
 
             <form onSubmit={handleSubmit} className='space-y-4'>
               {modalMode === 'edit' && (
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>Order ID *</label>
                     <input
@@ -937,7 +937,7 @@ const DeliveriesPage = () => {
                 </small>
               </div>
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                 {/* Only show Status field in edit mode */}
                 {modalMode === 'edit' && (
                   <div className='space-y-2'>
@@ -973,7 +973,7 @@ const DeliveriesPage = () => {
                 </div>
               </div>
 
-              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+              <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                 <div className='space-y-2'>
                   <label className='text-sm font-medium'>Estimated Delivery Date *</label>
                   <input
@@ -1033,7 +1033,7 @@ const DeliveriesPage = () => {
                 />
               </div>
 
-              <div className='flex justify-end space-x-3 pt-4 border-t'>
+              <div className='flex justify-end space-x-3 border-t pt-4'>
                 <Button
                   type='button'
                   variant='outline'
@@ -1065,8 +1065,8 @@ const DeliveriesPage = () => {
       {/* View Modal */}
       {showViewModal && selectedDelivery && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
-          <div className='w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
-            <div className='flex items-center justify-between border-b pb-4 mb-4'>
+          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
+            <div className='mb-4 flex items-center justify-between border-b pb-4'>
               <h3 className='text-xl font-semibold'>Delivery Details</h3>
               <button
                 className='rounded-full p-1 hover:bg-gray-100'
@@ -1078,8 +1078,8 @@ const DeliveriesPage = () => {
 
             <div className='space-y-6'>
               <div className='space-y-3'>
-                <h4 className='font-medium text-lg'>Basic Information</h4>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <h4 className='text-lg font-medium'>Basic Information</h4>
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-1'>
                     <label className='text-sm text-gray-500'>Order ID</label>
                     <p className='font-medium'>
@@ -1108,7 +1108,7 @@ const DeliveriesPage = () => {
               </div>
 
               <div className='space-y-3'>
-                <h4 className='font-medium text-lg'>Delivery Information</h4>
+                <h4 className='text-lg font-medium'>Delivery Information</h4>
                 <div className='grid grid-cols-1 gap-4'>
                   <div className='space-y-1'>
                     <label className='text-sm text-gray-500'>Delivery Address</label>
@@ -1117,7 +1117,7 @@ const DeliveriesPage = () => {
                         'No address provided'}
                     </p>
                   </div>
-                  <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                  <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                     <div className='space-y-1'>
                       <label className='text-sm text-gray-500'>Estimated Date</label>
                       <p className='font-medium'>
@@ -1143,8 +1143,8 @@ const DeliveriesPage = () => {
               </div>
 
               <div className='space-y-3'>
-                <h4 className='font-medium text-lg'>Assignment & Tracking</h4>
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <h4 className='text-lg font-medium'>Assignment & Tracking</h4>
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-1'>
                     <label className='text-sm text-gray-500'>Assigned Deliverer</label>
                     <p className='font-medium'>
@@ -1166,12 +1166,12 @@ const DeliveriesPage = () => {
 
               {selectedDelivery.notes && (
                 <div className='space-y-3'>
-                  <h4 className='font-medium text-lg'>Notes</h4>
+                  <h4 className='text-lg font-medium'>Notes</h4>
                   <p>{selectedDelivery.notes}</p>
                 </div>
               )}
 
-              <div className='flex justify-end space-x-3 pt-4 border-t'>
+              <div className='flex justify-end space-x-3 border-t pt-4'>
                 {userRole === 'admin' && (
                   <Button
                     variant='outline'
