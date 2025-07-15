@@ -91,7 +91,7 @@ const SettingsPage = () => {
   const tabs = [
     { id: 'profile', label: t('profile'), icon: User },
     { id: 'system', label: t('system'), icon: Settings },
-    { id: 'notifications', label: t('notifications'), icon: Bell },
+    { id: 'notifications', label: t('notificationsTab', { defaultValue: 'Notifications' }), icon: Bell },
     { id: 'security', label: t('security'), icon: Shield },
     { id: 'data', label: t('data'), icon: Database },
   ];
@@ -118,20 +118,34 @@ const SettingsPage = () => {
     try {
       setLoading(true);
       const response = await userAPI.getProfile();
-      const user = response.data;
+      
+      // Check if response exists and has data property
+      const userData = response && response.data ? response.data : response;
+      
+      // Set current user with fallback to empty object
+      const user = userData || {};
       setCurrentUser(user);
 
-      // Populate profile data
+      // Populate profile data with safe fallbacks
       setProfileData({
         firstName: user.firstName || '',
         lastName: user.lastName || '',
         email: user.email || '',
         phone: user.phone || '',
-        avatar: null,
+        avatar: user.avatar || null,
       });
     } catch (error) {
       console.error('Error fetching user profile:', error);
-      toast.error('Failed to load profile data');
+      toast.error(t('failedToLoadProfile', { defaultValue: 'Failed to load profile data' }));
+      
+      // Set default profile data in case of error
+      setProfileData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        avatar: null,
+      });
     } finally {
       setLoading(false);
     }
@@ -324,8 +338,8 @@ const SettingsPage = () => {
     <div className='space-y-6'>
       <div className='flex flex-col gap-6 rounded-xl bg-card p-6 shadow'>
         <div>
-          <h2 className='text-xl font-bold'>{t('preferencesTitle')}</h2>
-          <p className='text-muted-foreground'>{t('preferencesSubtitle')}</p>
+          <h2 className='text-xl font-bold'>{t('system')}</h2>
+          <p className='text-muted-foreground'>{t('preferences')}</p>
         </div>
 
         <div className='space-y-6'>
@@ -343,15 +357,15 @@ const SettingsPage = () => {
                     })
                   }
                 >
-                  <option value='en'>{t('languages.en')}</option>
-                  <option value='pt'>{t('languages.pt')}</option>
+                  <option value='en'>{t('languages.en', { ns: 'settings' })}</option>
+                  <option value='pt'>{t('languages.pt', { ns: 'settings' })}</option>
                 </Select>
               </div>
             </div>
           </div>
 
           <div>
-            <h3 className='mb-4 text-lg font-medium'>{t('localization')}</h3>
+            <h3 className='mb-4 text-lg font-medium'>{t('regionalization', { defaultValue: 'Regionalization' })}</h3>
             <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
               <div className='space-y-2'>
                 <label className='text-sm font-medium'>{t('timezone')}</label>
@@ -392,19 +406,19 @@ const SettingsPage = () => {
           </div>
 
           <div>
-            <h3 className='mb-4 text-lg font-medium'>{t('dashboardBehavior')}</h3>
+            <h3 className='mb-4 text-lg font-medium'>{t('dashboardBehavior', { defaultValue: 'Dashboard Behavior' })}</h3>
             <div className='space-y-4'>
               <div className='flex items-center justify-between'>
                 <div>
-                  <Label htmlFor='auto-refresh'>{t('autoRefresh')}</Label>
+                  <Label htmlFor='auto-refresh'>{t('autoRefresh', { defaultValue: 'Auto Refresh' })}</Label>
                   <p className='text-sm text-muted-foreground'>
-                    {t('autoRefreshDescription')}
+                    {t('autoRefreshDescription', { defaultValue: 'Automatically refresh dashboard data' })}
                   </p>
                 </div>
                 <Switch
                   id='auto-refresh'
                   checked={systemPrefs.autoRefresh}
-                  onCheckedChange={checked =>
+                  onChange={checked =>
                     setSystemPrefs({
                       ...systemPrefs,
                       autoRefresh: checked,
@@ -416,7 +430,7 @@ const SettingsPage = () => {
               {systemPrefs.autoRefresh && (
                 <div className='space-y-2'>
                   <label className='text-sm font-medium'>
-                    {t('refreshInterval')}
+                    {t('refreshInterval', { defaultValue: 'Refresh Interval (seconds)' })}
                   </label>
                   <Input
                     type='number'
@@ -443,7 +457,7 @@ const SettingsPage = () => {
             className='flex items-center gap-2'
           >
             <Save className='h-4 w-4' />
-            {saving ? t('common:loading') : t('savePreferences')}
+            {saving ? t('common:loading') : t('savePreferences', { defaultValue: 'Save Preferences' })}
           </Button>
         </div>
       </div>
@@ -453,13 +467,13 @@ const SettingsPage = () => {
   const renderNotificationsTab = () => (
     <div className='tab-content'>
       <div className='tab-header'>
-        <h2>Notification Settings</h2>
-        <p>Configure how and when you receive notifications</p>
+        <h2>{t('notificationsTab', { ns: 'settings' })}</h2>
+        <p>{t('notificationsDescription', { defaultValue: 'Configure how and when you receive notifications' })}</p>
       </div>
 
       <form onSubmit={handleNotificationSubmit} className='settings-form'>
         <div className='form-section'>
-          <h3>Notification Channels</h3>
+          <h3>{t('notificationChannels', { defaultValue: 'Notification Channels' })}</h3>
           <div className='notification-toggles'>
             <div className='form-group'>
               <label className='checkbox-label'>
@@ -475,7 +489,7 @@ const SettingsPage = () => {
                 />
                 <span className='checkmark'></span>
                 <Mail size={16} />
-                Email Notifications
+                {t('notifications.email', { ns: 'settings' })}
               </label>
             </div>
 
@@ -493,7 +507,7 @@ const SettingsPage = () => {
                 />
                 <span className='checkmark'></span>
                 <Bell size={16} />
-                Push Notifications
+                {t('notifications.push', { ns: 'settings' })}
               </label>
             </div>
 
@@ -511,14 +525,14 @@ const SettingsPage = () => {
                 />
                 <span className='checkmark'></span>
                 <Phone size={16} />
-                SMS Notifications
+                {t('notifications.sms', { ns: 'settings' })}
               </label>
             </div>
           </div>
         </div>
 
         <div className='form-section'>
-          <h3>Notification Types</h3>
+          <h3>{t('notificationTypes', { defaultValue: 'Notification Types' })}</h3>
           <div className='notification-types'>
             <div className='form-group'>
               <label className='checkbox-label'>
@@ -533,9 +547,9 @@ const SettingsPage = () => {
                   }
                 />
                 <span className='checkmark'></span>
-                Delivery Updates
+                {t('notifications.deliveryUpdates', { ns: 'settings' })}
               </label>
-              <small>Get notified when delivery status changes</small>
+              <small>{t('deliveryUpdatesDescription', { defaultValue: 'Get notified when delivery status changes' })}</small>
             </div>
 
             <div className='form-group'>
@@ -551,9 +565,9 @@ const SettingsPage = () => {
                   }
                 />
                 <span className='checkmark'></span>
-                System Alerts
+                {t('notifications.systemAlerts', { ns: 'settings' })}
               </label>
-              <small>Important system notifications and errors</small>
+              <small>{t('systemAlertsDescription', { defaultValue: 'Important system notifications and errors' })}</small>
             </div>
 
             <div className='form-group'>
@@ -569,15 +583,15 @@ const SettingsPage = () => {
                   }
                 />
                 <span className='checkmark'></span>
-                Weekly Reports
+                {t('notifications.weeklyReports', { ns: 'settings' })}
               </label>
-              <small>Performance summaries and analytics</small>
+              <small>{t('weeklyReportsDescription', { defaultValue: 'Performance summaries and analytics' })}</small>
             </div>
           </div>
         </div>
 
         <div className='form-section'>
-          <h3>Quiet Hours</h3>
+          <h3>{t('quietHours', { defaultValue: 'Quiet Hours' })}</h3>
           <div className='form-group'>
             <label className='checkbox-label'>
               <input
@@ -594,17 +608,17 @@ const SettingsPage = () => {
                 }
               />
               <span className='checkmark'></span>
-              Enable Quiet Hours
+              {t('enableQuietHours', { defaultValue: 'Enable Quiet Hours' })}
             </label>
             <small>
-              Suppress non-critical notifications during specified hours
+              {t('quietHoursDescription', { defaultValue: 'Suppress non-critical notifications during specified hours' })}
             </small>
           </div>
 
           {notificationSettings.quietHours.enabled && (
             <div className='form-row'>
               <div className='form-group'>
-                <label>Start Time</label>
+                <label>{t('startTime', { defaultValue: 'Start Time' })}</label>
                 <input
                   type='time'
                   value={notificationSettings.quietHours.start}
@@ -620,7 +634,7 @@ const SettingsPage = () => {
                 />
               </div>
               <div className='form-group'>
-                <label>End Time</label>
+                <label>{t('endTime', { defaultValue: 'End Time' })}</label>
                 <input
                   type='time'
                   value={notificationSettings.quietHours.end}
@@ -646,7 +660,7 @@ const SettingsPage = () => {
             ) : (
               <Save size={16} />
             )}
-            Save Notification Settings
+            {t('saveNotificationSettings', { defaultValue: 'Save Notification Settings' })}
           </button>
         </div>
       </form>
