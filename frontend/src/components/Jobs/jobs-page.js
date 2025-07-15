@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Play,
   Square,
@@ -8,7 +8,6 @@ import {
   CheckCircle,
   Clock,
   Settings,
-  TrendingUp,
   Bell,
   Database,
   Shield,
@@ -22,8 +21,6 @@ import { Button } from '../UI/button';
 import { Card, CardContent } from '../UI/card';
 import { Badge } from '../UI/badge';
 import { Grid, GridItem } from '../UI/grid';
-import { Table, TableHeader as THead, TableRow as TR, TableHead as TH, TableBody as TBody, TableCell as TD } from '../UI/table';
-import { cn } from '../../lib/utils';
 
 const JobsPage = () => {
   const { t } = useTranslation(['jobs', 'common']);
@@ -65,11 +62,7 @@ const JobsPage = () => {
     },
   };
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true);
       const response = await jobsAPI.getStatus();
@@ -96,7 +89,11 @@ const JobsPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [t]);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -360,7 +357,14 @@ const JobsPage = () => {
                       <td className='p-3'>
                         <div className='flex items-center gap-2'>
                           <div
-                            className={`rounded p-1 text-${jobInfo.color}-600`}
+                            className={`rounded p-1 ${
+                              jobInfo.color === 'green' ? 'text-green-600' :
+                              jobInfo.color === 'blue' ? 'text-blue-600' :
+                              jobInfo.color === 'purple' ? 'text-purple-600' :
+                              jobInfo.color === 'orange' ? 'text-orange-600' :
+                              jobInfo.color === 'red' ? 'text-red-600' :
+                              'text-gray-600'
+                            }`}
                           >
                             <JobIcon className='h-4 w-4' />
                           </div>
@@ -473,7 +477,14 @@ const JobsPage = () => {
                       <td className='p-3'>
                         <div className='flex items-center gap-2'>
                           <div
-                            className={`rounded p-1 text-${jobInfo.color}-600`}
+                            className={`rounded p-1 ${
+                              jobInfo.color === 'green' ? 'text-green-600' :
+                              jobInfo.color === 'blue' ? 'text-blue-600' :
+                              jobInfo.color === 'purple' ? 'text-purple-600' :
+                              jobInfo.color === 'orange' ? 'text-orange-600' :
+                              jobInfo.color === 'red' ? 'text-red-600' :
+                              'text-gray-600'
+                            }`}
                           >
                             <JobIcon className='h-4 w-4' />
                           </div>
