@@ -53,7 +53,9 @@ i18n
     resources: {
       en: translationsEN,
       pt: translationsPT
-    }
+    },
+    // Enable returnObjects option to access nested objects
+    returnObjects: true
   });
 
 export default i18n; 
