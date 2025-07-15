@@ -34,32 +34,32 @@ const JobsPage = () => {
 
   const jobDescriptions = {
     healthCheck: {
-      title: t('jobs.healthCheck'),
-      description: t('jobs.healthCheckDescription'),
+      title: t('healthCheck'),
+      description: t('healthCheckDescription'),
       icon: Shield,
       color: 'green',
     },
     notifications: {
-      title: t('jobs.notifications'),
-      description: t('jobs.notificationsDescription'),
+      title: t('notifications'),
+      description: t('notificationsDescription'),
       icon: Bell,
       color: 'blue',
     },
     performanceMonitoring: {
-      title: t('jobs.performanceMonitoring'),
-      description: t('jobs.performanceMonitoringDescription'),
+      title: t('performanceMonitoring'),
+      description: t('performanceMonitoringDescription'),
       icon: Monitor,
       color: 'purple',
     },
     overdueDeliveries: {
-      title: t('jobs.overdueDeliveries'),
-      description: t('jobs.overdueDeliveriesDescription'),
+      title: t('overdueDeliveries'),
+      description: t('overdueDeliveriesDescription'),
       icon: AlertTriangle,
       color: 'orange',
     },
     dataCleanup: {
-      title: t('jobs.dataCleanup'),
-      description: t('jobs.dataCleanupDescription'),
+      title: t('dataCleanup'),
+      description: t('dataCleanupDescription'),
       icon: Database,
       color: 'red',
     },
@@ -76,7 +76,7 @@ const JobsPage = () => {
       setDashboardData(response); // Changed from response.data to response
     } catch (error) {
       console.error('Error fetching job status:', error);
-      toast.error(t('jobs.errorFetchingStatus'));
+      toast.error(t('errorFetchingStatus'));
       // Provide fallback data to prevent destructuring errors
       setDashboardData({
         jobStatus: { 
@@ -102,18 +102,18 @@ const JobsPage = () => {
     setRefreshing(true);
     await fetchDashboardData();
     setRefreshing(false);
-    toast.success(t('jobs.dataRefreshed'));
+    toast.success(t('dataRefreshed'));
   };
 
   const handleStartJob = async (jobName) => {
     try {
       setRunningJob(jobName);
       await jobsAPI.startJob(jobName);
-      toast.success(t('jobs.jobStarted', { jobName }));
+      toast.success(t('jobStarted', { jobName }));
       fetchDashboardData();
     } catch (error) {
       console.error(`Error starting job ${jobName}:`, error);
-      toast.error(t('jobs.errorStartingJob', { jobName }));
+      toast.error(t('errorStartingJob', { jobName }));
     } finally {
       setRunningJob(null);
     }
@@ -123,11 +123,11 @@ const JobsPage = () => {
     try {
       setRunningJob(jobName);
       await jobsAPI.stopJob(jobName);
-      toast.success(t('jobs.jobStopped', { jobName }));
+      toast.success(t('jobStopped', { jobName }));
       fetchDashboardData();
     } catch (error) {
       console.error(`Error stopping job ${jobName}:`, error);
-      toast.error(t('jobs.errorStoppingJob', { jobName }));
+      toast.error(t('errorStoppingJob', { jobName }));
     } finally {
       setRunningJob(null);
     }
@@ -137,11 +137,11 @@ const JobsPage = () => {
     try {
       setRunningJob('all');
       await jobsAPI.startAllJobs();
-      toast.success(t('jobs.allJobsStarted'));
+      toast.success(t('allJobsStarted'));
       fetchDashboardData();
     } catch (error) {
       console.error('Error starting all jobs:', error);
-      toast.error(t('jobs.errorStartingAllJobs'));
+      toast.error(t('errorStartingAllJobs'));
     } finally {
       setRunningJob(null);
     }
@@ -151,11 +151,11 @@ const JobsPage = () => {
     try {
       setRunningJob('all');
       await jobsAPI.stopAllJobs();
-      toast.success(t('jobs.allJobsStopped'));
+      toast.success(t('allJobsStopped'));
       fetchDashboardData();
     } catch (error) {
       console.error('Error stopping all jobs:', error);
-      toast.error(t('jobs.errorStoppingAllJobs'));
+      toast.error(t('errorStoppingAllJobs'));
     } finally {
       setRunningJob(null);
     }
@@ -180,10 +180,10 @@ const JobsPage = () => {
         <div>
           <h1 className='flex items-center gap-2 text-2xl font-bold'>
             <Zap className='h-6 w-6 text-primary' />
-            {t('jobs.title')}
+            {t('title')}
           </h1>
           <p className='text-muted-foreground'>
-            {t('jobs.subtitle')}
+            {t('subtitle')}
           </p>
         </div>
         <div className='flex gap-2'>
@@ -200,14 +200,14 @@ const JobsPage = () => {
             {refreshing ? t('common:loading') : t('common:refresh')}
           </Button>
           <Button
-            variant='success'
+            variant='default'
             size='sm'
             onClick={handleStartAllJobs}
             disabled={jobStatus?.isRunning}
             className='flex items-center gap-2'
           >
             <Play className='h-4 w-4' />
-            {t('jobs.startAll')}
+            {t('startAll')}
           </Button>
           <Button
             variant='destructive'
@@ -217,7 +217,7 @@ const JobsPage = () => {
             className='flex items-center gap-2'
           >
             <Square className='h-4 w-4' />
-            {t('jobs.stopAll')}
+            {t('stopAll')}
           </Button>
         </div>
       </div>
@@ -236,14 +236,14 @@ const JobsPage = () => {
                   className='text-xs'
                 >
                   {jobStatus?.isRunning
-                    ? t('jobs.systemActive')
-                    : t('jobs.systemInactive')}
+                    ? t('systemActive')
+                    : t('systemInactive')}
                 </Badge>
               </div>
               <h3 className='text-3xl font-bold'>
                 {jobStatus?.activeJobs || 0}/{jobStatus?.totalJobs || 0}
               </h3>
-              <p className='text-sm text-muted-foreground'>{t('jobs.activeJobs')}</p>
+              <p className='text-sm text-muted-foreground'>{t('activeJobs')}</p>
             </CardContent>
           </Card>
         </GridItem>
@@ -256,13 +256,13 @@ const JobsPage = () => {
                   <CheckCircle className='h-5 w-5' />
                 </div>
                 <Badge variant='outline' className='text-xs'>
-                  {t('jobs.lastRun')}
+                  {t('lastRun')}
                 </Badge>
               </div>
               <h3 className='text-3xl font-bold'>
                 {jobStatus?.successRate || 0}%
               </h3>
-              <p className='text-sm text-muted-foreground'>{t('jobs.successRate')}</p>
+              <p className='text-sm text-muted-foreground'>{t('successRate')}</p>
             </CardContent>
           </Card>
         </GridItem>
@@ -275,7 +275,7 @@ const JobsPage = () => {
                   <Clock className='h-5 w-5' />
                 </div>
                 <Badge variant='outline' className='text-xs'>
-                  {t('jobs.lastExecution')}
+                  {t('lastExecution')}
                 </Badge>
               </div>
               <h3 className='text-3xl font-bold'>
@@ -286,7 +286,7 @@ const JobsPage = () => {
               <p className='text-sm text-muted-foreground'>
                 {jobStatus?.lastRun
                   ? new Date(jobStatus.lastRun).toLocaleDateString()
-                  : t('jobs.never')}
+                  : t('never')}
               </p>
             </CardContent>
           </Card>
@@ -310,16 +310,16 @@ const JobsPage = () => {
                   className='text-xs'
                 >
                   {systemHealth?.status === 'healthy'
-                    ? t('jobs.healthy')
+                    ? t('healthy')
                     : systemHealth?.status === 'warning'
-                    ? t('jobs.warning')
-                    : t('jobs.critical')}
+                    ? t('warning')
+                    : t('critical')}
                 </Badge>
               </div>
               <h3 className='text-3xl font-bold'>
                 {systemHealth?.issuesCount || 0}
               </h3>
-              <p className='text-sm text-muted-foreground'>{t('jobs.activeIssues')}</p>
+              <p className='text-sm text-muted-foreground'>{t('activeIssues')}</p>
             </CardContent>
           </Card>
         </GridItem>
@@ -328,20 +328,20 @@ const JobsPage = () => {
       {/* Jobs Table */}
       <Card className='mb-8'>
         <CardContent className='p-6'>
-          <h3 className='mb-4 text-lg font-medium'>{t('jobs.backgroundJobs')}</h3>
+          <h3 className='mb-4 text-lg font-medium'>{t('backgroundJobs')}</h3>
           <p className='mb-6 text-sm text-muted-foreground'>
-            {t('jobs.manageBackgroundJobs')}
+            {t('manageBackgroundJobs')}
           </p>
 
           <div className='overflow-x-auto'>
             <table className='w-full border-collapse'>
               <thead>
                 <tr className='border-b bg-muted/50'>
-                  <th className='p-3 text-left'>{t('jobs.jobName')}</th>
-                  <th className='p-3 text-left'>{t('jobs.description')}</th>
-                  <th className='p-3 text-left'>{t('jobs.schedule')}</th>
-                  <th className='p-3 text-left'>{t('jobs.lastRunTime')}</th>
-                  <th className='p-3 text-left'>{t('jobs.status')}</th>
+                  <th className='p-3 text-left'>{t('jobName')}</th>
+                  <th className='p-3 text-left'>{t('description')}</th>
+                  <th className='p-3 text-left'>{t('schedule')}</th>
+                  <th className='p-3 text-left'>{t('lastRunTime')}</th>
+                  <th className='p-3 text-left'>{t('status')}</th>
                   <th className='p-3 text-left'>{t('common:actions')}</th>
                 </tr>
               </thead>
@@ -349,7 +349,7 @@ const JobsPage = () => {
                 {jobStatus?.jobs?.map(job => {
                   const jobInfo = jobDescriptions[job.name] || {
                     title: job.name,
-                    description: t('jobs.noDescription'),
+                    description: t('noDescription'),
                     icon: Settings,
                     color: 'gray',
                   };
@@ -370,11 +370,11 @@ const JobsPage = () => {
                       <td className='p-3 text-sm text-muted-foreground'>
                         {jobInfo.description}
                       </td>
-                      <td className='p-3'>{job.schedule || t('jobs.manual')}</td>
+                      <td className='p-3'>{job.schedule || t('manual')}</td>
                       <td className='p-3'>
                         {job.lastRun
                           ? new Date(job.lastRun).toLocaleString()
-                          : t('jobs.never')}
+                          : t('never')}
                       </td>
                       <td className='p-3'>
                         <Badge
@@ -389,11 +389,11 @@ const JobsPage = () => {
                           }
                         >
                           {job.status === 'running'
-                            ? t('jobs.running')
+                            ? t('running')
                             : job.status === 'idle'
-                            ? t('jobs.idle')
+                            ? t('idle')
                             : job.status === 'failed'
-                            ? t('jobs.failed')
+                            ? t('failed')
                             : job.status}
                         </Badge>
                       </td>
@@ -411,11 +411,11 @@ const JobsPage = () => {
                             ) : (
                               <Square className='h-3 w-3' />
                             )}
-                            {t('jobs.stop')}
+                            {t('stop')}
                           </Button>
                         ) : (
                           <Button
-                            variant='success'
+                            variant='default'
                             size='sm'
                             onClick={() => handleStartJob(job.name)}
                             disabled={runningJob === job.name}
@@ -426,7 +426,7 @@ const JobsPage = () => {
                             ) : (
                               <Play className='h-3 w-3' />
                             )}
-                            {t('jobs.start')}
+                            {t('start')}
                           </Button>
                         )}
                       </td>
@@ -442,21 +442,21 @@ const JobsPage = () => {
       {/* Recent Job Runs */}
       <Card>
         <CardContent className='p-6'>
-          <h3 className='mb-4 text-lg font-medium'>{t('jobs.recentJobRuns')}</h3>
+          <h3 className='mb-4 text-lg font-medium'>{t('recentJobRuns')}</h3>
           <p className='mb-6 text-sm text-muted-foreground'>
-            {t('jobs.recentJobRunsDescription')}
+            {t('recentJobRunsDescription')}
           </p>
 
           <div className='overflow-x-auto'>
             <table className='w-full border-collapse'>
               <thead>
                 <tr className='border-b bg-muted/50'>
-                  <th className='p-3 text-left'>{t('jobs.jobName')}</th>
-                  <th className='p-3 text-left'>{t('jobs.startTime')}</th>
-                  <th className='p-3 text-left'>{t('jobs.endTime')}</th>
-                  <th className='p-3 text-left'>{t('jobs.duration')}</th>
-                  <th className='p-3 text-left'>{t('jobs.status')}</th>
-                  <th className='p-3 text-left'>{t('jobs.result')}</th>
+                  <th className='p-3 text-left'>{t('jobName')}</th>
+                  <th className='p-3 text-left'>{t('startTime')}</th>
+                  <th className='p-3 text-left'>{t('endTime')}</th>
+                  <th className='p-3 text-left'>{t('duration')}</th>
+                  <th className='p-3 text-left'>{t('status')}</th>
+                  <th className='p-3 text-left'>{t('result')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -486,7 +486,7 @@ const JobsPage = () => {
                       <td className='p-3'>
                         {run.endTime
                           ? new Date(run.endTime).toLocaleString()
-                          : t('jobs.running')}
+                          : t('running')}
                       </td>
                       <td className='p-3'>
                         {run.duration ? `${run.duration}ms` : '--'}
@@ -502,16 +502,16 @@ const JobsPage = () => {
                           }
                         >
                           {run.status === 'completed'
-                            ? t('jobs.completed')
+                            ? t('completed')
                             : run.status === 'running'
-                            ? t('jobs.running')
+                            ? t('running')
                             : run.status === 'failed'
-                            ? t('jobs.failed')
+                            ? t('failed')
                             : run.status}
                         </Badge>
                       </td>
                       <td className='p-3 text-sm'>
-                        {run.result || t('jobs.noResult')}
+                        {run.result || t('noResult')}
                       </td>
                     </tr>
                   );
