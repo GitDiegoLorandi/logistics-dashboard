@@ -4,31 +4,51 @@ const Deliverer = require('../models/delivererModel');
 // Create Delivery
 const createDelivery = async (req, res) => {
   try {
+    console.log('Creating delivery - Request body:', req.body);
+    console.log('Creating delivery - User info:', req.user);
+    console.log('Creating delivery - Headers:', req.headers);
+    
     // Generate a unique Order ID
     const today = new Date();
     const dateStr = `${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}`;
     const randomPart = Math.floor(1000 + Math.random() * 9000); // 4-digit random number
     const orderId = `ORD-${dateStr}-${randomPart}`;
+    console.log('Generated orderId:', orderId);
 
     // Force status to be "Pending" for new deliveries
     const deliveryData = {
       ...req.body,
       orderId,
       status: 'Pending', // Always set status to Pending for new deliveries
-      createdBy: req.user.userId || req.user.id, // Handle both possible field names
     };
+    
+    // Handle createdBy field - only add if it's a valid MongoDB ObjectId
+    if (req.user && (req.user.userId || req.user.id)) {
+      const userId = req.user.userId || req.user.id;
+      if (/^[0-9a-fA-F]{24}$/.test(userId)) {
+        deliveryData.createdBy = userId;
+      } else {
+        console.log('Warning: User ID is not a valid MongoDB ObjectId, skipping createdBy field');
+      }
+    } else {
+      console.log('Warning: No user info in request, skipping createdBy field');
+    }
+
+    console.log('Final delivery data to be created:', deliveryData);
 
     // Validate required fields
     if (!deliveryData.customer) {
+      console.log('Validation error: Customer name is required');
       return res.status(400).json({
-        message: 'Customer name is required',
+        message: 'Validation failed',
         errors: [{ field: 'customer', message: 'Customer name is required' }],
       });
     }
 
     if (!deliveryData.deliveryAddress) {
+      console.log('Validation error: Delivery address is required');
       return res.status(400).json({
-        message: 'Delivery address is required',
+        message: 'Validation failed',
         errors: [
           { field: 'deliveryAddress', message: 'Delivery address is required' },
         ],
@@ -42,8 +62,9 @@ const createDelivery = async (req, res) => {
       today.setHours(0, 0, 0, 0); // Reset time to start of day for comparison
 
       if (estimatedDate < today) {
+        console.log('Validation error: Estimated delivery date must be in the future');
         return res.status(400).json({
-          message: 'Estimated delivery date must be in the future',
+          message: 'Validation failed',
           errors: [
             {
               field: 'estimatedDeliveryDate',
@@ -82,6 +103,7 @@ const createDelivery = async (req, res) => {
               validationError.errors[field].message ||
               `Invalid value for ${field}`,
           });
+          console.log(`Validation error for field ${field}:`, validationError.errors[field].message);
         });
 
         return res.status(400).json({
@@ -92,6 +114,7 @@ const createDelivery = async (req, res) => {
 
       if (validationError.code === 11000) {
         // Handle duplicate key error (likely duplicate orderId)
+        console.log('Duplicate key error:', validationError);
         return res.status(400).json({
           message: 'A delivery with this Order ID already exists',
           errors: [{ field: 'orderId', message: 'Order ID must be unique' }],

@@ -224,17 +224,20 @@ const DeliveriesPage = () => {
   // Handle Form Submission
   const handleSubmit = async e => {
     e.preventDefault();
+    console.log('Delivery form submission triggered');
     try {
       setLoading(true);
 
       // Validate required fields
       if (!formData.customer.trim()) {
+        console.log('Validation error: Customer name is required');
         toast.error('Customer name is required');
         setLoading(false);
         return;
       }
 
       if (!formData.deliveryAddress.trim()) {
+        console.log('Validation error: Delivery address is required');
         toast.error('Delivery address is required');
         setLoading(false);
         return;
@@ -246,6 +249,7 @@ const DeliveriesPage = () => {
       today.setHours(0, 0, 0, 0); // Reset time to start of day for comparison
 
       if (estimatedDate < today) {
+        console.log('Validation error: Estimated delivery date must be in the future');
         toast.error('Estimated delivery date must be in the future');
         setLoading(false);
         return;
@@ -296,6 +300,8 @@ const DeliveriesPage = () => {
               deliverer: formData.deliverer || undefined,
             };
 
+      console.log('Prepared submission data:', submissionData);
+
       // Store previous deliverer ID if we're editing
       const previousDelivererId =
         modalMode === 'edit' ? selectedDelivery.deliverer?._id : null;
@@ -303,6 +309,10 @@ const DeliveriesPage = () => {
       if (modalMode === 'create') {
         console.log('Creating delivery with data:', submissionData);
         try {
+          // Check if we have an auth token
+          const token = localStorage.getItem('authToken');
+          console.log('Auth token exists:', !!token, token ? `Length: ${token.length}` : '');
+          
           const response = await deliveryAPI.create(submissionData);
           console.log('Created delivery:', response);
           toast.success('Delivery created successfully!');
@@ -315,18 +325,22 @@ const DeliveriesPage = () => {
           }, 300);
         } catch (err) {
           console.error('Error creating delivery:', err);
+          console.error('Error details:', JSON.stringify(err, null, 2));
           
-          if (err.response?.data?.errors && Array.isArray(err.response.data.errors)) {
+          if (err.data && err.data.errors && Array.isArray(err.data.errors)) {
             // Handle validation errors array
-            err.response.data.errors.forEach(error => {
+            console.log('Validation errors from API:', err.data.errors);
+            err.data.errors.forEach(error => {
               toast.error(`${error.field}: ${error.message}`);
             });
-          } else if (err.response?.data?.message) {
-            // Handle single error message
-            toast.error(err.response.data.message);
+          } else if (err.data && err.data.message) {
+            console.log('Error message from API:', err.data.message);
+            toast.error(err.data.message);
           } else if (err.message) {
+            console.log('Error message:', err.message);
             toast.error(err.message);
           } else {
+            console.log('Unknown error format:', err);
             toast.error('Failed to create delivery. Please check your input and try again.');
           }
           
