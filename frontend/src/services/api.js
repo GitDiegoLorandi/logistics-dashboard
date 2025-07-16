@@ -21,6 +21,20 @@ api.interceptors.request.use(
     const token = localStorage.getItem('authToken');
     if (token) {
       console.log(`Request to ${config.url}: Adding Authorization header with token`);
+      console.log(`Token first 15 chars: ${token.substring(0, 15)}...`);
+      
+      try {
+        // Log the token's payload (without verification)
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log('Token payload:', payload);
+        
+        if (!payload.userId) {
+          console.warn('Warning: Token does not contain userId in payload');
+        }
+      } catch (e) {
+        console.error('Error parsing token:', e);
+      }
+      
       config.headers.Authorization = `Bearer ${token}`;
     } else {
       console.log(`Request to ${config.url}: No auth token found`);
@@ -272,13 +286,23 @@ export const userAPI = {
   getAll: params => api.get('/users', { params }),
   getProfile: async () => {
     try {
+      console.log('Fetching user profile...');
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        console.warn('No authentication token found when fetching user profile');
+        throw new Error('Authentication required');
+      }
+      
       const response = await api.get('/users/profile');
+      console.log('User profile fetched successfully:', response);
       return response;
     } catch (error) {
-      console.warn('Error fetching user profile, using mock data instead:', error);
+      console.warn('Error fetching user profile:', error);
+      console.warn('Status code:', error.status || 'No status code');
+      console.warn('Error message:', error.message || 'No error message');
       
       // Return mock data for development purposes
-      return {
+      const mockUser = {
         id: 'mock-user-id',
         firstName: 'Demo',
         lastName: 'User',
@@ -289,6 +313,9 @@ export const userAPI = {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString()
       };
+      
+      console.log('Using mock user data instead:', mockUser);
+      return mockUser;
     }
   },
   getById: id => api.get(`/users/${id}`),

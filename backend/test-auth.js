@@ -1,55 +1,94 @@
 require('dotenv').config();
+const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
+const config = require('./src/config');
 const User = require('./src/models/userModel');
 
-const testAuth = async () => {
+async function testAuth() {
+  console.log('Testing authentication flow...');
+  
   try {
-    console.log('🔄 Testing authentication system...');
-
     // Connect to MongoDB
-    await mongoose.connect(process.env.MONGO_URI, {
+    console.log('Connecting to MongoDB...');
+    await mongoose.connect(config.MONGODB_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
-    console.log('✅ Connected to MongoDB');
-
-    // Test user creation
-    const testEmail = 'test@example.com';
-    const testPassword = 'password123';
-
-    // Clean up any existing test user
-    await User.deleteOne({ email: testEmail });
-    console.log('🧹 Cleaned up existing test user');
-
-    // Create new user
-    console.log('👤 Creating test user...');
-    const newUser = await User.create({
-      email: testEmail,
-      password: testPassword,
-      role: 'user',
-    });
-
-    console.log('✅ User created successfully:');
-    console.log('   ID:', newUser._id);
-    console.log('   Email:', newUser.email);
-    console.log('   Role:', newUser.role);
-    console.log('   Password hashed:', newUser.password.startsWith('$2b$'));
-
-    // Test password comparison
-    console.log('🔐 Testing password comparison...');
-    const isPasswordValid = await newUser.comparePassword(testPassword);
-    console.log('   Password valid:', isPasswordValid);
-
-    // Clean up
-    await User.deleteOne({ email: testEmail });
-    console.log('🧹 Test user cleaned up');
-
-    await mongoose.disconnect();
-    console.log('✅ Test completed successfully!');
+    console.log('Connected to MongoDB');
+    
+    // Check if test user exists
+    const testEmail = 'admin@example.com';
+    console.log(`Checking if user ${testEmail} exists...`);
+    
+    let user = await User.findOne({ email: testEmail });
+    
+    if (!user) {
+      console.log('Test user not found, creating...');
+      user = new User({
+        email: testEmail,
+        password: 'password123',
+        role: 'admin',
+        firstName: 'Admin',
+        lastName: 'User',
+        isActive: true
+      });
+      
+      await user.save();
+      console.log('Test user created');
+    } else {
+      console.log('Test user found:', user.email);
+    }
+    
+    // Generate a token
+    console.log('Generating JWT token...');
+    const token = jwt.sign(
+      { 
+        userId: user._id,
+        email: user.email,
+        role: user.role
+      },
+      config.JWT_SECRET,
+      { expiresIn: config.JWT_EXPIRES_IN }
+    );
+    
+    console.log('Token generated successfully');
+    console.log('Token:', token);
+    
+    // Verify the token
+    console.log('Verifying token...');
+    const decoded = jwt.verify(token, config.JWT_SECRET);
+    console.log('Token verified successfully');
+    console.log('Decoded token:', decoded);
+    
+    // Test token expiration
+    console.log('JWT expiration setting:', config.JWT_EXPIRES_IN);
+    console.log('Token expiration date:', new Date(decoded.exp * 1000).toISOString());
+    
+    // Close connection
+    await mongoose.connection.close();
+    console.log('Connection closed successfully');
+    
+    console.log('\nAuthentication test completed successfully');
+    console.log('\nTo test in the frontend:');
+    console.log('1. Open browser console');
+    console.log('2. Run: localStorage.setItem("authToken", "' + token + '")');
+    console.log('3. Run: localStorage.setItem("user", JSON.stringify(' + JSON.stringify({
+      _id: user._id.toString(),
+      email: user.email,
+      role: user.role,
+      firstName: user.firstName,
+      lastName: user.lastName
+    }) + '))');
+    console.log('4. Refresh the page');
+    
   } catch (error) {
-    console.error('❌ Test failed:', error);
-    process.exit(1);
+    console.error('Authentication test failed:');
+    console.error('Error type:', error.name);
+    console.error('Error message:', error.message);
+    if (error.stack) {
+      console.error('Stack trace:', error.stack);
+    }
   }
-};
+}
 
 testAuth();
