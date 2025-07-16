@@ -10,7 +10,15 @@
     "search": "Search...",
     "filter": "Filter",
     "filters": "Filters",
-    "actions": "Actions",
+    "actions": {
+      "view": "View",
+      "edit": "Edit",
+      "delete": "Delete",
+      "save": "Save",
+      "cancel": "Cancel",
+      "viewStats": "View Stats",
+      "assign": "Assign"
+    },
     "status": "Status",
     "noResults": "No results found",
     "confirm": "Confirm",

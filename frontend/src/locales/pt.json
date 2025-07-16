@@ -9,7 +9,15 @@
     "view": "Visualizar",
     "search": "Pesquisar...",
     "filter": "Filtrar",
-    "actions": "Ações",
+    "actions": {
+      "view": "Visualizar",
+      "edit": "Editar",
+      "delete": "Excluir",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "viewStats": "Ver Estatísticas",
+      "assign": "Atribuir"
+    },
     "status": "Status",
     "noResults": "Nenhum resultado encontrado",
     "confirm": "Confirmar",
