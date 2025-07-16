@@ -615,7 +615,7 @@ const UsersPage = () => {
               <TH>{t('role', { ns: 'common' })}</TH>
               <TH>{t('status', { ns: 'common' })}</TH>
               <TH>{t('created', { ns: 'common' })}</TH>
-              <TH className='text-right'>{t('actions', { ns: 'common' })}</TH>
+              <TH className='text-right'>{t('actionsHeader', { ns: 'common' })}</TH>
             </TR>
           </THead>
           <TBody>

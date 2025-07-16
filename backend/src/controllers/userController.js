@@ -34,15 +34,58 @@ const getAllUsers = async (req, res) => {
 // Get Current User Profile
 const getUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId).select('-password');
-    if (!user || !user.isActive) {
-      return res.status(404).json({ message: 'User not found' });
+    // Check if req.user exists
+    if (!req.user) {
+      console.error('User not authenticated: req.user is null or undefined');
+      return res.status(401).json({ message: 'User not authenticated' });
     }
 
-    res.status(200).json(user);
+    // Log full request user object for debugging
+    console.log('User object in request:', JSON.stringify(req.user));
+    
+    // Check if userId exists
+    if (!req.user.userId) {
+      console.error('Invalid token structure: Missing userId in token payload');
+      return res.status(400).json({ message: 'Invalid token structure: Missing userId' });
+    }
+
+    console.log(`Attempting to find user with ID: ${req.user.userId}`);
+    
+    try {
+      const user = await User.findById(req.user.userId).select('-password');
+      
+      if (!user) {
+        console.log(`No user found with ID: ${req.user.userId}`);
+        return res.status(404).json({ message: 'User not found' });
+      }
+      
+      if (!user.isActive) {
+        console.log(`User found but inactive: ${req.user.userId}`);
+        return res.status(403).json({ message: 'User account is inactive' });
+      }
+
+      console.log(`User found successfully: ${user.email}`);
+      res.status(200).json(user);
+    } catch (dbError) {
+      console.error('Database error when finding user:', dbError);
+      
+      // Check for specific MongoDB errors
+      if (dbError.name === 'CastError') {
+        return res.status(400).json({ message: 'Invalid user ID format' });
+      }
+      
+      if (dbError.name === 'MongoNetworkError' || dbError.name === 'MongooseServerSelectionError') {
+        return res.status(503).json({ message: 'Database connection error' });
+      }
+      
+      throw dbError; // Re-throw for general error handler
+    }
   } catch (error) {
     console.error('Error fetching user profile:', error);
-    res.status(500).json({ message: 'Error fetching user profile' });
+    res.status(500).json({ 
+      message: 'Error fetching user profile',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
   }
 };
 
