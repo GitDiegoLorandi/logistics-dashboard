@@ -58,6 +58,18 @@ const healthCheckJob = async () => {
 
     // Store health check result
     await storeHealthCheck(healthData);
+    
+    // Update job manager's system health data
+    try {
+      const { jobManager } = require('./index');
+      jobManager.systemHealth = {
+        status: healthData.status,
+        issuesCount: healthData.issues.length,
+        lastChecked: healthData.timestamp
+      };
+    } catch (error) {
+      console.error('Failed to update job manager system health:', error);
+    }
 
     // Only log if there are issues or significant changes
     if (healthData.status !== 'healthy') {
@@ -83,6 +95,18 @@ const healthCheckJob = async () => {
       checks: {},
       issues: [error.message],
     });
+    
+    // Update job manager's system health data to reflect error
+    try {
+      const { jobManager } = require('./index');
+      jobManager.systemHealth = {
+        status: 'error',
+        issuesCount: 1,
+        lastChecked: new Date().toISOString()
+      };
+    } catch (jobManagerError) {
+      console.error('Failed to update job manager system health:', jobManagerError);
+    }
 
     throw error;
   }
