@@ -19,6 +19,7 @@
       "viewStats": "View Stats",
       "assign": "Assign"
     },
+    "actionsHeader": "Actions",
     "status": "Status",
     "noResults": "No results found",
     "confirm": "Confirm",
@@ -546,6 +547,13 @@
     "manager": "Manager",
     "user": "User",
     "deliverer": "Deliverer",
+    "users": {
+      "user": "User",
+      "admin": "Administrator",
+      "manager": "Manager",
+      "deliverer": "Deliverer",
+      "active": "Active"
+    },
     "firstName": "First Name",
     "lastName": "Last Name",
     "email": "Email",
