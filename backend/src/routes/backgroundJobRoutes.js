@@ -77,7 +77,14 @@ const router = express.Router();
  */
 router.get('/status', authMiddleware, roleMiddleware(['admin']), (req, res) => {
   try {
+    console.log('GET /jobs/status: Received request');
+    console.log('User ID:', req.user?.userId);
+    console.log('User Role:', req.user?.role);
+    
     const status = jobManager.getJobStatus();
+    console.log('Job status retrieved:', JSON.stringify(status, null, 2));
+    
+    // Use the status directly as the job manager now returns data in the expected format
     res.status(200).json(status);
   } catch (error) {
     console.error('Error getting job status:', error);
@@ -87,6 +94,32 @@ router.get('/status', authMiddleware, roleMiddleware(['admin']), (req, res) => {
     });
   }
 });
+
+// Helper function to calculate success rate
+function calculateSuccessRate(jobs) {
+  const jobsList = Object.values(jobs);
+  if (!jobsList.length) return 0;
+  
+  let totalSuccess = 0;
+  let totalRuns = 0;
+  
+  jobsList.forEach(job => {
+    totalSuccess += job.successCount || 0;
+    totalRuns += (job.successCount || 0) + (job.errorCount || 0);
+  });
+  
+  return totalRuns > 0 ? Math.round((totalSuccess / totalRuns) * 100) : 0;
+}
+
+// Helper function to get the most recent run time
+function getLastRunTime(jobs) {
+  const jobsList = Object.values(jobs);
+  const runTimes = jobsList
+    .map(job => job.lastRun)
+    .filter(time => time !== null);
+  
+  return runTimes.length > 0 ? new Date(Math.max(...runTimes.map(t => new Date(t).getTime()))) : null;
+}
 
 /**
  * @swagger
