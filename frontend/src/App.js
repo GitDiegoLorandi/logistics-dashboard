@@ -3,9 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import './index.css';
 import {
   Login,
-  Register,
-  ForgotPassword,
-  ResetPassword,
   ProtectedRoute,
   DashboardLayout,
   Welcome,
@@ -48,9 +45,6 @@ function App() {
         <Routes>
           {/* Authentication routes */}
           <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
           
           {/* Welcome page */}
           <Route path="/welcome" element={<Welcome />} />

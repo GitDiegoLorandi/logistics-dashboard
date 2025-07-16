@@ -25,14 +25,14 @@ import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { userAPI, authAPI } from '../../services/api';
 import { syncUserData, ensureConsistentUserIdFormat, getBestAvailableUserData } from './user-preferences';
-import { Button } from '../UI/button';
-import { Input } from '../UI/input';
-import { Select } from '../UI/select';
-import { Card, CardContent } from '../UI/card';
-import { Badge } from '../UI/badge';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '../UI/tabs';
-import { Switch } from '../UI/switch';
-import { Label } from '../UI/label';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Select } from '../ui/select';
+import { Card, CardContent } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/tabs';
+import { Switch } from '../ui/switch';
+import { Label } from '../ui/label';
 import { cn } from '../../lib/utils';
 
 const SettingsPage = () => {

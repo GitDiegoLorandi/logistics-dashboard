@@ -12,12 +12,12 @@ import {
   LucideLogOut,
   LucideChevronRight
 } from 'lucide-react';
-import { Button } from '../UI/button';
-import { Avatar, AvatarFallback, AvatarImage } from '../UI/avatar';
-import { Breadcrumbs } from '../UI/breadcrumbs';
-import { CommandPalette } from '../UI/command-palette';
+import { Button } from '../ui/button';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Breadcrumbs } from '../ui/breadcrumbs';
+import { CommandPalette } from '../ui/command-palette';
 import { cn } from '../../lib/utils';
-import LanguageSwitcher from '../UI/language-switcher';
+import LanguageSwitcher from '../ui/language-switcher';
 import { useTranslation } from '../../hooks/use-translation';
 
 const DashboardLayout = () => {
