@@ -116,6 +116,11 @@ const DeliverersPage = () => {
   const [selectedDelivery, setSelectedDelivery] = useState('');
   const [loadingDeliveries, setLoadingDeliveries] = useState(false);
 
+  // Log modal state changes
+  useEffect(() => {
+    console.log('showModal state changed:', showModal);
+  }, [showModal]);
+
   // Pagination & Filtering
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -280,18 +285,30 @@ const DeliverersPage = () => {
   useEffect(() => {
     fetchDeliverers();
     checkUserRole();
+    checkAuthToken();
   }, [fetchDeliverers]);
+
+  // Check auth token
+  const checkAuthToken = () => {
+    const token = localStorage.getItem('authToken');
+    console.log('Auth token in localStorage:', token ? `${token.substring(0, 10)}...` : 'Not found');
+  };
 
   // Check user role
   const checkUserRole = () => {
     // Get user data from localStorage
     const userData = localStorage.getItem('user');
+    console.log('Checking user role. User data in localStorage:', userData);
+    
     if (userData) {
       try {
         const parsedUser = JSON.parse(userData);
+        console.log('Parsed user data:', parsedUser);
         const userRole = parsedUser.role?.toLowerCase();
         console.log('User role:', userRole);
-        setIsAdmin(userRole === 'admin');
+        const hasAdminRole = userRole === 'admin';
+        console.log('Is admin?', hasAdminRole);
+        setIsAdmin(hasAdminRole);
       } catch (error) {
         console.error('Error parsing user data:', error);
         setIsAdmin(false);
@@ -345,23 +362,25 @@ const DeliverersPage = () => {
   // Handle Create/Edit Deliverer
   const handleSaveDeliverer = async e => {
     e.preventDefault();
-    console.log('Form submission triggered');
-    console.log('Form data:', formData);
+    console.log('handleSaveDeliverer called');
 
     // Check if user is admin
     if (!isAdmin) {
+      console.log('User is not admin, cannot create/edit deliverer');
       toast.error('You need admin privileges to create or edit deliverers');
       return;
     }
 
     // Validate required fields
     if (!formData.name || !formData.email) {
+      console.log('Missing required fields: name or email');
       toast.error('Name and email are required');
       return;
     }
 
     // Validate name length
     if (formData.name.length < 2) {
+      console.log('Name too short');
       toast.error('Name must be at least 2 characters');
       return;
     }
@@ -369,24 +388,37 @@ const DeliverersPage = () => {
     // Validate email format
     const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
     if (!emailRegex.test(formData.email)) {
+      console.log('Invalid email format');
       toast.error('Please provide a valid email address');
       return;
     }
 
     // Validate phone number format if provided
     if (formData.phone && !/^[+]?[1-9][\d]{0,15}$/.test(formData.phone)) {
+      console.log('Invalid phone format');
       toast.error('Please provide a valid phone number');
       return;
     }
 
+    // Validate vehicleType is selected
+    if (!formData.vehicleType) {
+      console.log('No vehicle type selected');
+      toast.error('Please select a vehicle type');
+      return;
+    }
+
+    // Set loading state
+    setLoading(true);
+    console.log('Form data to be submitted:', formData);
+
     try {
       if (modalMode === 'create') {
-        console.log('Creating new deliverer...');
+        console.log('Creating new deliverer');
         const response = await delivererAPI.create(formData);
         console.log('Create deliverer response:', response);
         toast.success('Deliverer created successfully');
       } else {
-        console.log('Updating deliverer...');
+        console.log('Updating deliverer:', selectedDeliverer._id);
         const response = await delivererAPI.update(selectedDeliverer._id, formData);
         console.log('Update deliverer response:', response);
         toast.success('Deliverer updated successfully');
@@ -398,14 +430,20 @@ const DeliverersPage = () => {
     } catch (err) {
       console.error('Error saving deliverer:', err);
       
-      // Handle validation errors
+      // Enhanced error handling
       if (err.data && err.data.errors && Array.isArray(err.data.errors)) {
         err.data.errors.forEach(error => {
           toast.error(`${error.field || 'Validation error'}: ${error.message}`);
         });
+      } else if (err.data && err.data.message) {
+        toast.error(err.data.message);
+      } else if (err.message) {
+        toast.error(err.message);
       } else {
-        toast.error(err.message || 'Failed to save deliverer');
+        toast.error('Failed to save deliverer. Please check your form data.');
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -467,9 +505,11 @@ const DeliverersPage = () => {
 
   // Handle Create New Deliverer
   const handleCreateDeliverer = () => {
+    console.log('handleCreateDeliverer called');
     resetForm();
     setModalMode('create');
     setShowModal(true);
+    console.log('Modal should be shown now, showModal set to:', true);
   };
 
   // Helper function to get status icon
@@ -558,7 +598,10 @@ const DeliverersPage = () => {
             {t('common:refresh')}
           </Button>
           <Button
-            onClick={handleCreateDeliverer}
+            onClick={() => {
+              console.log('Create Deliverer button clicked');
+              handleCreateDeliverer();
+            }}
             size='sm'
             className='flex items-center gap-2'
           >
@@ -813,7 +856,10 @@ const DeliverersPage = () => {
             </p>
             {isAdmin && (
               <Button
-                onClick={handleCreateDeliverer}
+                onClick={() => {
+                  console.log('Empty state Create Deliverer button clicked');
+                  handleCreateDeliverer();
+                }}
                 className='flex items-center gap-2'
               >
                 <Plus className='h-4 w-4' />
@@ -860,6 +906,7 @@ const DeliverersPage = () => {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+          {console.log('Rendering modal')}
           <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
             <div className='mb-4 flex items-center justify-between border-b pb-4'>
               <h3 className='text-xl font-semibold'>
@@ -875,7 +922,10 @@ const DeliverersPage = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSaveDeliverer} className='space-y-4'>
+            <form onSubmit={(e) => {
+              console.log('Form submitted');
+              handleSaveDeliverer(e);
+            }} className='space-y-4'>
               <div className='space-y-4'>
                 <h4 className='text-lg font-medium'>{t('basicInfo')}</h4>
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
@@ -936,6 +986,7 @@ const DeliverersPage = () => {
                       value={formData.vehicleType}
                       onChange={e => handleFormChange('vehicleType', e.target.value)}
                       className='w-full'
+                      required
                     >
                       <option value=''>{t('selectVehicleType')}</option>
                       <option value='Car'>{t('vehicles.car')}</option>
@@ -1043,7 +1094,7 @@ const DeliverersPage = () => {
                 </div>
               </div>
 
-              <div className='flex justify-end space-x-3 border-t pt-4'>
+              <div className='flex justify-end gap-2'>
                 <Button
                   type='button'
                   variant='outline'
@@ -1051,10 +1102,20 @@ const DeliverersPage = () => {
                 >
                   {t('cancel')}
                 </Button>
-                <Button type='submit'>
-                  {modalMode === 'create'
-                    ? t('createDeliverer')
-                    : t('updateDeliverer')}
+                <Button 
+                  type='submit' 
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <div className="flex items-center gap-2">
+                      <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
+                      {modalMode === 'create' ? 'Creating...' : 'Updating...'}
+                    </div>
+                  ) : (
+                    modalMode === 'create'
+                      ? t('createDeliverer')
+                      : t('updateDeliverer')
+                  )}
                 </Button>
               </div>
             </form>

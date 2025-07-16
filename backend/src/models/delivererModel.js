@@ -67,6 +67,7 @@ const delivererSchema = new mongoose.Schema(
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      required: false // Make this field optional
     },
     isActive: {
       type: Boolean,
