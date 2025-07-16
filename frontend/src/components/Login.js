@@ -65,12 +65,16 @@ const Login = () => {
     setErrors({});
 
     try {
+      console.log('Attempting login with email:', formData.email);
       const response = await authAPI.login(formData);
+      console.log('Login successful, response:', response);
+      console.log('User role from response:', response.user?.role);
 
       // No need to manually store token/user as authAPI.login now handles this
       toast.success(t('login.welcome', { name: response.user?.name || response.user?.email || t('common.user') }));
       navigate('/dashboard');
     } catch (error) {
+      console.error('Login error:', error);
       let errorMessage = t('login.errors.generic');
 
       if (error.status) {
