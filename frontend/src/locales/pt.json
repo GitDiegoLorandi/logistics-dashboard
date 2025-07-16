@@ -155,6 +155,12 @@
     "onTime": "Taxa de entrega no prazo",
     "lastSevenDays": "Últimos 7 dias",
     "currentStatus": "Status atual",
+    "noDataAvailable": "Dados não disponíveis",
+    "noDataAvailableShort": "N/D",
+    "userDataNotAvailable": "Dados do usuário não disponíveis",
+    "dataLoadingError": "Erro ao carregar dados do painel",
+    "noTrendDataAvailable": "Dados de tendência não disponíveis",
+    "noStatusDataAvailable": "Dados de status não disponíveis",
     "chartLabels": {
       "dailyDeliveryTrends": "Tendências diárias de entregas concluídas",
       "statusDistribution": "Distribuição atual de status de entregas",
