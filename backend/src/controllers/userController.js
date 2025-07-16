@@ -49,18 +49,50 @@ const getUserProfile = async (req, res) => {
       return res.status(400).json({ message: 'Invalid token structure: Missing userId' });
     }
 
-    console.log(`Attempting to find user with ID: ${req.user.userId}`);
+    const userId = req.user.userId;
+    console.log(`Attempting to find user with ID: ${userId}`);
     
     try {
-      const user = await User.findById(req.user.userId).select('-password');
+      // First try with direct ID lookup
+      let user = null;
+      
+      // Try different lookup approaches
+      if (/^[0-9a-fA-F]{24}$/.test(userId)) {
+        console.log('Using MongoDB ObjectId lookup');
+        // Valid MongoDB ObjectId format
+        user = await User.findById(userId).select('-password');
+      } else {
+        console.log('Using alternative lookup methods since ID is not a valid MongoDB ObjectId');
+        // Try different lookup methods
+        user = await User.findOne({
+          $or: [
+            { _id: userId }, // Try anyway
+            { id: userId },  // Maybe the ID is stored in a different field
+            { email: req.user.email } // Use email if available in the token
+          ]
+        }).select('-password');
+      }
       
       if (!user) {
-        console.log(`No user found with ID: ${req.user.userId}`);
-        return res.status(404).json({ message: 'User not found' });
+        console.log(`No user found with ID: ${userId}`);
+        
+        // As a fallback, try to find by email if available in local storage
+        if (req.user.email) {
+          console.log(`Trying to find user by email: ${req.user.email}`);
+          user = await User.findOne({ email: req.user.email }).select('-password');
+          if (user) {
+            console.log('Found user by email');
+          }
+        }
+        
+        // If still not found, return not found error
+        if (!user) {
+          return res.status(404).json({ message: 'User not found' });
+        }
       }
       
       if (!user.isActive) {
-        console.log(`User found but inactive: ${req.user.userId}`);
+        console.log(`User found but inactive: ${userId}`);
         return res.status(403).json({ message: 'User account is inactive' });
       }
 
@@ -136,10 +168,46 @@ const updateUserProfile = async (req, res) => {
       }
     }
 
-    const updatedUser = await User.findByIdAndUpdate(req.user.userId, updates, {
-      new: true,
-      runValidators: true,
-    }).select('-password');
+    // Use safer lookup method for updating
+    let updatedUser;
+    const userId = req.user.userId;
+
+    try {
+      if (/^[0-9a-fA-F]{24}$/.test(userId)) {
+        // Valid MongoDB ObjectId format
+        updatedUser = await User.findByIdAndUpdate(userId, updates, {
+          new: true,
+          runValidators: true,
+        }).select('-password');
+      } else {
+        // Try different lookup methods
+        const user = await User.findOne({
+          $or: [
+            { _id: userId },
+            { id: userId },
+            { email: req.user.email }
+          ]
+        });
+
+        if (user) {
+          // Update the user
+          Object.keys(updates).forEach(key => {
+            user[key] = updates[key];
+          });
+
+          // Save the updated user
+          updatedUser = await user.save();
+          updatedUser = updatedUser.toObject();
+          delete updatedUser.password;
+        }
+      }
+    } catch (dbError) {
+      console.error('Database error when updating user:', dbError);
+      if (dbError.name === 'CastError') {
+        return res.status(400).json({ message: 'Invalid user ID format' });
+      }
+      throw dbError;
+    }
 
     if (!updatedUser || !updatedUser.isActive) {
       return res.status(404).json({ message: 'User not found' });

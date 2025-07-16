@@ -28,8 +28,24 @@ api.interceptors.request.use(
         const payload = JSON.parse(atob(token.split('.')[1]));
         console.log('Token payload:', payload);
         
-        if (!payload.userId) {
-          console.warn('Warning: Token does not contain userId in payload');
+        // Check the specific format of userId to help debug the issue
+        if (payload.userId) {
+          console.log(`UserId in token: ${payload.userId}`);
+          console.log(`UserId type: ${typeof payload.userId}`);
+          console.log(`UserId length: ${payload.userId.length}`);
+          console.log(`Is valid MongoDB ObjectId: ${/^[0-9a-fA-F]{24}$/.test(payload.userId)}`);
+        } else if (payload.id) {
+          console.log(`Id in token: ${payload.id}`);
+          console.log(`Id type: ${typeof payload.id}`);
+          console.log(`Id length: ${payload.id.length}`);
+          console.log(`Is valid MongoDB ObjectId: ${/^[0-9a-fA-F]{24}$/.test(payload.id)}`);
+        } else if (payload.sub) {
+          console.log(`Sub in token: ${payload.sub}`);
+          console.log(`Sub type: ${typeof payload.sub}`);
+          console.log(`Sub length: ${payload.sub.length}`);
+          console.log(`Is valid MongoDB ObjectId: ${/^[0-9a-fA-F]{24}$/.test(payload.sub)}`);
+        } else {
+          console.warn('Warning: Token does not contain userId, id, or sub in payload');
         }
       } catch (e) {
         console.error('Error parsing token:', e);
@@ -287,35 +303,74 @@ export const userAPI = {
   getProfile: async () => {
     try {
       console.log('Fetching user profile...');
+      // First try to get user from localStorage
+      const storedUser = localStorage.getItem('user');
+      
+      if (storedUser) {
+        console.log('Found user data in localStorage');
+        const userData = JSON.parse(storedUser);
+        
+        // If we have a stored user, use it but also try to refresh from API
+        try {
+          // Try to get fresh data from API in the background
+          const response = await api.get('/users/profile');
+          console.log('User profile refreshed from API:', response);
+          
+          // If successful, update localStorage with fresh data
+          localStorage.setItem('user', JSON.stringify(response));
+          return response;
+        } catch (apiError) {
+          // If API call fails but we have stored user data, use the stored data
+          console.warn('Could not refresh user profile from API, using stored data');
+          console.warn('API error:', apiError);
+          return userData;
+        }
+      }
+      
+      // If no stored user, check for token and try API call
       const token = localStorage.getItem('authToken');
       if (!token) {
         console.warn('No authentication token found when fetching user profile');
         throw new Error('Authentication required');
       }
       
+      // Make API call
       const response = await api.get('/users/profile');
       console.log('User profile fetched successfully:', response);
+      
+      // Store the fresh data
+      localStorage.setItem('user', JSON.stringify(response));
       return response;
     } catch (error) {
       console.warn('Error fetching user profile:', error);
       console.warn('Status code:', error.status || 'No status code');
       console.warn('Error message:', error.message || 'No error message');
       
-      // Return mock data for development purposes
-      const mockUser = {
-        id: 'mock-user-id',
-        firstName: 'Demo',
-        lastName: 'User',
-        email: 'demo@example.com',
-        phone: '555-123-4567',
-        role: 'admin',
-        avatar: null,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      
-      console.log('Using mock user data instead:', mockUser);
-      return mockUser;
+      // Check if we can use authAPI to get current user
+      try {
+        const currentUser = await authAPI.getCurrentUser();
+        console.log('Retrieved user from auth API:', currentUser);
+        localStorage.setItem('user', JSON.stringify(currentUser));
+        return currentUser;
+      } catch (authError) {
+        console.warn('Could not retrieve user from auth API:', authError);
+        
+        // Last resort: return mock data only if everything else fails
+        const mockUser = {
+          id: 'mock-user-id',
+          firstName: 'Demo',
+          lastName: 'User',
+          email: 'demo@example.com',
+          phone: '555-123-4567',
+          role: 'admin',
+          avatar: null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        
+        console.log('Using mock user data as last resort:', mockUser);
+        return mockUser;
+      }
     }
   },
   getById: id => api.get(`/users/${id}`),
