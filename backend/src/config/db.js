@@ -2,7 +2,15 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI, {
+    // Get the connection string from environment variables
+    let connectionString = process.env.MONGO_URI;
+    
+    // If the connection string doesn't include a database name, add it
+    if (!connectionString.includes('mongodb.net/logistics-dashboard')) {
+      connectionString = connectionString.replace('mongodb.net', 'mongodb.net/logistics-dashboard');
+    }
+    
+    const conn = await mongoose.connect(connectionString, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });

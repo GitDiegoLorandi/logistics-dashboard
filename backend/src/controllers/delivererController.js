@@ -4,7 +4,34 @@ const Delivery = require('../models/deliveryModel');
 // Create Deliverer (Admin Only)
 const createDeliverer = async (req, res) => {
   try {
-    console.log('Creating deliverer:', req.body.email);
+    console.log('Creating deliverer with data:', req.body);
+    console.log('User making request:', req.user);
+    console.log('Request headers:', req.headers);
+
+    // Validate required fields
+    if (!req.body.name) {
+      console.log('Validation error: Name is required');
+      return res.status(400).json({ 
+        message: 'Validation failed', 
+        errors: [{ field: 'name', message: 'Name is required' }] 
+      });
+    }
+
+    if (!req.body.email) {
+      console.log('Validation error: Email is required');
+      return res.status(400).json({ 
+        message: 'Validation failed', 
+        errors: [{ field: 'email', message: 'Email is required' }] 
+      });
+    }
+
+    if (!req.body.vehicleType) {
+      console.log('Validation error: Vehicle type is required');
+      return res.status(400).json({ 
+        message: 'Validation failed', 
+        errors: [{ field: 'vehicleType', message: 'Vehicle type is required' }] 
+      });
+    }
 
     // Check if deliverer already exists
     const existingDeliverer = await Deliverer.findOne({
@@ -13,24 +40,55 @@ const createDeliverer = async (req, res) => {
     });
 
     if (existingDeliverer) {
+      console.log('Deliverer already exists with email:', req.body.email);
       return res
         .status(400)
         .json({ message: 'Deliverer already exists with this email' });
     }
 
-    const deliverer = await Deliverer.create({
-      ...req.body,
-      createdBy: req.user.userId,
-    });
+    // Create deliverer object without createdBy field
+    const delivererData = { ...req.body };
+    
+    // Only add createdBy if it's a valid MongoDB ObjectId
+    // This prevents the "Cast to ObjectId failed" error
+    if (req.user && req.user.userId && /^[0-9a-fA-F]{24}$/.test(req.user.userId)) {
+      delivererData.createdBy = req.user.userId;
+    } else {
+      console.log('Warning: Invalid or missing user ID, skipping createdBy field');
+    }
 
-    console.log('Deliverer created successfully:', deliverer._id);
+    console.log('Final deliverer data to be created:', delivererData);
+    
+    try {
+      const deliverer = await Deliverer.create(delivererData);
+      console.log('Deliverer created successfully:', deliverer._id);
+      console.log('New deliverer data:', deliverer);
 
-    res.status(201).json({
-      message: 'Deliverer created successfully',
-      deliverer,
-    });
+      res.status(201).json({
+        message: 'Deliverer created successfully',
+        deliverer,
+      });
+    } catch (mongooseError) {
+      console.error('Mongoose error creating deliverer:', mongooseError);
+      throw mongooseError;
+    }
   } catch (error) {
     console.error('Error creating deliverer:', error);
+
+    // Handle validation errors from Mongoose
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.keys(error.errors).map(field => ({
+        field,
+        message: error.errors[field].message
+      }));
+      
+      console.log('Mongoose validation errors:', validationErrors);
+      
+      return res.status(400).json({
+        message: 'Validation failed',
+        errors: validationErrors
+      });
+    }
 
     if (error.code === 11000) {
       return res
