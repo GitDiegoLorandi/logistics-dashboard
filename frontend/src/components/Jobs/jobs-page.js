@@ -349,7 +349,7 @@ const JobsPage = () => {
                   <th className='p-3 text-left'>{t('schedule')}</th>
                   <th className='p-3 text-left'>{t('lastRunTime')}</th>
                   <th className='p-3 text-left'>{t('status')}</th>
-                  <th className='p-3 text-left'>{t('common:actions')}</th>
+                  <th className='p-3 text-left'>{t('common:actionsHeader')}</th>
                 </tr>
               </thead>
               <tbody>
