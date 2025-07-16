@@ -203,7 +203,7 @@ export const DeliveriesTable = ({
       },
       {
         id: 'actions',
-        header: t('actions', { ns: 'common' }),
+        header: t('actionsHeader', { ns: 'common' }),
         cell: ({ row }) => {
           const delivery = row.original;
           const canEdit = ['admin', 'manager'].includes(userRole);
