@@ -38,6 +38,13 @@ class JobManager {
   constructor() {
     this.jobs = new Map();
     this.isRunning = false;
+    this.recentRuns = []; // Track recent job executions
+    this.maxRecentRuns = 50; // Maximum number of recent runs to keep
+    this.systemHealth = { 
+      status: 'unknown',
+      issuesCount: 0,
+      lastChecked: null
+    };
   }
 
   /**
@@ -74,18 +81,49 @@ class JobManager {
       schedule,
       async () => {
         const startTime = Date.now();
-
+        const run = { 
+          jobName, 
+          startTime: new Date().toISOString(),
+          status: 'running'
+        };
+        
+        // Add to recent runs immediately when job starts
+        this.addRecentRun(run);
+        
         try {
           console.log(`🔄 Starting job: ${jobName}`);
           await jobFunction();
           const duration = Date.now() - startTime;
           console.log(`✅ Job completed: ${jobName} (${duration}ms)`);
+          
+          // Update job stats and recent runs
+          if (this.jobs.has(jobName)) {
+            const job = this.jobs.get(jobName);
+            job.successCount++;
+            job.lastRun = new Date().toISOString();
+            this.jobs.set(jobName, job);
+          }
+          
+          // Update the run with completion data
+          run.endTime = new Date().toISOString();
+          run.duration = duration;
+          run.status = 'completed';
+          run.result = 'Success';
+          this.updateRecentRun(run);
+          
         } catch (error) {
           const duration = Date.now() - startTime;
           console.error(`❌ Job failed: ${jobName} (${duration}ms)`, error);
 
           // Log error details for monitoring
           this.logJobError(jobName, error, duration);
+          
+          // Update the run with error data
+          run.endTime = new Date().toISOString();
+          run.duration = duration;
+          run.status = 'failed';
+          run.result = `Error: ${error.message}`;
+          this.updateRecentRun(run);
         }
       },
       {
@@ -102,10 +140,35 @@ class JobManager {
       lastError: null,
       successCount: 0,
       errorCount: 0,
+      isRunning: false,
     });
 
     task.start();
     console.log(`📅 Scheduled job: ${jobName} (${schedule})`);
+  }
+
+  /**
+   * Add a new job run to the recent runs array
+   */
+  addRecentRun(run) {
+    // Generate a unique ID for the run for easy tracking/updating
+    run.id = `${run.jobName}-${Date.now()}`;
+    this.recentRuns.unshift(run);
+    
+    // Ensure we don't exceed the maximum number of recent runs
+    if (this.recentRuns.length > this.maxRecentRuns) {
+      this.recentRuns.pop();
+    }
+  }
+  
+  /**
+   * Update an existing job run in the recent runs array
+   */
+  updateRecentRun(updatedRun) {
+    const index = this.recentRuns.findIndex(run => run.id === updatedRun.id);
+    if (index !== -1) {
+      this.recentRuns[index] = updatedRun;
+    }
   }
 
   /**
@@ -131,22 +194,64 @@ class JobManager {
     const status = {
       isRunning: this.isRunning,
       totalJobs: this.jobs.size,
-      jobs: {},
+      activeJobs: 0,
+      successRate: this.calculateSuccessRate(),
+      lastRun: this.getLastRunTime(),
+      jobs: [],
     };
 
+    // Convert jobs Map to array for easier frontend consumption
     this.jobs.forEach((job, jobName) => {
-      status.jobs[jobName] = {
-        name: job.name,
+      status.jobs.push({
+        name: jobName,
         schedule: job.schedule,
         lastRun: job.lastRun,
-        lastError: job.lastError,
+        status: job.isRunning ? 'running' : 'idle',
         successCount: job.successCount,
         errorCount: job.errorCount,
-        isRunning: job.task.running,
-      };
+      });
+      
+      if (job.isRunning) {
+        status.activeJobs++;
+      }
     });
 
+    // Add system health data
+    status.systemHealth = this.systemHealth;
+    
+    // Add recent runs data
+    status.recentRuns = this.recentRuns;
+
     return status;
+  }
+  
+  /**
+   * Calculate the overall success rate of jobs
+   */
+  calculateSuccessRate() {
+    let totalSuccess = 0;
+    let totalRuns = 0;
+    
+    this.jobs.forEach(job => {
+      totalSuccess += job.successCount || 0;
+      totalRuns += (job.successCount || 0) + (job.errorCount || 0);
+    });
+    
+    return totalRuns > 0 ? Math.round((totalSuccess / totalRuns) * 100) : 0;
+  }
+  
+  /**
+   * Get the most recent run time
+   */
+  getLastRunTime() {
+    const runTimes = [];
+    this.jobs.forEach(job => {
+      if (job.lastRun) {
+        runTimes.push(new Date(job.lastRun).getTime());
+      }
+    });
+    
+    return runTimes.length > 0 ? new Date(Math.max(...runTimes)).toISOString() : null;
   }
 
   /**
@@ -156,8 +261,8 @@ class JobManager {
     const status = this.getJobStatus();
     console.log('📊 Background Jobs Status:', {
       totalJobs: status.totalJobs,
-      runningJobs: Object.values(status.jobs).filter(job => job.isRunning)
-        .length,
+      runningJobs: status.activeJobs,
+      successRate: status.successRate + '%'
     });
   }
 
@@ -189,10 +294,6 @@ class JobManager {
    * Manually run a specific job (for testing)
    */
   async runJobManually(jobName) {
-    if (!this.jobs.has(jobName)) {
-      throw new Error(`Job not found: ${jobName}`);
-    }
-
     if (!jobsMap[jobName] || !jobsMap[jobName].function) {
       throw new Error(`Job function not found: ${jobName}`);
     }
@@ -201,8 +302,25 @@ class JobManager {
     
     console.log(`🔄 Manually running job: ${jobName}`);
     const startTime = Date.now();
+    
+    // Create a run record
+    const run = { 
+      jobName, 
+      startTime: new Date().toISOString(),
+      status: 'running'
+    };
+    
+    // Add to recent runs immediately when job starts
+    this.addRecentRun(run);
 
     try {
+      // Update the job to show it's running if it exists in the jobs map
+      if (this.jobs.has(jobName)) {
+        const job = this.jobs.get(jobName);
+        job.isRunning = true;
+        this.jobs.set(jobName, job);
+      }
+      
       await jobFunction();
       const duration = Date.now() - startTime;
       console.log(`✅ Manual job completed: ${jobName} (${duration}ms)`);
@@ -211,15 +329,38 @@ class JobManager {
       if (this.jobs.has(jobName)) {
         const job = this.jobs.get(jobName);
         job.successCount++;
-        job.lastRun = new Date();
+        job.lastRun = new Date().toISOString();
+        job.isRunning = false;
         this.jobs.set(jobName, job);
       }
+      
+      // Update the run with completion data
+      run.endTime = new Date().toISOString();
+      run.duration = duration;
+      run.status = 'completed';
+      run.result = 'Success';
+      this.updateRecentRun(run);
 
       return { success: true, duration };
     } catch (error) {
       const duration = Date.now() - startTime;
       console.error(`❌ Manual job failed: ${jobName} (${duration}ms)`, error);
       this.logJobError(jobName, error, duration);
+      
+      // Update the job to show it's not running
+      if (this.jobs.has(jobName)) {
+        const job = this.jobs.get(jobName);
+        job.isRunning = false;
+        this.jobs.set(jobName, job);
+      }
+      
+      // Update the run with error data
+      run.endTime = new Date().toISOString();
+      run.duration = duration;
+      run.status = 'failed';
+      run.result = `Error: ${error.message}`;
+      this.updateRecentRun(run);
+      
       throw error;
     }
   }
