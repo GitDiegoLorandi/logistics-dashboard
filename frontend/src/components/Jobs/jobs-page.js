@@ -25,7 +25,7 @@ import { Grid, GridItem } from '../UI/grid';
 const JobsPage = () => {
   const { t } = useTranslation(['jobs', 'common']);
   const [loading, setLoading] = useState(true);
-  const [dashboardData, setDashboardData] = useState({});
+  const [dashboardData, setDashboardData] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [runningJob, setRunningJob] = useState(null);
 
@@ -65,27 +65,26 @@ const JobsPage = () => {
   const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true);
+      console.log('Fetching job status data...');
+      
+      // Check if auth token exists
+      const token = localStorage.getItem('authToken');
+      console.log('Auth token exists:', !!token);
+      
       const response = await jobsAPI.getStatus();
-      setDashboardData(response); // Changed from response.data to response
+      console.log('Job status API response:', response);
+      
+      // API now returns data in the correct format directly
+      setDashboardData(response);
     } catch (error) {
       console.error('Error fetching job status:', error);
-      toast.error(t('errorFetchingStatus'));
-      // Provide fallback data to prevent destructuring errors
-      setDashboardData({
-        jobStatus: { 
-          isRunning: false,
-          activeJobs: 0,
-          totalJobs: 0,
-          successRate: 0,
-          lastRun: null,
-          jobs: []
-        },
-        systemHealth: { 
-          status: 'unknown',
-          issuesCount: 0
-        },
-        recentRuns: []
+      console.error('Error details:', {
+        message: error.message,
+        status: error.status,
+        data: error.data
       });
+      
+      toast.error(t('errorFetchingStatus'));
     } finally {
       setLoading(false);
     }
@@ -158,7 +157,18 @@ const JobsPage = () => {
     }
   };
 
-  const { jobStatus = {}, systemHealth = {}, recentRuns = [] } = dashboardData || {};
+  // Destructure values from dashboardData
+  const isRunning = dashboardData?.isRunning || false;
+  const activeJobs = dashboardData?.activeJobs || 0;
+  const totalJobs = dashboardData?.totalJobs || 0;
+  const successRate = dashboardData?.successRate || 0;
+  const lastRun = dashboardData?.lastRun || null;
+  const jobs = dashboardData?.jobs || [];
+  const systemHealth = dashboardData?.systemHealth || { 
+    status: 'unknown', 
+    issuesCount: 0 
+  };
+  const recentRuns = dashboardData?.recentRuns || [];
 
   if (loading) {
     return (
@@ -200,7 +210,7 @@ const JobsPage = () => {
             variant='default'
             size='sm'
             onClick={handleStartAllJobs}
-            disabled={jobStatus?.isRunning}
+            disabled={isRunning}
             className='flex items-center gap-2'
           >
             <Play className='h-4 w-4' />
@@ -210,7 +220,7 @@ const JobsPage = () => {
             variant='destructive'
             size='sm'
             onClick={handleStopAllJobs}
-            disabled={!jobStatus?.isRunning}
+            disabled={!isRunning}
             className='flex items-center gap-2'
           >
             <Square className='h-4 w-4' />
@@ -229,16 +239,16 @@ const JobsPage = () => {
                   <Activity className='h-5 w-5' />
                 </div>
                 <Badge
-                  variant={jobStatus?.isRunning ? 'success' : 'destructive'}
+                  variant={isRunning ? 'success' : 'destructive'}
                   className='text-xs'
                 >
-                  {jobStatus?.isRunning
+                  {isRunning
                     ? t('systemActive')
                     : t('systemInactive')}
                 </Badge>
               </div>
               <h3 className='text-3xl font-bold'>
-                {jobStatus?.activeJobs || 0}/{jobStatus?.totalJobs || 0}
+                {activeJobs || 0}/{totalJobs || 0}
               </h3>
               <p className='text-sm text-muted-foreground'>{t('activeJobs')}</p>
             </CardContent>
@@ -257,7 +267,7 @@ const JobsPage = () => {
                 </Badge>
               </div>
               <h3 className='text-3xl font-bold'>
-                {jobStatus?.successRate || 0}%
+                {successRate || 0}%
               </h3>
               <p className='text-sm text-muted-foreground'>{t('successRate')}</p>
             </CardContent>
@@ -276,13 +286,13 @@ const JobsPage = () => {
                 </Badge>
               </div>
               <h3 className='text-3xl font-bold'>
-                {jobStatus?.lastRun
-                  ? new Date(jobStatus.lastRun).toLocaleTimeString()
+                {lastRun
+                  ? new Date(lastRun).toLocaleTimeString()
                   : '--:--'}
               </h3>
               <p className='text-sm text-muted-foreground'>
-                {jobStatus?.lastRun
-                  ? new Date(jobStatus.lastRun).toLocaleDateString()
+                {lastRun
+                  ? new Date(lastRun).toLocaleDateString()
                   : t('never')}
               </p>
             </CardContent>
@@ -343,7 +353,7 @@ const JobsPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {jobStatus?.jobs?.map(job => {
+                {jobs.map(job => {
                   const jobInfo = jobDescriptions[job.name] || {
                     title: job.name,
                     description: t('noDescription'),
@@ -464,7 +474,7 @@ const JobsPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {recentRuns?.map((run, index) => {
+                {recentRuns.map((run, index) => {
                   const jobInfo = jobDescriptions[run.jobName] || {
                     title: run.jobName,
                     icon: Settings,
@@ -473,7 +483,7 @@ const JobsPage = () => {
                   const JobIcon = jobInfo.icon;
 
                   return (
-                    <tr key={index} className='border-b hover:bg-muted/50'>
+                    <tr key={run.id || index} className='border-b hover:bg-muted/50'>
                       <td className='p-3'>
                         <div className='flex items-center gap-2'>
                           <div
@@ -527,6 +537,13 @@ const JobsPage = () => {
                     </tr>
                   );
                 })}
+                {recentRuns.length === 0 && (
+                  <tr>
+                    <td colSpan="6" className="p-4 text-center text-muted-foreground">
+                      {t('noJobRuns')}
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
