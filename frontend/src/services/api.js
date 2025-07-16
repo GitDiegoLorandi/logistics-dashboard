@@ -20,11 +20,15 @@ api.interceptors.request.use(
     // Use standardized 'authToken' key
     const token = localStorage.getItem('authToken');
     if (token) {
+      console.log(`Request to ${config.url}: Adding Authorization header with token`);
       config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      console.log(`Request to ${config.url}: No auth token found`);
     }
     return config;
   },
   error => {
+    console.error('Request interceptor error:', error);
     return Promise.reject(error);
   }
 );
@@ -89,14 +93,19 @@ api.interceptors.response.use(
 // API endpoints
 export const authAPI = {
   login: credentials => api.post('/auth/login', credentials).then(data => {
+    console.log('Login response received:', data);
     // Store token in localStorage
     if (data.token) {
+      console.log('Storing auth token in localStorage');
       localStorage.setItem('authToken', data.token);
       
       // Store user data if available
       if (data.user) {
+        console.log('Storing user data in localStorage:', data.user);
         localStorage.setItem('user', JSON.stringify(data.user));
       }
+    } else {
+      console.warn('No token received in login response');
     }
     return data;
   }),
@@ -136,10 +145,38 @@ export const deliveryAPI = {
   getById: id => api.get(`/deliveries/${id}`),
   create: async (data) => {
     try {
-      const response = await api.post('/deliveries', data);
-      return response;
+      console.log('deliveryAPI.create: Creating delivery with data:', data);
+      
+      // Check if auth token exists
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        console.error('deliveryAPI.create: No authentication token found');
+        throw new Error('Authentication required. Please log in.');
+      }
+      console.log('deliveryAPI.create: Auth token found, length:', token.length);
+      
+      // Log the request details
+      console.log('deliveryAPI.create: Making POST request to /deliveries');
+      console.log('deliveryAPI.create: Request headers will include Authorization: Bearer [token]');
+      
+      // Make the API call with detailed logging
+      console.log('deliveryAPI.create: About to make axios POST request');
+      try {
+        const response = await api.post('/deliveries', data);
+        console.log('deliveryAPI.create: Create delivery response:', response);
+        return response;
+      } catch (axiosError) {
+        console.error('deliveryAPI.create: Axios error during POST request:', axiosError);
+        throw axiosError;
+      }
     } catch (error) {
       console.error('Error in deliveryAPI.create:', error);
+      console.error('Error details:', {
+        message: error.message,
+        status: error.status,
+        data: error.data,
+        stack: error.stack
+      });
       throw error;
     }
   },
@@ -186,10 +223,22 @@ export const delivererAPI = {
         console.error('No authentication token found');
         throw new Error('Authentication required. Please log in.');
       }
+      console.log('API: Auth token found, length:', token.length);
       
-      const response = await api.post('/deliverers', data);
-      console.log('API: Create deliverer response:', response);
-      return response;
+      // Log the request details
+      console.log('API: Making POST request to /deliverers');
+      console.log('API: Request headers will include Authorization: Bearer [token]');
+      
+      // Make the API call with detailed logging
+      console.log('API: About to make axios POST request');
+      try {
+        const response = await api.post('/deliverers', data);
+        console.log('API: Create deliverer response:', response);
+        return response;
+      } catch (axiosError) {
+        console.error('API: Axios error during POST request:', axiosError);
+        throw axiosError;
+      }
     } catch (error) {
       console.error('Error in delivererAPI.create:', error);
       console.error('Error details:', {
@@ -262,25 +311,44 @@ export const statisticsAPI = {
 export const jobsAPI = {
   getStatus: async () => {
     try {
+      console.log('jobsAPI.getStatus: Making GET request to /jobs/status');
+      
+      // Check if auth token exists
+      const token = localStorage.getItem('authToken');
+      console.log('jobsAPI.getStatus: Auth token exists:', !!token);
+      
       const response = await api.get('/jobs/status');
-      return response || {
-        jobStatus: { 
-          isRunning: false,
-          activeJobs: 0,
-          totalJobs: 0,
-          successRate: 0,
-          lastRun: null,
-          jobs: []
-        },
+      console.log('jobsAPI.getStatus: Response received:', response);
+      
+      // The backend should now return data in exactly the format we need
+      if (!response) {
+        throw new Error('Empty response from jobs status API');
+      }
+      
+      return response;
+    } catch (error) {
+      console.error('Error in jobsAPI.getStatus:', error);
+      console.error('Error details:', {
+        message: error.message,
+        status: error.status,
+        data: error.data,
+        stack: error.stack
+      });
+      
+      // Return fallback data on error to prevent UI crashes
+      return {
+        isRunning: false,
+        totalJobs: 0,
+        activeJobs: 0,
+        successRate: 0,
+        lastRun: null,
+        jobs: [],
         systemHealth: { 
           status: 'unknown',
           issuesCount: 0
         },
         recentRuns: []
       };
-    } catch (error) {
-      console.error('Error in jobsAPI.getStatus:', error);
-      throw error;
     }
   },
   getHealth: async () => {
