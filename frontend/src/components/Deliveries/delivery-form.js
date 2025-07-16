@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Save, X } from 'lucide-react';
-import { Input } from '../UI/input';
-import { Button } from '../UI/button';
-import { Select } from '../UI/select';
+import { Input } from '../ui/input';
+import { Button } from '../ui/button';
+import { Select } from '../ui/select';
 import { useTranslation } from 'react-i18next';
 import PropTypes from 'prop-types';
 

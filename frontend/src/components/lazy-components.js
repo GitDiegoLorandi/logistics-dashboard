@@ -1,5 +1,5 @@
 import React, { lazy } from 'react';
-import { Skeleton } from './UI/skeleton';
+import { Skeleton } from './ui/skeleton';
 
 // Loading fallback component
 const LoadingFallback = () => (
@@ -10,21 +10,18 @@ const LoadingFallback = () => (
 
 // Authentication components
 export const Login = lazy(() => import('./Login'));
-export const ForgotPassword = lazy(() => import('./forgot-password'));
-export const ResetPassword = lazy(() => import('./reset-password'));
-export const Register = lazy(() => import('./register'));
 
 // Core components
 export const ProtectedRoute = lazy(() => import('./protected-route'));
-export const DashboardLayout = lazy(() => import('./Layout/dashboard-layout'));
+export const DashboardLayout = lazy(() => import('./layout/dashboard-layout'));
 export const Welcome = lazy(() => import('./welcome'));
 
 // Page components
-export const DashboardOverview = lazy(() => import('./Dashboard/dashboard-overview'));
-export const DeliveriesPage = lazy(() => import('./Deliveries/deliveries-page'));
-export const DeliveryForm = lazy(() => import('./Deliveries/delivery-form'));
-export const DeliverersPage = lazy(() => import('./Deliverers/deliverers-page'));
-export const UsersPage = lazy(() => import('./Users/users-page'));
-export const AnalyticsPage = lazy(() => import('./Analytics/analytics-page'));
-export const JobsPage = lazy(() => import('./Jobs/jobs-page'));
-export const SettingsPage = lazy(() => import('./Settings/settings-page')); 
+export const DashboardOverview = lazy(() => import('./dashboard/dashboard-overview'));
+export const DeliveriesPage = lazy(() => import('./deliveries/deliveries-page'));
+export const DeliveryForm = lazy(() => import('./deliveries/delivery-form'));
+export const DeliverersPage = lazy(() => import('./deliverers/deliverers-page'));
+export const UsersPage = lazy(() => import('./users/users-page'));
+export const AnalyticsPage = lazy(() => import('./analytics/analytics-page'));
+export const JobsPage = lazy(() => import('./jobs/jobs-page'));
+export const SettingsPage = lazy(() => import('./settings/settings-page')); 
