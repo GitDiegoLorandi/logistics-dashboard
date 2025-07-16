@@ -803,7 +803,7 @@ const DeliverersPage = () => {
                       size='sm'
                       className='h-8 w-8 p-0'
                       onClick={() => handleViewStats(deliverer)}
-                      title={t('actions.viewStats')}
+                      title={t('actions.viewStats', { ns: 'common' })}
                     >
                       <BarChart3 className='h-4 w-4' />
                     </Button>
@@ -813,7 +813,7 @@ const DeliverersPage = () => {
                         size='sm'
                         className='h-8 w-8 p-0 text-info hover:text-info/80'
                         onClick={() => handleOpenAssignModal(deliverer)}
-                        title={t('actions.assign')}
+                        title={t('actions.assign', { ns: 'common' })}
                       >
                         <Link className='h-4 w-4' />
                       </Button>
@@ -825,7 +825,7 @@ const DeliverersPage = () => {
                           size='sm'
                           className='h-8 w-8 p-0'
                           onClick={() => handleEditDeliverer(deliverer)}
-                          title={t('actions.edit')}
+                          title={t('actions.edit', { ns: 'common' })}
                         >
                           <Edit3 className='h-4 w-4' />
                         </Button>
@@ -834,7 +834,7 @@ const DeliverersPage = () => {
                           size='sm'
                           className='h-8 w-8 p-0 text-destructive hover:text-destructive/80'
                           onClick={() => handleDeleteDeliverer(deliverer._id)}
-                          title={t('actions.delete')}
+                          title={t('actions.delete', { ns: 'common' })}
                         >
                           <Trash2 className='h-4 w-4' />
                         </Button>
