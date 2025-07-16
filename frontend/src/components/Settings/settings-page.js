@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   User,
   Settings,
@@ -24,6 +24,7 @@ import {
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { userAPI, authAPI } from '../../services/api';
+import { syncUserData, ensureConsistentUserIdFormat, getBestAvailableUserData } from './user-preferences';
 import { Button } from '../UI/button';
 import { Input } from '../UI/input';
 import { Select } from '../UI/select';
@@ -78,21 +79,10 @@ const SettingsPage = () => {
     },
   });
 
-  // Security Settings
-  const [securitySettings, setSecuritySettings] = useState({
-    twoFactorAuth: false,
-    sessionTimeout: 30,
-    loginAlerts: true,
-    apiKeyAccess: false,
-    ipRestrictions: '',
-    allowedDevices: 5,
-  });
-
   const tabs = [
     { id: 'profile', label: t('profile'), icon: User },
     { id: 'system', label: t('system'), icon: Settings },
     { id: 'notifications', label: t('notificationsTab', { defaultValue: 'Notifications' }), icon: Bell },
-    { id: 'security', label: t('security'), icon: Shield },
     { id: 'data', label: t('data'), icon: Database },
   ];
 
@@ -117,35 +107,75 @@ const SettingsPage = () => {
   const fetchUserProfile = async () => {
     try {
       setLoading(true);
-      const response = await userAPI.getProfile();
       
-      // Check if response exists and has data property
-      const userData = response && response.data ? response.data : response;
+      // First try to get best available user data as a fallback
+      const bestAvailableData = getBestAvailableUserData();
+      if (bestAvailableData && Object.keys(bestAvailableData).length > 0) {
+        // Pre-populate form with best available data while we fetch from API
+        setProfileData({
+          firstName: bestAvailableData.firstName || '',
+          lastName: bestAvailableData.lastName || '',
+          email: bestAvailableData.email || '',
+          phone: bestAvailableData.phone || '',
+          avatar: bestAvailableData.avatar || null,
+        });
+        setCurrentUser(bestAvailableData);
+      }
       
-      // Set current user with fallback to empty object
-      const user = userData || {};
-      setCurrentUser(user);
-
-      // Populate profile data with safe fallbacks
-      setProfileData({
-        firstName: user.firstName || '',
-        lastName: user.lastName || '',
-        email: user.email || '',
-        phone: user.phone || '',
-        avatar: user.avatar || null,
-      });
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      toast.error(t('failedToLoadProfile', { defaultValue: 'Failed to load profile data' }));
-      
-      // Set default profile data in case of error
-      setProfileData({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        avatar: null,
-      });
+      // Now try to get fresh data from the API
+      try {
+        // Get the current user data from the API
+        const response = await userAPI.getProfile();
+        console.log('User profile data received:', response);
+        
+        // Extract user data handling possible response structures
+        const userData = response?.data || response;
+        
+        if (!userData) {
+          throw new Error('No user data received');
+        }
+        
+        // Ensure ID format is consistent
+        const normalizedUserData = ensureConsistentUserIdFormat(userData);
+        
+        // Sync with localStorage
+        syncUserData(normalizedUserData);
+        
+        // Update state
+        setCurrentUser(normalizedUserData);
+        setProfileData({
+          firstName: normalizedUserData.firstName || '',
+          lastName: normalizedUserData.lastName || '',
+          email: normalizedUserData.email || '',
+          phone: normalizedUserData.phone || '',
+          avatar: normalizedUserData.avatar || null,
+        });
+        
+        console.log('Profile data set successfully:', {
+          firstName: normalizedUserData.firstName,
+          lastName: normalizedUserData.lastName,
+          email: normalizedUserData.email,
+        });
+      } catch (apiError) {
+        console.error('Error fetching user profile from API:', apiError);
+        
+        // We already set data from bestAvailableData if it exists, 
+        // so we only need to show an error message if we have no data at all
+        if (!bestAvailableData || Object.keys(bestAvailableData).length === 0) {
+          toast.error(t('failedToLoadProfile', { defaultValue: 'Failed to load profile data' }));
+          // Set empty profile data as last resort
+          setProfileData({
+            firstName: '',
+            lastName: '',
+            email: '',
+            phone: '',
+            avatar: null,
+          });
+        } else {
+          // Just show a warning that we're using cached data
+          toast.warn(t('usingCachedProfile', { defaultValue: 'Using cached profile data' }));
+        }
+      }
     } finally {
       setLoading(false);
     }
@@ -155,12 +185,54 @@ const SettingsPage = () => {
     e.preventDefault();
     try {
       setSaving(true);
-      await userAPI.updateProfile(profileData);
-      toast.success('Profile updated successfully');
-      fetchUserProfile();
+      
+      // Ensure we have the most complete user data for the update
+      const currentUserData = currentUser || getBestAvailableUserData();
+      
+      // Create the update data with proper ID fields
+      const updateData = {
+        ...profileData,
+        // Preserve IDs
+        id: currentUserData.id,
+        _id: currentUserData._id
+      };
+      
+      // Log the update attempt
+      console.log('Updating profile with data:', updateData);
+      
+      try {
+        // Try to update through API
+        const updatedData = await userAPI.updateProfile(updateData);
+        console.log('Profile update API response:', updatedData);
+        
+        // Sync updated data with localStorage
+        syncUserData({
+          ...currentUserData,
+          ...profileData,
+          ...(updatedData?.user || updatedData || {})
+        });
+        
+        toast.success(t('profileUpdated', { defaultValue: 'Profile updated successfully' }));
+      } catch (apiError) {
+        console.error('API error updating profile:', apiError);
+        
+        // Even if API fails, still update the localStorage data
+        // This allows the UI to remain consistent even if backend sync fails
+        syncUserData({
+          ...currentUserData,
+          ...profileData
+        });
+        
+        toast.warn(t('profileUpdatedLocallyOnly', { 
+          defaultValue: 'Profile updated locally only. Changes will sync when connection is restored.'
+        }));
+      }
+      
+      // Refresh user profile to get latest data and ensure consistency
+      await fetchUserProfile();
     } catch (error) {
-      console.error('Error updating profile:', error);
-      toast.error('Failed to update profile');
+      console.error('Error in profile update process:', error);
+      toast.error(t('profileUpdateFailed', { defaultValue: 'Failed to update profile' }));
     } finally {
       setSaving(false);
     }
@@ -201,15 +273,6 @@ const SettingsPage = () => {
     } finally {
       setSaving(false);
     }
-  };
-
-  const generateApiKey = () => {
-    const key =
-      'sk_' +
-      Math.random().toString(36).substring(2, 15) +
-      Math.random().toString(36).substring(2, 15);
-    toast.success('New API key generated');
-    return key;
   };
 
   const exportData = () => {
@@ -342,7 +405,7 @@ const SettingsPage = () => {
           <p className='text-muted-foreground'>{t('preferences')}</p>
         </div>
 
-        <div className='space-y-6'>
+        <form onSubmit={handleSystemPrefsSubmit} className='space-y-6'>
           <div>
             <h3 className='mb-4 text-lg font-medium'>{t('language')}</h3>
             <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
@@ -448,465 +511,322 @@ const SettingsPage = () => {
               )}
             </div>
           </div>
-        </div>
 
-        <div className='flex justify-end'>
-          <Button
-            onClick={handleSystemPrefsSubmit}
-            disabled={saving}
-            className='flex items-center gap-2'
-          >
-            <Save className='h-4 w-4' />
-            {saving ? t('common:loading') : t('savePreferences', { defaultValue: 'Save Preferences' })}
-          </Button>
-        </div>
+          <div className='flex justify-end'>
+            <Button
+              type="submit"
+              disabled={saving}
+              className='flex items-center gap-2'
+            >
+              <Save className='h-4 w-4' />
+              {saving ? t('common:loading') : t('savePreferences', { defaultValue: 'Save Preferences' })}
+            </Button>
+          </div>
+        </form>
       </div>
     </div>
   );
 
   const renderNotificationsTab = () => (
-    <div className='tab-content'>
-      <div className='tab-header'>
-        <h2>{t('notificationsTab', { ns: 'settings' })}</h2>
-        <p>{t('notificationsDescription', { defaultValue: 'Configure how and when you receive notifications' })}</p>
-      </div>
-
-      <form onSubmit={handleNotificationSubmit} className='settings-form'>
-        <div className='form-section'>
-          <h3>{t('notificationChannels', { defaultValue: 'Notification Channels' })}</h3>
-          <div className='notification-toggles'>
-            <div className='form-group'>
-              <label className='checkbox-label'>
-                <input
-                  type='checkbox'
-                  checked={notificationSettings.emailNotifications}
-                  onChange={e =>
-                    setNotificationSettings({
-                      ...notificationSettings,
-                      emailNotifications: e.target.checked,
-                    })
-                  }
-                />
-                <span className='checkmark'></span>
-                <Mail size={16} />
-                {t('notifications.email', { ns: 'settings' })}
-              </label>
-            </div>
-
-            <div className='form-group'>
-              <label className='checkbox-label'>
-                <input
-                  type='checkbox'
-                  checked={notificationSettings.pushNotifications}
-                  onChange={e =>
-                    setNotificationSettings({
-                      ...notificationSettings,
-                      pushNotifications: e.target.checked,
-                    })
-                  }
-                />
-                <span className='checkmark'></span>
-                <Bell size={16} />
-                {t('notifications.push', { ns: 'settings' })}
-              </label>
-            </div>
-
-            <div className='form-group'>
-              <label className='checkbox-label'>
-                <input
-                  type='checkbox'
-                  checked={notificationSettings.smsNotifications}
-                  onChange={e =>
-                    setNotificationSettings({
-                      ...notificationSettings,
-                      smsNotifications: e.target.checked,
-                    })
-                  }
-                />
-                <span className='checkmark'></span>
-                <Phone size={16} />
-                {t('notifications.sms', { ns: 'settings' })}
-              </label>
-            </div>
-          </div>
+    <div className='space-y-6'>
+      <div className='flex flex-col gap-6 rounded-xl bg-card p-6 shadow'>
+        <div>
+          <h2 className='text-xl font-bold'>{t('notificationsTab', { ns: 'settings' })}</h2>
+          <p className='text-muted-foreground'>{t('notificationsDescription', { defaultValue: 'Configure how and when you receive notifications' })}</p>
         </div>
 
-        <div className='form-section'>
-          <h3>{t('notificationTypes', { defaultValue: 'Notification Types' })}</h3>
-          <div className='notification-types'>
-            <div className='form-group'>
-              <label className='checkbox-label'>
-                <input
-                  type='checkbox'
-                  checked={notificationSettings.deliveryUpdates}
-                  onChange={e =>
-                    setNotificationSettings({
-                      ...notificationSettings,
-                      deliveryUpdates: e.target.checked,
-                    })
-                  }
-                />
-                <span className='checkmark'></span>
-                {t('notifications.deliveryUpdates', { ns: 'settings' })}
-              </label>
-              <small>{t('deliveryUpdatesDescription', { defaultValue: 'Get notified when delivery status changes' })}</small>
-            </div>
-
-            <div className='form-group'>
-              <label className='checkbox-label'>
-                <input
-                  type='checkbox'
-                  checked={notificationSettings.systemAlerts}
-                  onChange={e =>
-                    setNotificationSettings({
-                      ...notificationSettings,
-                      systemAlerts: e.target.checked,
-                    })
-                  }
-                />
-                <span className='checkmark'></span>
-                {t('notifications.systemAlerts', { ns: 'settings' })}
-              </label>
-              <small>{t('systemAlertsDescription', { defaultValue: 'Important system notifications and errors' })}</small>
-            </div>
-
-            <div className='form-group'>
-              <label className='checkbox-label'>
-                <input
-                  type='checkbox'
-                  checked={notificationSettings.weeklyReports}
-                  onChange={e =>
-                    setNotificationSettings({
-                      ...notificationSettings,
-                      weeklyReports: e.target.checked,
-                    })
-                  }
-                />
-                <span className='checkmark'></span>
-                {t('notifications.weeklyReports', { ns: 'settings' })}
-              </label>
-              <small>{t('weeklyReportsDescription', { defaultValue: 'Performance summaries and analytics' })}</small>
-            </div>
-          </div>
-        </div>
-
-        <div className='form-section'>
-          <h3>{t('quietHours', { defaultValue: 'Quiet Hours' })}</h3>
-          <div className='form-group'>
-            <label className='checkbox-label'>
-              <input
-                type='checkbox'
-                checked={notificationSettings.quietHours.enabled}
-                onChange={e =>
-                  setNotificationSettings({
-                    ...notificationSettings,
-                    quietHours: {
-                      ...notificationSettings.quietHours,
-                      enabled: e.target.checked,
-                    },
-                  })
-                }
-              />
-              <span className='checkmark'></span>
-              {t('enableQuietHours', { defaultValue: 'Enable Quiet Hours' })}
-            </label>
-            <small>
-              {t('quietHoursDescription', { defaultValue: 'Suppress non-critical notifications during specified hours' })}
-            </small>
-          </div>
-
-          {notificationSettings.quietHours.enabled && (
-            <div className='form-row'>
-              <div className='form-group'>
-                <label>{t('startTime', { defaultValue: 'Start Time' })}</label>
-                <input
-                  type='time'
-                  value={notificationSettings.quietHours.start}
-                  onChange={e =>
-                    setNotificationSettings({
-                      ...notificationSettings,
-                      quietHours: {
-                        ...notificationSettings.quietHours,
-                        start: e.target.value,
-                      },
-                    })
-                  }
-                />
-              </div>
-              <div className='form-group'>
-                <label>{t('endTime', { defaultValue: 'End Time' })}</label>
-                <input
-                  type='time'
-                  value={notificationSettings.quietHours.end}
-                  onChange={e =>
-                    setNotificationSettings({
-                      ...notificationSettings,
-                      quietHours: {
-                        ...notificationSettings.quietHours,
-                        end: e.target.value,
-                      },
-                    })
-                  }
-                />
-              </div>
-            </div>
-          )}
-        </div>
-
-        <div className='form-actions'>
-          <button type='submit' className='btn-primary' disabled={saving}>
-            {saving ? (
-              <RefreshCw className='spinning' size={16} />
-            ) : (
-              <Save size={16} />
-            )}
-            {t('saveNotificationSettings', { defaultValue: 'Save Notification Settings' })}
-          </button>
-        </div>
-      </form>
-    </div>
-  );
-
-  const renderSecurityTab = () => (
-    <div className='tab-content'>
-      <div className='tab-header'>
-        <h2>Security Settings</h2>
-        <p>Manage your account security and access controls</p>
-      </div>
-
-      <div className='settings-form'>
-        <div className='form-section'>
-          <h3>Authentication</h3>
-          <div className='security-item'>
-            <div className='security-info'>
-              <h4>Two-Factor Authentication</h4>
-              <p>Add an extra layer of security to your account</p>
-            </div>
-            <div className='security-action'>
-              <button
-                className={`btn-toggle ${securitySettings.twoFactorAuth ? 'active' : ''}`}
-                onClick={() =>
-                  setSecuritySettings({
-                    ...securitySettings,
-                    twoFactorAuth: !securitySettings.twoFactorAuth,
-                  })
-                }
-              >
-                {securitySettings.twoFactorAuth ? 'Enabled' : 'Disabled'}
-              </button>
-            </div>
-          </div>
-
-          <div className='form-group'>
-            <label>Session Timeout (minutes)</label>
-            <select
-              value={securitySettings.sessionTimeout}
-              onChange={e =>
-                setSecuritySettings({
-                  ...securitySettings,
-                  sessionTimeout: parseInt(e.target.value),
-                })
-              }
-            >
-              <option value='15'>15 minutes</option>
-              <option value='30'>30 minutes</option>
-              <option value='60'>1 hour</option>
-              <option value='240'>4 hours</option>
-              <option value='480'>8 hours</option>
-            </select>
-          </div>
-        </div>
-
-        <div className='form-section'>
-          <h3>API Access</h3>
-          <div className='security-item'>
-            <div className='security-info'>
-              <h4>API Key Access</h4>
-              <p>Generate API keys for third-party integrations</p>
-            </div>
-            <div className='security-action'>
-              <button
-                className={`btn-toggle ${securitySettings.apiKeyAccess ? 'active' : ''}`}
-                onClick={() =>
-                  setSecuritySettings({
-                    ...securitySettings,
-                    apiKeyAccess: !securitySettings.apiKeyAccess,
-                  })
-                }
-              >
-                {securitySettings.apiKeyAccess ? 'Enabled' : 'Disabled'}
-              </button>
-            </div>
-          </div>
-
-          {securitySettings.apiKeyAccess && (
-            <div className='api-key-section'>
-              <div className='api-key-display'>
-                <label>Current API Key</label>
-                <div className='api-key-input'>
-                  <input
-                    type={showApiKey ? 'text' : 'password'}
-                    value='sk_1234567890abcdef'
-                    readOnly
-                  />
-                  <button
-                    type='button'
-                    onClick={() => setShowApiKey(!showApiKey)}
-                    className='btn-icon'
-                  >
-                    {showApiKey ? <EyeOff size={16} /> : <Eye size={16} />}
-                  </button>
+        <form onSubmit={handleNotificationSubmit} className='space-y-6'>
+          <div>
+            <h3 className='mb-4 text-lg font-medium'>{t('notificationChannels', { defaultValue: 'Notification Channels' })}</h3>
+            <div className='space-y-4'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <Label htmlFor='email-notifications'>{t('notifications.email', { ns: 'settings' })}</Label>
                 </div>
+                <Switch
+                  id='email-notifications'
+                  checked={notificationSettings.emailNotifications}
+                  onChange={checked =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      emailNotifications: checked,
+                    })
+                  }
+                />
               </div>
-              <button
-                type='button'
-                onClick={generateApiKey}
-                className='btn-secondary'
-              >
-                <RefreshCw size={16} />
-                Generate New Key
-              </button>
+              
+              <div className='flex items-center justify-between'>
+                <div>
+                  <Label htmlFor='push-notifications'>{t('notifications.push', { ns: 'settings' })}</Label>
+                </div>
+                <Switch
+                  id='push-notifications'
+                  checked={notificationSettings.pushNotifications}
+                  onChange={checked =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      pushNotifications: checked,
+                    })
+                  }
+                />
+              </div>
+              
+              <div className='flex items-center justify-between'>
+                <div>
+                  <Label htmlFor='sms-notifications'>{t('notifications.sms', { ns: 'settings' })}</Label>
+                </div>
+                <Switch
+                  id='sms-notifications'
+                  checked={notificationSettings.smsNotifications}
+                  onChange={checked =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      smsNotifications: checked,
+                    })
+                  }
+                />
+              </div>
             </div>
-          )}
-        </div>
-
-        <div className='form-section'>
-          <h3>Login Security</h3>
-          <div className='form-group'>
-            <label className='checkbox-label'>
-              <input
-                type='checkbox'
-                checked={securitySettings.loginAlerts}
-                onChange={e =>
-                  setSecuritySettings({
-                    ...securitySettings,
-                    loginAlerts: e.target.checked,
-                  })
-                }
-              />
-              <span className='checkmark'></span>
-              Email alerts for new logins
-            </label>
           </div>
 
-          <div className='form-group'>
-            <label>Maximum Allowed Devices</label>
-            <select
-              value={securitySettings.allowedDevices}
-              onChange={e =>
-                setSecuritySettings({
-                  ...securitySettings,
-                  allowedDevices: parseInt(e.target.value),
-                })
-              }
+          <div>
+            <h3 className='mb-4 text-lg font-medium'>{t('notificationTypes', { defaultValue: 'Notification Types' })}</h3>
+            <div className='space-y-4'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <Label htmlFor='delivery-updates'>{t('notifications.deliveryUpdates', { ns: 'settings' })}</Label>
+                  <p className='text-sm text-muted-foreground'>
+                    {t('deliveryUpdatesDescription', { defaultValue: 'Get notified when delivery status changes' })}
+                  </p>
+                </div>
+                <Switch
+                  id='delivery-updates'
+                  checked={notificationSettings.deliveryUpdates}
+                  onChange={checked =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      deliveryUpdates: checked,
+                    })
+                  }
+                />
+              </div>
+              
+              <div className='flex items-center justify-between'>
+                <div>
+                  <Label htmlFor='system-alerts'>{t('notifications.systemAlerts', { ns: 'settings' })}</Label>
+                  <p className='text-sm text-muted-foreground'>
+                    {t('systemAlertsDescription', { defaultValue: 'Important system notifications and errors' })}
+                  </p>
+                </div>
+                <Switch
+                  id='system-alerts'
+                  checked={notificationSettings.systemAlerts}
+                  onChange={checked =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      systemAlerts: checked,
+                    })
+                  }
+                />
+              </div>
+              
+              <div className='flex items-center justify-between'>
+                <div>
+                  <Label htmlFor='weekly-reports'>{t('notifications.weeklyReports', { ns: 'settings' })}</Label>
+                  <p className='text-sm text-muted-foreground'>
+                    {t('weeklyReportsDescription', { defaultValue: 'Performance summaries and analytics' })}
+                  </p>
+                </div>
+                <Switch
+                  id='weekly-reports'
+                  checked={notificationSettings.weeklyReports}
+                  onChange={checked =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      weeklyReports: checked,
+                    })
+                  }
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <h3 className='mb-4 text-lg font-medium'>{t('quietHours', { defaultValue: 'Quiet Hours' })}</h3>
+            <div className='space-y-4'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <Label htmlFor='quiet-hours'>{t('enableQuietHours', { defaultValue: 'Enable Quiet Hours' })}</Label>
+                  <p className='text-sm text-muted-foreground'>
+                    {t('quietHoursDescription', { defaultValue: 'Suppress non-critical notifications during specified hours' })}
+                  </p>
+                </div>
+                <Switch
+                  id='quiet-hours'
+                  checked={notificationSettings.quietHours.enabled}
+                  onChange={checked =>
+                    setNotificationSettings({
+                      ...notificationSettings,
+                      quietHours: {
+                        ...notificationSettings.quietHours,
+                        enabled: checked,
+                      },
+                    })
+                  }
+                />
+              </div>
+              
+              {notificationSettings.quietHours.enabled && (
+                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+                  <div className='space-y-2'>
+                    <Label htmlFor='start-time'>{t('startTime', { defaultValue: 'Start Time' })}</Label>
+                    <Input
+                      id='start-time'
+                      type='time'
+                      value={notificationSettings.quietHours.start}
+                      onChange={e =>
+                        setNotificationSettings({
+                          ...notificationSettings,
+                          quietHours: {
+                            ...notificationSettings.quietHours,
+                            start: e.target.value,
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                  <div className='space-y-2'>
+                    <Label htmlFor='end-time'>{t('endTime', { defaultValue: 'End Time' })}</Label>
+                    <Input
+                      id='end-time'
+                      type='time'
+                      value={notificationSettings.quietHours.end}
+                      onChange={e =>
+                        setNotificationSettings({
+                          ...notificationSettings,
+                          quietHours: {
+                            ...notificationSettings.quietHours,
+                            end: e.target.value,
+                          },
+                        })
+                      }
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className='flex justify-end'>
+            <Button
+              type='submit'
+              disabled={saving}
+              className='flex items-center gap-2'
             >
-              <option value='3'>3 devices</option>
-              <option value='5'>5 devices</option>
-              <option value='10'>10 devices</option>
-              <option value='unlimited'>Unlimited</option>
-            </select>
+              <Save className='h-4 w-4' />
+              {saving ? t('common:loading') : t('saveNotificationSettings', { defaultValue: 'Save Notification Settings' })}
+            </Button>
           </div>
-        </div>
-
-        <div className='form-actions'>
-          <button
-            type='button'
-            onClick={() => toast.success('Security settings saved')}
-            className='btn-primary'
-          >
-            <Save size={16} />
-            Save Security Settings
-          </button>
-        </div>
+        </form>
       </div>
     </div>
   );
 
   const renderDataTab = () => (
-    <div className='tab-content'>
-      <div className='tab-header'>
-        <h2>Data Management</h2>
-        <p>Import, export, and manage your data</p>
-      </div>
+    <div className='space-y-6'>
+      <div className='flex flex-col gap-6 rounded-xl bg-card p-6 shadow'>
+        <div>
+          <h2 className='text-xl font-bold'>{t('data', { defaultValue: 'Data Management' })}</h2>
+          <p className='text-muted-foreground'>{t('dataManagementDescription', { defaultValue: 'Import, export, and manage your data' })}</p>
+        </div>
 
-      <div className='settings-form'>
-        <div className='form-section'>
-          <h3>Data Export</h3>
-          <div className='data-actions'>
-            <div className='data-action-item'>
-              <div className='data-info'>
-                <h4>Export Deliveries</h4>
-                <p>Download delivery history in CSV format</p>
+        <div className='space-y-6'>
+          <div>
+            <h3 className='mb-4 text-lg font-medium'>{t('dataExport', { defaultValue: 'Data Export' })}</h3>
+            <div className='space-y-4'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <p className='font-medium'>{t('exportDeliveries', { defaultValue: 'Export Deliveries' })}</p>
+                  <p className='text-sm text-muted-foreground'>
+                    {t('exportDeliveriesDescription', { defaultValue: 'Download delivery history in CSV format' })}
+                  </p>
+                </div>
+                <Button
+                  onClick={exportDeliveries}
+                  variant="outline"
+                  disabled={saving}
+                  className='flex items-center gap-2'
+                >
+                  {saving ? (
+                    <>
+                      <RefreshCw className='h-4 w-4 animate-spin' />
+                      {t('exporting', { defaultValue: 'Exporting...' })}
+                    </>
+                  ) : (
+                    <>
+                      <Download className='h-4 w-4' />
+                      {t('exportDeliveries', { defaultValue: 'Export Deliveries' })}
+                    </>
+                  )}
+                </Button>
               </div>
-              <button
-                onClick={exportDeliveries}
-                className='btn-secondary'
-                disabled={saving}
-              >
-                {saving ? (
-                  <>
-                    <RefreshCw className='spinning' size={16} />
-                    Exporting...
-                  </>
-                ) : (
-                  <>
-                    <Download size={16} />
-                    Export Deliveries
-                  </>
-                )}
-              </button>
             </div>
           </div>
-        </div>
 
-        <div className='form-section'>
-          <h3>Data Import</h3>
-          <div className='data-actions'>
-            <div className='data-action-item'>
-              <div className='data-info'>
-                <h4>Import Deliveries</h4>
-                <p>Upload delivery data from CSV file</p>
+          <div>
+            <h3 className='mb-4 text-lg font-medium'>{t('dataImport', { defaultValue: 'Data Import' })}</h3>
+            <div className='space-y-4'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <p className='font-medium'>{t('importDeliveries', { defaultValue: 'Import Deliveries' })}</p>
+                  <p className='text-sm text-muted-foreground'>
+                    {t('importDeliveriesDescription', { defaultValue: 'Upload delivery data from CSV file' })}
+                  </p>
+                </div>
+                <Button variant="outline" className='flex items-center gap-2'>
+                  <Upload className='h-4 w-4' />
+                  {t('chooseFile', { defaultValue: 'Choose File' })}
+                  <input type='file' accept='.csv' className='hidden' />
+                </Button>
               </div>
-              <label className='file-upload-btn'>
-                <Upload size={16} />
-                Choose File
-                <input type='file' accept='.csv' style={{ display: 'none' }} />
-              </label>
             </div>
           </div>
-        </div>
 
-        <div className='form-section'>
-          <h3>Data Retention</h3>
-          <div className='form-group'>
-            <label>Automatic Data Cleanup</label>
-            <select>
-              <option value='never'>Never delete</option>
-              <option value='1year'>After 1 year</option>
-              <option value='2years'>After 2 years</option>
-              <option value='5years'>After 5 years</option>
-            </select>
-            <small>
-              Automatically delete old delivery records after specified period
-            </small>
-          </div>
-        </div>
-
-        <div className='form-section danger-zone'>
-          <h3>Danger Zone</h3>
-          <div className='danger-actions'>
-            <div className='danger-item'>
-              <div className='danger-info'>
-                <h4>Delete All Data</h4>
-                <p>
-                  Permanently delete all your account data. This action cannot
-                  be undone.
-                </p>
+          <div>
+            <h3 className='mb-4 text-lg font-medium'>{t('dataRetention', { defaultValue: 'Data Retention' })}</h3>
+            <div className='space-y-4'>
+              <div className='grid grid-cols-1 gap-4'>
+                <div className='space-y-2'>
+                  <label className='text-sm font-medium'>{t('automaticDataCleanup', { defaultValue: 'Automatic Data Cleanup' })}</label>
+                  <Select>
+                    <option value='never'>{t('neverDelete', { defaultValue: 'Never delete' })}</option>
+                    <option value='1year'>{t('after1Year', { defaultValue: 'After 1 year' })}</option>
+                    <option value='2years'>{t('after2Years', { defaultValue: 'After 2 years' })}</option>
+                    <option value='5years'>{t('after5Years', { defaultValue: 'After 5 years' })}</option>
+                  </Select>
+                  <p className='text-xs text-muted-foreground'>
+                    {t('automaticDataCleanupDescription', { defaultValue: 'Automatically delete old delivery records after specified period' })}
+                  </p>
+                </div>
               </div>
-              <button className='btn-danger'>
-                <AlertTriangle size={16} />
-                Delete All Data
-              </button>
+            </div>
+          </div>
+
+          <div className='border-t pt-6'>
+            <h3 className='mb-4 text-lg font-medium text-destructive'>{t('dangerZone', { defaultValue: 'Danger Zone' })}</h3>
+            <div className='space-y-4'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <p className='font-medium'>{t('deleteAllData', { defaultValue: 'Delete All Data' })}</p>
+                  <p className='text-sm text-muted-foreground'>
+                    {t('deleteAllDataDescription', { defaultValue: 'Permanently delete all your account data. This action cannot be undone.' })}
+                  </p>
+                </div>
+                <Button variant="destructive" className='flex items-center gap-2'>
+                  <AlertTriangle className='h-4 w-4' />
+                  {t('deleteAllData', { defaultValue: 'Delete All Data' })}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -922,8 +842,6 @@ const SettingsPage = () => {
         return renderSystemTab();
       case 'notifications':
         return renderNotificationsTab();
-      case 'security':
-        return renderSecurityTab();
       case 'data':
         return renderDataTab();
       default:
