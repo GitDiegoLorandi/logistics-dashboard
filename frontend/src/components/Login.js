@@ -70,7 +70,19 @@ const Login = () => {
       console.log('Login successful, response:', response);
       console.log('User role from response:', response.user?.role);
 
-      // No need to manually store token/user as authAPI.login now handles this
+      // Explicitly store token and user data in localStorage
+      if (response.token) {
+        console.log('Storing auth token in localStorage');
+        localStorage.setItem('authToken', response.token);
+        
+        if (response.user) {
+          console.log('Storing user data in localStorage:', response.user);
+          localStorage.setItem('user', JSON.stringify(response.user));
+        }
+      } else {
+        console.warn('No token received in login response');
+      }
+
       toast.success(t('login.welcome', { name: response.user?.name || response.user?.email || t('common.user') }));
       navigate('/dashboard');
     } catch (error) {
