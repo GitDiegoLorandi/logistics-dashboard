@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { authAPI } from '../services/api';
 import { toast } from 'react-toastify';
-import { Button } from './UI/button';
+import { Button } from './ui/button';
 import { cn } from '../lib/utils';
 import { Eye, EyeOff, Lock, Mail, Package } from 'lucide-react';
-import LanguageSwitcher from './UI/language-switcher';
+import LanguageSwitcher from './ui/language-switcher';
 
 const Login = () => {
   const { t } = useTranslation(['auth', 'common']);
@@ -159,14 +159,9 @@ const Login = () => {
             </div>
 
             <div className='space-y-2'>
-              <div className="flex items-center justify-between">
-                <label htmlFor='password' className='text-sm font-medium'>
-                  {t('login.password')}
-                </label>
-                <Link to="/forgot-password" className="text-xs text-primary hover:underline">
-                  {t('login.forgotPassword')}
-                </Link>
-              </div>
+              <label htmlFor='password' className='text-sm font-medium'>
+                {t('login.password')}
+              </label>
               <div className='relative'>
                 <Lock className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
                 <input
@@ -234,15 +229,6 @@ const Login = () => {
               )}
             </Button>
           </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              {t('login.noAccount')}{' '}
-              <Link to="/register" className="text-primary hover:underline">
-                {t('login.signUp')}
-              </Link>
-            </p>
-          </div>
 
           <div className='mt-8 border-t border-border pt-6'>
             <div className='rounded-md bg-muted/50 p-4 text-center text-xs text-muted-foreground'>

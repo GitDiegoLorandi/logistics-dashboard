@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { Package, ArrowRight, CheckCircle } from 'lucide-react';
-import { Button } from './UI/button';
+import { Button } from './ui/button';
 
 const Welcome = () => {
   const { t } = useTranslation(['welcome', 'common']);

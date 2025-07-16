@@ -12,9 +12,9 @@ import {
   RefreshCw
 } from 'lucide-react';
 import { statisticsAPI } from '../../services/api';
-import ResponsiveChartCard from '../UI/data-visualization/charts/responsive-chart-card';
-import { LineChart, PieChart } from '../UI/data-visualization/charts';
-import { Button } from '../UI/button';
+import ResponsiveChartCard from '../ui/data-visualization/charts/responsive-chart-card';
+import { LineChart, PieChart } from '../ui/data-visualization/charts';
+import { Button } from '../ui/button';
 
 /**
  * Dashboard overview component

@@ -13,14 +13,14 @@ import {
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { statisticsAPI } from '../../services/api';
-import { Button } from '../UI/button';
-import { Card, CardContent } from '../UI/card';
-import { Badge } from '../UI/badge';
-import { Grid, GridItem } from '../UI/grid';
-import { Input } from '../UI/input';
-import { Select } from '../UI/select';
-import { Label } from '../UI/label';
-import ResponsiveChartCard from '../UI/data-visualization/charts/responsive-chart-card';
+import { Button } from '../ui/button';
+import { Card, CardContent } from '../ui/card';
+import { Badge } from '../ui/badge';
+import { Grid, GridItem } from '../ui/grid';
+import { Input } from '../ui/input';
+import { Select } from '../ui/select';
+import { Label } from '../ui/label';
+import ResponsiveChartCard from '../ui/data-visualization/charts/responsive-chart-card';
 import {
   LineChart,
   Line,

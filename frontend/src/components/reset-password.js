@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Package, Lock, Eye, EyeOff, Check } from 'lucide-react';
-import { Button } from './UI/button';
+import { Button } from './ui/button';
 import { cn } from '../lib/utils';
 
 const ResetPassword = () => {
