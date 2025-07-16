@@ -134,6 +134,12 @@
     "onTime": "On-time delivery rate",
     "lastSevenDays": "Last 7 days",
     "currentStatus": "Current status",
+    "noDataAvailable": "No data available",
+    "noDataAvailableShort": "N/A",
+    "userDataNotAvailable": "User data not available",
+    "dataLoadingError": "Error loading dashboard data",
+    "noTrendDataAvailable": "No trend data available",
+    "noStatusDataAvailable": "No status data available",
     "chartLabels": {
       "dailyDeliveryTrends": "Daily delivery trends",
       "statusDistribution": "Current delivery status distribution",
