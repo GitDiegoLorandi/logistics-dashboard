@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { useTable, useSortBy, useFilters, usePagination } from 'react-table';
 import { LucideChevronDown, LucideChevronUp, LucideDownload } from 'lucide-react';
-import { Button } from '../UI/button';
-import { Badge } from '../UI/badge';
+import { Button } from '../ui/button';
+import { Badge } from '../ui/badge';
 import { getStatusColor } from '../../constants/status-colors';
 import { exportToCSV } from '../../utils/export-utils';
 import PropTypes from 'prop-types';

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { 
   LucideMenu, 
@@ -23,18 +23,81 @@ import { useTranslation } from '../../hooks/use-translation';
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
   const location = useLocation();
   const { t } = useTranslation('common');
   
-  // Navigation items
-  const navItems = [
-    { path: '/dashboard', icon: <LucideBarChart2 className="h-5 w-5" />, label: t('navigation.dashboard') },
-    { path: '/dashboard/deliveries', icon: <LucidePackage className="h-5 w-5" />, label: t('navigation.deliveries') },
-    { path: '/dashboard/deliverers', icon: <LucideTruck className="h-5 w-5" />, label: t('navigation.deliverers') },
-    { path: '/dashboard/users', icon: <LucideUsers className="h-5 w-5" />, label: t('navigation.users') },
-    { path: '/dashboard/jobs', icon: <LucideBriefcase className="h-5 w-5" />, label: t('navigation.jobs') },
-    { path: '/dashboard/settings', icon: <LucideSettings className="h-5 w-5" />, label: t('navigation.settings') },
+  // Get current user from localStorage on mount
+  useEffect(() => {
+    const userData = localStorage.getItem('user');
+    if (userData) {
+      try {
+        const parsedUser = JSON.parse(userData);
+        setCurrentUser(parsedUser);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+      }
+    }
+  }, []);
+
+  // Check if user has required role
+  const hasRole = (requiredRoles) => {
+    if (!currentUser || !currentUser.role) return false;
+    const userRole = currentUser.role.toLowerCase();
+    return requiredRoles.includes(userRole);
+  };
+  
+  // All possible navigation items with role requirements
+  const allNavItems = [
+    { 
+      path: '/dashboard', 
+      icon: <LucideBarChart2 className="h-5 w-5" />, 
+      label: t('navigation.dashboard'),
+      roles: ['admin', 'user', 'manager', 'deliverer']
+    },
+    { 
+      path: '/dashboard/deliveries', 
+      icon: <LucidePackage className="h-5 w-5" />, 
+      label: t('navigation.deliveries'),
+      roles: ['admin', 'user', 'manager', 'deliverer']
+    },
+    { 
+      path: '/dashboard/deliverers', 
+      icon: <LucideTruck className="h-5 w-5" />, 
+      label: t('navigation.deliverers'),
+      roles: ['admin', 'user', 'manager', 'deliverer']
+    },
+    { 
+      path: '/dashboard/users', 
+      icon: <LucideUsers className="h-5 w-5" />, 
+      label: t('navigation.users'),
+      roles: ['admin']
+    },
+    {
+      path: '/dashboard/analytics',
+      icon: <LucideBarChart2 className="h-5 w-5" />,
+      label: t('navigation.analytics'),
+      roles: ['admin', 'manager']
+    },
+    { 
+      path: '/dashboard/jobs', 
+      icon: <LucideBriefcase className="h-5 w-5" />, 
+      label: t('navigation.jobs'),
+      roles: ['admin']
+    },
+    { 
+      path: '/dashboard/settings', 
+      icon: <LucideSettings className="h-5 w-5" />, 
+      label: t('navigation.settings'),
+      roles: ['admin', 'user', 'manager', 'deliverer']
+    },
   ];
+  
+  // Filter navigation items based on user role
+  const navItems = allNavItems.filter(item => {
+    if (!currentUser || !item.roles) return false;
+    return item.roles.includes(currentUser.role?.toLowerCase() || 'user');
+  });
   
   // Generate breadcrumbs from current path
   const generateBreadcrumbs = () => {
@@ -46,6 +109,7 @@ const DashboardLayout = () => {
       deliveries: 'navigation.deliveries',
       deliverers: 'navigation.deliverers',
       users: 'navigation.users',
+      analytics: 'navigation.analytics',
       jobs: 'navigation.jobs',
       settings: 'navigation.settings',
       new: 'actions.add',
@@ -81,7 +145,17 @@ const DashboardLayout = () => {
   const handleLogout = () => {
     // Clear token and redirect to login
     localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
     window.location.href = '/login';
+  };
+  
+  // Get user role text for display
+  const getUserRoleText = () => {
+    if (!currentUser || !currentUser.role) return '';
+    
+    // Capitalize first letter
+    const role = currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1).toLowerCase();
+    return role;
   };
   
   return (
@@ -141,11 +215,16 @@ const DashboardLayout = () => {
           <div className="mb-4 flex items-center gap-3">
             <Avatar>
               <AvatarImage src="/avatars/user.png" />
-              <AvatarFallback>JD</AvatarFallback>
+              <AvatarFallback>
+                {currentUser?.firstName?.charAt(0) || 'U'}
+                {currentUser?.lastName?.charAt(0) || ''}
+              </AvatarFallback>
             </Avatar>
             <div>
-              <p className="text-sm font-medium">John Doe</p>
-              <p className="text-xs text-muted-foreground">Administrator</p>
+              <p className="text-sm font-medium">
+                {currentUser?.firstName || ''} {currentUser?.lastName || 'User'}
+              </p>
+              <p className="text-xs text-muted-foreground">{getUserRoleText()}</p>
             </div>
           </div>
           <Button 
