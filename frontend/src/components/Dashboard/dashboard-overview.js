@@ -11,7 +11,7 @@ import {
   Truck,
   RefreshCw
 } from 'lucide-react';
-import { statisticsAPI } from '../../services/api';
+import { deliveryAPI, userAPI, delivererAPI } from '../../services/api';
 import ResponsiveChartCard from '../ui/data-visualization/charts/responsive-chart-card';
 import { LineChart, PieChart } from '../ui/data-visualization/charts';
 import { Button } from '../ui/button';
@@ -29,14 +29,102 @@ const DashboardOverview = () => {
     try {
       setLoading(true);
       setError(null);
-      console.log('Fetching dashboard statistics...');
+      console.log('Fetching dashboard data from APIs...');
       
-      // Fetch statistics from API
-      const data = await statisticsAPI.getOverall();
-      console.log('Dashboard statistics received:', data);
-      setStats(data);
+      // Fetch data from multiple APIs
+      const [deliveriesData, deliverersData, usersData] = await Promise.all([
+        deliveryAPI.getAll(),
+        delivererAPI.getAll(),
+        userAPI.getProfile().catch(() => null)
+      ]);
+
+      // Process deliveries data
+      const deliveriesArray = deliveriesData?.docs || [];
+      const delivered = deliveriesArray.filter(d => d.status === 'Delivered').length;
+      const pending = deliveriesArray.filter(d => d.status === 'Pending').length;
+      const inTransit = deliveriesArray.filter(d => d.status === 'In Transit').length;
+      const cancelled = deliveriesArray.filter(d => d.status === 'Cancelled').length;
+      
+      // Create status breakdown for pie chart
+      const byStatus = [
+        { name: 'Delivered', value: delivered },
+        { name: 'Pending', value: pending },
+        { name: 'In Transit', value: inTransit },
+        { name: 'Cancelled', value: cancelled }
+      ].filter(item => item.value > 0);
+
+      // Create trends data - last 7 days
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+      
+      // Group by date to create trend data
+      const trendData = [];
+      const dateMap = new Map();
+      
+      deliveriesArray.forEach(delivery => {
+        const date = new Date(delivery.createdAt || delivery.created_at || Date.now()).toISOString().split('T')[0];
+        if (!dateMap.has(date)) {
+          dateMap.set(date, { date, completed: 0, pending: 0 });
+        }
+        
+        if (delivery.status === 'Delivered') {
+          dateMap.get(date).completed += 1;
+        } else if (delivery.status === 'Pending' || delivery.status === 'In Transit') {
+          dateMap.get(date).pending += 1;
+        }
+      });
+      
+      // Convert to array and sort by date
+      const trendsArray = Array.from(dateMap.values())
+        .sort((a, b) => new Date(a.date) - new Date(b.date))
+        .slice(-7); // Only take the last 7 days
+
+      // Calculate on-time delivery rate
+      const totalDelivered = delivered;
+      const onTimeDeliveries = deliveriesArray.filter(
+        d => d.status === 'Delivered' && new Date(d.deliveredAt || d.delivered_at) <= new Date(d.expectedDeliveryDate || d.expected_delivery_date)
+      ).length;
+      const onTimeRate = totalDelivered > 0 ? Math.round((onTimeDeliveries / totalDelivered) * 100) : 0;
+
+      // Process user data
+      const userInfo = usersData || { role: 'unknown' };
+      
+      // Create dashboard data structure
+      const dashboardData = {
+        deliveries: {
+          total: deliveriesArray.length,
+          pending: pending,
+          inTransit: inTransit,
+          completed: delivered,
+          failed: cancelled,
+          byStatus: byStatus,
+          trends: trendsArray.length > 0 ? trendsArray : [
+            { date: new Date().toISOString().split('T')[0], completed: 0, pending: 0 }
+          ]
+        },
+        deliverers: {
+          total: Array.isArray(deliverersData) ? deliverersData.length : 0,
+          active: Array.isArray(deliverersData) ? deliverersData.filter(d => d.status === 'active' || d.status === 'Active').length : 0,
+          inactive: Array.isArray(deliverersData) ? deliverersData.filter(d => d.status !== 'active' && d.status !== 'Active').length : 0,
+          onDelivery: Array.isArray(deliverersData) ? deliverersData.filter(d => d.currentDelivery || d.current_delivery).length : 0
+        },
+        users: {
+          total: userInfo ? 1 : 0,
+          admins: userInfo.role === 'admin' ? 1 : 0,
+          managers: userInfo.role === 'manager' ? 1 : 0,
+          operators: userInfo.role === 'user' ? 1 : 0
+        },
+        performance: {
+          onTimeDeliveryRate: onTimeRate,
+          averageDeliveryTime: 0, // Not calculated yet
+          customerSatisfaction: 0 // Not available yet
+        }
+      };
+      
+      console.log('Dashboard data processed:', dashboardData);
+      setStats(dashboardData);
     } catch (err) {
-      console.error('Error fetching dashboard data:', err);
+      console.error('Error loading dashboard data:', err);
       setError(err.message || 'Failed to load dashboard data');
     } finally {
       setLoading(false);

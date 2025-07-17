@@ -11,7 +11,6 @@ import {
   DeliveriesPage,
   DeliverersPage,
   UsersPage,
-  AnalyticsPage,
   JobsPage,
   SettingsPage
 } from './components/lazy-components';
@@ -69,13 +68,6 @@ function App() {
             <Route path="/dashboard/jobs" element={
               <RoleBasedRoute allowedRoles={['admin']}>
                 <JobsPage />
-              </RoleBasedRoute>
-            } />
-            
-            {/* Admin and manager routes */}
-            <Route path="/dashboard/analytics" element={
-              <RoleBasedRoute allowedRoles={['admin', 'manager']}>
-                <AnalyticsPage />
               </RoleBasedRoute>
             } />
             

@@ -73,12 +73,7 @@ const DashboardLayout = () => {
       label: t('navigation.users'),
       roles: ['admin']
     },
-    {
-      path: '/dashboard/analytics',
-      icon: <LucideBarChart2 className="h-5 w-5" />,
-      label: t('navigation.analytics'),
-      roles: ['admin', 'manager']
-    },
+
     { 
       path: '/dashboard/jobs', 
       icon: <LucideBriefcase className="h-5 w-5" />, 
@@ -109,7 +104,6 @@ const DashboardLayout = () => {
       deliveries: 'navigation.deliveries',
       deliverers: 'navigation.deliverers',
       users: 'navigation.users',
-      analytics: 'navigation.analytics',
       jobs: 'navigation.jobs',
       settings: 'navigation.settings',
       new: 'actions.add',
