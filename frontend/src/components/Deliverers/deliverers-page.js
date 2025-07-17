@@ -905,17 +905,17 @@ const DeliverersPage = () => {
 
       {/* Create/Edit Modal */}
       {showModal && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70'>
           {console.log('Rendering modal')}
-          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
-            <div className='mb-4 flex items-center justify-between border-b pb-4'>
+          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-card p-6 shadow-xl dark:bg-gray-800 dark:text-white'>
+            <div className='mb-4 flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-700'>
               <h3 className='text-xl font-semibold'>
                 {modalMode === 'create'
                   ? t('addNewDeliverer')
                   : t('editDeliverer')}
               </h3>
               <button
-                className='rounded-full p-1 hover:bg-gray-100'
+                className='rounded-full p-1 hover:bg-muted'
                 onClick={() => setShowModal(false)}
               >
                 <X size={24} />
@@ -927,7 +927,7 @@ const DeliverersPage = () => {
               handleSaveDeliverer(e);
             }} className='space-y-4'>
               <div className='space-y-4'>
-                <h4 className='text-lg font-medium'>{t('basicInfo')}</h4>
+                <h4 className='text-lg font-medium dark:text-gray-200'>{t('basicInfo')}</h4>
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('name')}</label>
@@ -1025,7 +1025,7 @@ const DeliverersPage = () => {
                     placeholder={t('enterAddress')}
                     disabled={false}
                   />
-                  <small className='text-xs text-gray-500'>
+                  <small className='text-xs text-muted-foreground'>
                     {t('startTypingForSuggestions')}
                   </small>
                 </div>
@@ -1094,7 +1094,7 @@ const DeliverersPage = () => {
                 </div>
               </div>
 
-              <div className='flex justify-end gap-2'>
+              <div className='flex justify-end gap-2 border-t border-gray-200 pt-4 dark:border-gray-700'>
                 <Button
                   type='button'
                   variant='outline'
@@ -1125,12 +1125,12 @@ const DeliverersPage = () => {
 
       {/* View Details Modal */}
       {showViewModal && selectedDeliverer && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
-          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
-            <div className='mb-4 flex items-center justify-between border-b pb-4'>
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70'>
+          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-card p-6 shadow-xl dark:bg-gray-800 dark:text-white'>
+            <div className='mb-4 flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-700'>
               <h3 className='text-xl font-semibold'>{t('delivererDetails')}</h3>
               <button
-                className='rounded-full p-1 hover:bg-gray-100'
+                className='rounded-full p-1 hover:bg-muted'
                 onClick={() => setShowViewModal(false)}
               >
                 <X size={24} />
@@ -1243,7 +1243,7 @@ const DeliverersPage = () => {
                 </div>
               </div>
               
-              <div className='flex justify-end space-x-3 border-t pt-4'>
+              <div className='flex justify-end space-x-3 border-t border-gray-200 pt-4 dark:border-gray-700'>
                 <Button onClick={() => setShowViewModal(false)}>
                   {t('close')}
                 </Button>
@@ -1255,12 +1255,12 @@ const DeliverersPage = () => {
 
       {/* Statistics Modal */}
       {showStatsModal && selectedDeliverer && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
-          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
-            <div className='mb-4 flex items-center justify-between border-b pb-4'>
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70'>
+          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-card p-6 shadow-xl dark:bg-gray-800 dark:text-white'>
+            <div className='mb-4 flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-700'>
               <h3 className='text-xl font-semibold'>{t('performanceStats', { name: selectedDeliverer.name })}</h3>
               <button
-                className='rounded-full p-1 hover:bg-gray-100'
+                className='rounded-full p-1 hover:bg-muted'
                 onClick={() => setShowStatsModal(false)}
               >
                 <X size={24} />
@@ -1328,7 +1328,7 @@ const DeliverersPage = () => {
                 </div>
               )}
               
-              <div className='flex justify-end space-x-3 border-t pt-4'>
+              <div className='flex justify-end space-x-3 border-t border-gray-200 pt-4 dark:border-gray-700'>
                 <Button onClick={() => setShowStatsModal(false)}>
                   {t('close')}
                 </Button>
@@ -1340,12 +1340,12 @@ const DeliverersPage = () => {
 
       {/* Assign Delivery Modal */}
       {showAssignModal && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
-          <div className='max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
-            <div className='mb-4 flex items-center justify-between border-b pb-4'>
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70'>
+          <div className='max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-card p-6 shadow-xl dark:bg-gray-800 dark:text-white'>
+            <div className='mb-4 flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-700'>
               <h3 className='text-xl font-semibold'>{t('assignDeliveryTo', { name: selectedDeliverer?.name })}</h3>
               <button
-                className='rounded-full p-1 hover:bg-gray-100'
+                className='rounded-full p-1 hover:bg-muted'
                 onClick={() => setShowAssignModal(false)}
               >
                 <X size={24} />
@@ -1354,7 +1354,7 @@ const DeliverersPage = () => {
 
             <form onSubmit={handleAssignDelivery} className='space-y-6'>
               <div className='space-y-4'>
-                <h4 className='text-lg font-medium'>{t('selectDelivery')}</h4>
+                <h4 className='text-lg font-medium dark:text-gray-200'>{t('selectDelivery')}</h4>
 
                 {loadingDeliveries ? (
                   <div className='flex justify-center py-4'>
@@ -1368,7 +1368,7 @@ const DeliverersPage = () => {
                   </div>
                 ) : (
                   <div className='space-y-2'>
-                    <label htmlFor='deliverySelect' className='text-sm font-medium'>{t('availableDeliveries')}</label>
+                    <label htmlFor='deliverySelect' className='text-sm font-medium dark:text-gray-200'>{t('availableDeliveries')}</label>
                     <Select
                       id='deliverySelect'
                       value={selectedDelivery}
@@ -1388,7 +1388,7 @@ const DeliverersPage = () => {
                 )}
               </div>
 
-              <div className='flex justify-end space-x-3 border-t pt-4'>
+              <div className='flex justify-end space-x-3 border-t border-gray-200 pt-4 dark:border-gray-700'>
                 <Button
                   type='button'
                   variant='outline'
