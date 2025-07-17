@@ -3,16 +3,10 @@ import {
   Search,
   Plus,
   Filter,
-  Edit3,
-  Clock,
   RefreshCw,
   X,
   ChevronLeft,
   ChevronRight,
-  AlertTriangle,
-  CheckCircle,
-  Truck,
-  XCircle,
   Package,
 } from 'lucide-react';
 import { toast } from 'react-toastify';
@@ -871,16 +865,16 @@ const DeliveriesPage = () => {
 
       {/* Create/Edit Modal */}
       {showModal && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
-          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
-            <div className='mb-4 flex items-center justify-between border-b pb-4'>
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70'>
+          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-card p-6 shadow-xl dark:bg-gray-800 dark:text-white'>
+            <div className='mb-4 flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-700'>
               <h3 className='text-xl font-semibold'>
                 {modalMode === 'create'
                   ? t('newDelivery')
                   : t('editDelivery')}
               </h3>
               <button
-                className='rounded-full p-1 hover:bg-gray-100'
+                className='rounded-full p-1 hover:bg-muted'
                 onClick={() => setShowModal(false)}
               >
                 <X size={24} />
@@ -891,7 +885,7 @@ const DeliveriesPage = () => {
               {modalMode === 'edit' && (
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>Order ID *</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>Order ID *</label>
                     <input
                       type='text'
                       value={formData.orderId}
@@ -901,11 +895,11 @@ const DeliveriesPage = () => {
                       required
                       disabled={true}
                       placeholder='Auto-generated for new deliveries'
-                      className='w-full rounded-md border border-gray-300 px-3 py-2'
+                      className='w-full rounded-md border border-input bg-background px-3 py-2 text-foreground dark:border-gray-600 dark:bg-gray-700'
                     />
                   </div>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>Customer *</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>Customer *</label>
                     <input
                       type='text'
                       value={formData.customer}
@@ -914,7 +908,7 @@ const DeliveriesPage = () => {
                       }
                       required
                       placeholder='Customer name'
-                      className='w-full rounded-md border border-gray-300 px-3 py-2'
+                      className='w-full rounded-md border border-input bg-background px-3 py-2 text-foreground dark:border-gray-600 dark:bg-gray-700'
                     />
                   </div>
                 </div>
@@ -922,7 +916,7 @@ const DeliveriesPage = () => {
 
               {modalMode === 'create' && (
                 <div className='space-y-2'>
-                  <label className='text-sm font-medium'>Customer *</label>
+                  <label className='text-sm font-medium dark:text-gray-200'>Customer *</label>
                   <input
                     type='text'
                     value={formData.customer}
@@ -931,13 +925,13 @@ const DeliveriesPage = () => {
                     }
                     required
                     placeholder='Customer name'
-                    className='w-full rounded-md border border-gray-300 px-3 py-2'
+                    className='w-full rounded-md border border-input bg-background px-3 py-2 text-foreground dark:border-gray-600 dark:bg-gray-700'
                   />
                 </div>
               )}
 
               <div className='space-y-2'>
-                <label className='text-sm font-medium'>Delivery Address</label>
+                <label className='text-sm font-medium dark:text-gray-200'>Delivery Address</label>
                 <AddressAutocomplete
                   value={formData.deliveryAddress}
                   onChange={address =>
@@ -946,7 +940,7 @@ const DeliveriesPage = () => {
                   placeholder='Enter delivery address'
                   disabled={loading}
                 />
-                <small className='text-xs text-gray-500'>
+                <small className='text-xs text-muted-foreground'>
                   Start typing to see address suggestions
                 </small>
               </div>
@@ -955,13 +949,13 @@ const DeliveriesPage = () => {
                 {/* Only show Status field in edit mode */}
                 {modalMode === 'edit' && (
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>Status</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>Status</label>
                     <select
                       value={formData.status}
                       onChange={e =>
                         setFormData({ ...formData, status: e.target.value })
                       }
-                      className='w-full rounded-md border border-gray-300 px-3 py-2'
+                      className='w-full rounded-md border border-input bg-background px-3 py-2 text-foreground dark:border-gray-600 dark:bg-gray-700'
                     >
                       <option value='PENDING'>{t('statuses.pending')}</option>
                       <option value='IN_TRANSIT'>{t('statuses.inTransit')}</option>
@@ -971,13 +965,13 @@ const DeliveriesPage = () => {
                   </div>
                 )}
                 <div className='space-y-2'>
-                  <label className='text-sm font-medium'>Priority</label>
-                  <select
-                    value={formData.priority}
-                    onChange={e =>
-                      setFormData({ ...formData, priority: e.target.value })
-                    }
-                    className='w-full rounded-md border border-gray-300 px-3 py-2'
+                  <label className='text-sm font-medium dark:text-gray-200'>Priority</label>
+                                      <select
+                      value={formData.priority}
+                      onChange={e =>
+                        setFormData({ ...formData, priority: e.target.value })
+                      }
+                      className='w-full rounded-md border border-input bg-background px-3 py-2 text-foreground dark:border-gray-600 dark:bg-gray-700'
                   >
                     <option value='LOW'>{t('priorities.low')}</option>
                     <option value='MEDIUM'>{t('priorities.medium')}</option>
@@ -989,31 +983,31 @@ const DeliveriesPage = () => {
 
               <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                 <div className='space-y-2'>
-                  <label className='text-sm font-medium'>Estimated Delivery Date *</label>
-                  <input
-                    type='date'
-                    value={formData.estimatedDeliveryDate}
-                    onChange={e =>
-                      setFormData({
-                        ...formData,
-                        estimatedDeliveryDate: e.target.value,
-                      })
-                    }
-                    min={new Date().toISOString().split('T')[0]} // Set minimum date to today
-                    required
-                    className='w-full rounded-md border border-gray-300 px-3 py-2'
+                  <label className='text-sm font-medium dark:text-gray-200'>Estimated Delivery Date *</label>
+                                      <input
+                      type='date'
+                      value={formData.estimatedDeliveryDate}
+                      onChange={e =>
+                        setFormData({
+                          ...formData,
+                          estimatedDeliveryDate: e.target.value,
+                        })
+                      }
+                      min={new Date().toISOString().split('T')[0]} // Set minimum date to today
+                      required
+                      className='w-full rounded-md border border-input bg-background px-3 py-2 text-foreground dark:border-gray-600 dark:bg-gray-700'
                   />
-                  <small className='text-xs text-gray-500'>Must be a future date</small>
+                  <small className='text-xs text-muted-foreground'>Must be a future date</small>
                 </div>
                 {userRole === 'admin' && (
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>Assign Deliverer</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>Assign Deliverer</label>
                     <select
                       value={formData.deliverer}
                       onChange={e =>
                         setFormData({ ...formData, deliverer: e.target.value })
                       }
-                      className='w-full rounded-md border border-gray-300 px-3 py-2'
+                      className='w-full rounded-md border border-input bg-background px-3 py-2 text-foreground dark:border-gray-600 dark:bg-gray-700'
                     >
                       <option value=''>{t('unassigned')}</option>
                       {/* Filter to only show available deliverers */}
@@ -1026,7 +1020,7 @@ const DeliveriesPage = () => {
                         ))}
                     </select>
                     {deliverers.filter(deliverer => deliverer.status === 'Available').length === 0 && (
-                      <small className='text-xs text-amber-500'>
+                      <small className='text-xs text-warning'>
                         No available deliverers at the moment
                       </small>
                     )}
@@ -1035,19 +1029,19 @@ const DeliveriesPage = () => {
               </div>
 
               <div className='space-y-2'>
-                <label className='text-sm font-medium'>Notes</label>
-                <textarea
-                  value={formData.notes}
-                  onChange={e =>
-                    setFormData({ ...formData, notes: e.target.value })
-                  }
-                  placeholder='Additional notes or instructions'
-                  rows='3'
-                  className='w-full rounded-md border border-gray-300 px-3 py-2'
+                <label className='text-sm font-medium dark:text-gray-200'>Notes</label>
+                                  <textarea
+                    value={formData.notes}
+                    onChange={e =>
+                      setFormData({ ...formData, notes: e.target.value })
+                    }
+                    placeholder='Additional notes or instructions'
+                    rows='3'
+                    className='w-full rounded-md border border-input bg-background px-3 py-2 text-foreground dark:border-gray-600 dark:bg-gray-700'
                 />
               </div>
 
-              <div className='flex justify-end space-x-3 border-t pt-4'>
+              <div className='flex justify-end space-x-3 border-t border-gray-200 pt-4 dark:border-gray-700'>
                 <Button
                   type='button'
                   variant='outline'
@@ -1078,12 +1072,12 @@ const DeliveriesPage = () => {
 
       {/* View Modal */}
       {showViewModal && selectedDelivery && (
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50'>
-          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6 shadow-xl'>
-            <div className='mb-4 flex items-center justify-between border-b pb-4'>
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70'>
+          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-card p-6 shadow-xl dark:bg-gray-800 dark:text-white'>
+            <div className='mb-4 flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-700'>
               <h3 className='text-xl font-semibold'>Delivery Details</h3>
               <button
-                className='rounded-full p-1 hover:bg-gray-100'
+                className='rounded-full p-1 hover:bg-muted'
                 onClick={() => setShowViewModal(false)}
               >
                 <X size={24} />
@@ -1095,25 +1089,25 @@ const DeliveriesPage = () => {
                 <h4 className='text-lg font-medium'>Basic Information</h4>
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-1'>
-                    <label className='text-sm text-gray-500'>Order ID</label>
+                    <label className='text-sm text-muted-foreground'>Order ID</label>
                     <p className='font-medium'>
                       {selectedDelivery.orderId}
                     </p>
                   </div>
                   <div className='space-y-1'>
-                    <label className='text-sm text-gray-500'>Customer</label>
+                    <label className='text-sm text-muted-foreground'>Customer</label>
                     <p className='font-medium'>
                       {selectedDelivery.customer}
                     </p>
                   </div>
                   <div className='space-y-1'>
-                    <label className='text-sm text-gray-500'>Status</label>
+                    <label className='text-sm text-muted-foreground'>Status</label>
                     <div>
                       <StatusBadge status={selectedDelivery.status} />
                     </div>
                   </div>
                   <div className='space-y-1'>
-                    <label className='text-sm text-gray-500'>Priority</label>
+                    <label className='text-sm text-muted-foreground'>Priority</label>
                     <div>
                       <PriorityBadge priority={selectedDelivery.priority} />
                     </div>
@@ -1125,7 +1119,7 @@ const DeliveriesPage = () => {
                 <h4 className='text-lg font-medium'>Delivery Information</h4>
                 <div className='grid grid-cols-1 gap-4'>
                   <div className='space-y-1'>
-                    <label className='text-sm text-gray-500'>Delivery Address</label>
+                    <label className='text-sm text-muted-foreground'>Delivery Address</label>
                     <p className='font-medium'>
                       {selectedDelivery.deliveryAddress ||
                         'No address provided'}
@@ -1133,7 +1127,7 @@ const DeliveriesPage = () => {
                   </div>
                   <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                     <div className='space-y-1'>
-                      <label className='text-sm text-gray-500'>Estimated Date</label>
+                      <label className='text-sm text-muted-foreground'>Estimated Date</label>
                       <p className='font-medium'>
                         {selectedDelivery.estimatedDeliveryDate
                           ? new Date(
@@ -1143,7 +1137,7 @@ const DeliveriesPage = () => {
                       </p>
                     </div>
                     <div className='space-y-1'>
-                      <label className='text-sm text-gray-500'>Actual Date</label>
+                      <label className='text-sm text-muted-foreground'>Actual Date</label>
                       <p className='font-medium'>
                         {selectedDelivery.actualDeliveryDate
                           ? new Date(
@@ -1160,7 +1154,7 @@ const DeliveriesPage = () => {
                 <h4 className='text-lg font-medium'>Assignment & Tracking</h4>
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-1'>
-                    <label className='text-sm text-gray-500'>Assigned Deliverer</label>
+                    <label className='text-sm text-muted-foreground'>Assigned Deliverer</label>
                     <p className='font-medium'>
                       {selectedDelivery.deliverer
                         ? `${selectedDelivery.deliverer.name} (${selectedDelivery.deliverer.email})`
@@ -1168,7 +1162,7 @@ const DeliveriesPage = () => {
                     </p>
                   </div>
                   <div className='space-y-1'>
-                    <label className='text-sm text-gray-500'>Created Date</label>
+                    <label className='text-sm text-muted-foreground'>Created Date</label>
                     <p className='font-medium'>
                       {new Date(
                         selectedDelivery.createdAt
@@ -1185,7 +1179,7 @@ const DeliveriesPage = () => {
                 </div>
               )}
 
-              <div className='flex justify-end space-x-3 border-t pt-4'>
+              <div className='flex justify-end space-x-3 border-t border-gray-200 pt-4 dark:border-gray-700'>
                 {userRole === 'admin' && (
                   <Button
                     variant='outline'
