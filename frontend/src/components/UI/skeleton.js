@@ -2,88 +2,144 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 /**
- * Skeleton component for loading states
- * 
- * @param {Object} props - Component props
- * @param {string} props.preset - Preset type ('card', 'chart', 'text', 'avatar', 'table')
- * @param {string} props.className - Additional CSS classes
- * @returns {React.ReactElement} Skeleton component
+ * Skeleton component for loading state
  */
-const Skeleton = ({ preset = 'text', className = '', ...props }) => {
-  const baseClasses = 'animate-pulse bg-gray-200 dark:bg-gray-700 rounded';
+const Skeleton = ({ 
+  className = '', 
+  variant = 'rectangular',
+  width,
+  height,
+  ...props 
+}) => {
+  const baseClasses = 'animate-pulse bg-[var(--color-border)]';
   
-  // Different skeleton presets
-  const presets = {
-    text: `${baseClasses} h-4 w-full my-1`,
-    card: `${baseClasses} h-40 w-full`,
-    chart: `${baseClasses} h-64 w-full`,
-    avatar: `${baseClasses} h-12 w-12 rounded-full`,
-    table: `${baseClasses} h-96 w-full`,
-    button: `${baseClasses} h-10 w-24`,
-    input: `${baseClasses} h-10 w-full`,
-    badge: `${baseClasses} h-6 w-16 rounded-full`,
+  const variantClasses = {
+    rectangular: 'rounded',
+    circular: 'rounded-full',
+    text: 'h-4 rounded w-2/3',
   };
+  
+  const style = {
+    ...(width ? { width } : {}),
+    ...(height ? { height } : {}),
+  };
+  
+  return (
+    <div 
+      className={`${baseClasses} ${variantClasses[variant]} ${className}`}
+      style={style}
+      {...props}
+      role="status"
+      aria-label="Loading..."
+    />
+  );
+};
 
-  // Generate multiple text lines for paragraph preset
-  if (preset === 'paragraph') {
-    return (
-      <div className={className} {...props}>
-        <div className={`${baseClasses} mb-2 h-4 w-full`}></div>
-        <div className={`${baseClasses} mb-2 h-4 w-5/6`}></div>
-        <div className={`${baseClasses} mb-2 h-4 w-4/6`}></div>
-        <div className={`${baseClasses} h-4 w-3/6`}></div>
+/**
+ * SkeletonText component for text placeholder loading states
+ */
+const SkeletonText = ({ lines = 3, className = '', ...props }) => {
+  return (
+    <div className={`space-y-2 ${className}`} role="status" aria-label="Loading content...">
+      {Array(lines)
+        .fill(0)
+        .map((_, i) => (
+          <Skeleton 
+            key={i} 
+            className={`h-4 ${i === lines - 1 ? 'w-2/3' : 'w-full'}`} 
+            variant="text"
+            {...props} 
+          />
+        ))}
+    </div>
+  );
+};
+
+/**
+ * SkeletonCard component for card placeholder loading states
+ */
+const SkeletonCard = ({ className = '', headerAction = false, footerAction = false, ...props }) => {
+  return (
+    <div 
+      className={`rounded-lg border border-[var(--color-border)] p-6 ${className}`} 
+      role="status"
+      aria-label="Loading card..."
+      {...props}
+    >
+      <div className="flex items-center justify-between mb-4">
+        <div className="space-y-2">
+          <Skeleton className="h-5 w-40" variant="text" />
+          <Skeleton className="h-4 w-24" variant="text" />
+        </div>
+        {headerAction && <Skeleton className="h-8 w-8 rounded-full" />}
       </div>
-    );
-  }
+      
+      <div className="space-y-4 my-6">
+        <Skeleton className="h-20 w-full" />
+        <SkeletonText lines={2} />
+      </div>
+      
+      {footerAction && (
+        <div className="flex justify-end gap-2 mt-4 pt-4 border-t border-[var(--color-border)]">
+          <Skeleton className="h-9 w-24 rounded-md" />
+          <Skeleton className="h-9 w-24 rounded-md" />
+        </div>
+      )}
+    </div>
+  );
+};
 
-  // Generate table skeleton
-  if (preset === 'table') {
-    return (
-      <div className={`${className} space-y-2`} {...props}>
-        <div className={`${baseClasses} mb-4 h-10 w-full`}></div>
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className={`${baseClasses} h-12 w-full`}></div>
+/**
+ * SkeletonTable component for table placeholder loading states
+ */
+const SkeletonTable = ({ rows = 5, cols = 4, className = '', ...props }) => {
+  return (
+    <div className={`rounded-lg border border-[var(--color-border)] overflow-hidden ${className}`} {...props}>
+      {/* Header */}
+      <div className="flex border-b border-[var(--color-border)] bg-[var(--input-bg)] p-4">
+        {Array(cols).fill(0).map((_, i) => (
+          <div key={`header-${i}`} className="flex-1 px-2">
+            <Skeleton className="h-6" />
+          </div>
         ))}
       </div>
-    );
-  }
-
-  // Generate form skeleton
-  if (preset === 'form') {
-    return (
-      <div className={`${className} space-y-4`} {...props}>
-        <div className={`${baseClasses} mb-1 h-4 w-24`}></div>
-        <div className={`${baseClasses} mb-4 h-10 w-full`}></div>
-        
-        <div className={`${baseClasses} mb-1 h-4 w-24`}></div>
-        <div className={`${baseClasses} mb-4 h-10 w-full`}></div>
-        
-        <div className={`${baseClasses} mb-1 h-4 w-24`}></div>
-        <div className={`${baseClasses} mb-4 h-10 w-full`}></div>
-        
-        <div className={`${baseClasses} mt-6 h-10 w-32`}></div>
-      </div>
-    );
-  }
-
-  // Default preset
-  return <div className={`${presets[preset] || presets.text} ${className}`} {...props}></div>;
+      
+      {/* Rows */}
+      {Array(rows).fill(0).map((_, i) => (
+        <div key={`row-${i}`} className="flex border-b border-[var(--color-border)] p-4">
+          {Array(cols).fill(0).map((_, j) => (
+            <div key={`cell-${i}-${j}`} className="flex-1 px-2">
+              <Skeleton className="h-6" />
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
 };
 
 Skeleton.propTypes = {
-  preset: PropTypes.oneOf([
-    'text', 
-    'card', 
-    'chart', 
-    'avatar', 
-    'table', 
-    'paragraph', 
-    'button', 
-    'form',
-    'input',
-    'badge'
-  ]),
+  className: PropTypes.string,
+  variant: PropTypes.oneOf(['rectangular', 'circular', 'text']),
+  width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+};
+
+SkeletonText.propTypes = {
+  lines: PropTypes.number,
   className: PropTypes.string,
 };
 
-export { Skeleton }; 
+SkeletonCard.propTypes = {
+  className: PropTypes.string,
+  headerAction: PropTypes.bool,
+  footerAction: PropTypes.bool,
+};
+
+SkeletonTable.propTypes = {
+  rows: PropTypes.number,
+  cols: PropTypes.number,
+  className: PropTypes.string,
+};
+
+export { Skeleton, SkeletonText, SkeletonCard, SkeletonTable }; 
