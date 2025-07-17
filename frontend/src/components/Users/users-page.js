@@ -786,9 +786,9 @@ const UsersPage = () => {
 
       {/* Create/Edit User Modal */}
       <Dialog open={showModal} onOpenChange={setShowModal}>
-        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
-          <div className='w-full max-w-lg rounded-lg bg-card shadow-lg'>
-            <div className='flex items-center justify-between border-b p-6'>
+        <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4'>
+          <div className='w-full max-w-lg rounded-lg bg-card shadow-lg dark:bg-gray-800 dark:text-white'>
+            <div className='flex items-center justify-between border-b border-gray-200 p-6 dark:border-gray-700'>
                               <h2 className='text-xl font-semibold'>
                 {modalMode === 'create' ? t('newUser') : t('editUser')}
               </h2>
@@ -809,10 +809,10 @@ const UsersPage = () => {
               className='space-y-6 p-6'
             >
               <div className='space-y-4'>
-                <h3 className='text-lg font-medium'>{t('userDetails')}</h3>
+                <h3 className='text-lg font-medium dark:text-gray-200'>{t('userDetails')}</h3>
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('email')} *</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>{t('email')} *</label>
                     <Input
                       type='email'
                       value={formData.email}
@@ -821,7 +821,7 @@ const UsersPage = () => {
                     />
                   </div>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('role')}</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>{t('role')}</label>
                     <Select
                       value={formData.role}
                       onChange={e => handleFormChange('role', e.target.value)}
@@ -836,7 +836,7 @@ const UsersPage = () => {
 
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('firstName')}</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>{t('firstName')}</label>
                     <Input
                       type='text'
                       value={formData.firstName}
@@ -846,7 +846,7 @@ const UsersPage = () => {
                     />
                   </div>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('lastName')}</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>{t('lastName')}</label>
                     <Input
                       type='text'
                       value={formData.lastName}
@@ -858,7 +858,7 @@ const UsersPage = () => {
                 </div>
 
                 <div className='space-y-2'>
-                  <label className='text-sm font-medium'>{t('phone')}</label>
+                  <label className='text-sm font-medium dark:text-gray-200'>{t('phone')}</label>
                   <Input
                     type='tel'
                     value={formData.phone}
@@ -869,10 +869,10 @@ const UsersPage = () => {
 
               {modalMode === 'create' && (
                 <div className='space-y-4'>
-                  <h3 className='text-lg font-medium'>{t('security', { ns: 'settings' })}</h3>
+                  <h3 className='text-lg font-medium dark:text-gray-200'>{t('security', { ns: 'settings' })}</h3>
                   <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                     <div className='space-y-2'>
-                      <label className='text-sm font-medium'>{t('password')} *</label>
+                      <label className='text-sm font-medium dark:text-gray-200'>{t('password')} *</label>
                       <Input
                         type='password'
                         value={formData.password}
@@ -884,7 +884,7 @@ const UsersPage = () => {
                       />
                     </div>
                     <div className='space-y-2'>
-                      <label className='text-sm font-medium'>
+                      <label className='text-sm font-medium dark:text-gray-200'>
                         {t('confirmPassword')} *
                       </label>
                       <Input
@@ -901,7 +901,7 @@ const UsersPage = () => {
                 </div>
               )}
 
-              <div className='flex justify-end gap-2 border-t pt-4'>
+              <div className='flex justify-end gap-2 border-t border-gray-200 pt-4 dark:border-gray-700'>
                 <Button
                   type='button'
                   variant='outline'
@@ -921,9 +921,9 @@ const UsersPage = () => {
       {/* View User Modal */}
       {showViewModal && selectedUser && (
         <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
-          <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
-            <div className='w-full max-w-lg rounded-lg bg-card shadow-lg'>
-              <div className='flex items-center justify-between border-b p-6'>
+          <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4'>
+            <div className='w-full max-w-lg rounded-lg bg-card shadow-lg dark:bg-gray-800 dark:text-white'>
+              <div className='flex items-center justify-between border-b border-gray-200 p-6 dark:border-gray-700'>
                 <h2 className='text-xl font-semibold'>{t('userDetails')}</h2>
                 <Button
                   variant='ghost'
@@ -937,7 +937,7 @@ const UsersPage = () => {
 
               <div className='space-y-6 p-6'>
                 <div className='space-y-4'>
-                  <h3 className='text-lg font-medium'>{t('userDetails')}</h3>
+                  <h3 className='text-lg font-medium dark:text-gray-200'>{t('userDetails')}</h3>
                   <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                     <div className='space-y-1'>
                       <label className='text-sm font-medium text-muted-foreground'>{t('firstName')} {t('lastName')}</label>
@@ -965,7 +965,7 @@ const UsersPage = () => {
                 </div>
 
                 <div className='space-y-4'>
-                  <h3 className='text-lg font-medium'>{t('status', { ns: 'common' })}</h3>
+                  <h3 className='text-lg font-medium dark:text-gray-200'>{t('status', { ns: 'common' })}</h3>
                   <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                     <div className='space-y-1'>
                       <label className='text-sm font-medium text-muted-foreground'>{t('status', { ns: 'common' })}</label>
@@ -1005,9 +1005,9 @@ const UsersPage = () => {
       {/* Change Password Modal */}
       {showPasswordModal && (
         <Dialog open={showPasswordModal} onOpenChange={setShowPasswordModal}>
-          <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4'>
-            <div className='w-full max-w-lg rounded-lg bg-card shadow-lg'>
-              <div className='flex items-center justify-between border-b p-6'>
+          <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4'>
+            <div className='w-full max-w-lg rounded-lg bg-card shadow-lg dark:bg-gray-800 dark:text-white'>
+              <div className='flex items-center justify-between border-b border-gray-200 p-6 dark:border-gray-700'>
                 <h2 className='text-xl font-semibold'>{t('changePassword')}</h2>
                 <Button
                   variant='ghost'
@@ -1021,9 +1021,9 @@ const UsersPage = () => {
 
               <form onSubmit={handleChangePassword} className='space-y-6 p-6'>
                 <div className='space-y-4'>
-                  <h3 className='text-lg font-medium'>{t('security', { ns: 'settings' })}</h3>
+                  <h3 className='text-lg font-medium dark:text-gray-200'>{t('security', { ns: 'settings' })}</h3>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('currentPassword')} *</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>{t('currentPassword')} *</label>
                     <Input
                       type='password'
                       value={passwordData.currentPassword}
@@ -1035,7 +1035,7 @@ const UsersPage = () => {
                   </div>
                   <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                     <div className='space-y-2'>
-                      <label className='text-sm font-medium'>{t('newPassword')} *</label>
+                      <label className='text-sm font-medium dark:text-gray-200'>{t('newPassword')} *</label>
                       <Input
                         type='password'
                         value={passwordData.newPassword}
@@ -1047,7 +1047,7 @@ const UsersPage = () => {
                       />
                     </div>
                     <div className='space-y-2'>
-                      <label className='text-sm font-medium'>{t('confirmPassword')} *</label>
+                      <label className='text-sm font-medium dark:text-gray-200'>{t('confirmPassword')} *</label>
                       <Input
                         type='password'
                         value={passwordData.confirmPassword}
@@ -1061,7 +1061,7 @@ const UsersPage = () => {
                   </div>
                 </div>
 
-                <div className='flex justify-end gap-2 border-t pt-4'>
+                <div className='flex justify-end gap-2 border-t border-gray-200 pt-4 dark:border-gray-700'>
                   <Button
                     type='button'
                     variant='outline'
