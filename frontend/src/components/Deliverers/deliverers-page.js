@@ -530,15 +530,15 @@ const DeliverersPage = () => {
   const getVehicleIcon = vehicleType => {
     switch (vehicleType) {
       case 'Car':
-        return <Car size={16} className='text-status-in-transit' />;
+        return <Car size={16} className='text-blue-600' />;
       case 'Van':
-        return <Car size={16} className='text-status-in-transit' />;
+        return <Truck size={16} className='text-purple-600' />;
       case 'Truck':
-        return <Truck size={16} />;
+        return <Truck size={16} className='text-red-600' />;
       case 'Motorcycle':
-        return <Car size={16} className='text-status-delivered' />;
+        return <Bike size={16} className='text-orange-600' />;
       case 'Bicycle':
-        return <Bike size={16} className='text-status-in-transit' />;
+        return <Bike size={16} className='text-green-600' />;
       default:
         return <Car size={16} className='text-muted-foreground' />;
     }
