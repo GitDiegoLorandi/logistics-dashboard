@@ -176,18 +176,25 @@ const DashboardLayout = () => {
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="flex h-16 items-center justify-between border-b border-[var(--color-border)] px-4 bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] text-white">
-          <Link to="/dashboard" className="flex items-center gap-2">
-            <div className="rounded-md bg-white/20 backdrop-blur-sm p-1 text-white">
+        {/* App title header with enhanced visibility */}
+        <div className="flex h-16 items-center justify-between border-b border-[var(--color-border)] bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] px-4">
+          <Link to="/dashboard" className="group flex items-center gap-2">
+            <div className="rounded-md bg-white p-1 text-[var(--color-primary)] shadow-md">
               <LucideTruck className="h-5 w-5" />
             </div>
-            <span className="text-lg font-bold">{t('app.title', { ns: 'common' })}</span>
+            <div className="relative">
+              <span className="text-lg font-extrabold tracking-wide text-white drop-shadow-[0_2px_2px_rgba(0,0,0,0.3)]">
+                {t('app.title', { ns: 'common' })}
+              </span>
+              {/* Add a subtle highlight effect */}
+              <span className="absolute -inset-1 rounded-lg bg-white/10 opacity-0 blur-sm transition-opacity duration-300 group-hover:opacity-100"></span>
+            </div>
           </Link>
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={() => setSidebarOpen(false)} 
-            className="lg:hidden text-white hover:bg-white/20"
+            className="text-white hover:bg-white/20 lg:hidden"
           >
             <LucideX className="h-5 w-5" />
           </Button>
@@ -252,6 +259,15 @@ const DashboardLayout = () => {
             >
               <LucideMenu className="h-5 w-5" />
             </Button>
+            {/* Add a visible app title in the header for larger screens */}
+            <div className="hidden items-center gap-2 md:flex">
+              <div className="rounded-md bg-[var(--color-primary)] p-1 text-white">
+                <LucideTruck className="h-5 w-5" />
+              </div>
+              <span className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-dark)] bg-clip-text text-lg font-bold text-transparent">
+                {t('app.title', { ns: 'common' })}
+              </span>
+            </div>
             <Breadcrumbs items={generateBreadcrumbs()} separator={<LucideChevronRight className="h-4 w-4 text-[var(--color-primary)]" />} />
           </div>
           
@@ -262,7 +278,7 @@ const DashboardLayout = () => {
         </header>
         
         {/* Main content area */}
-        <main id="main-content" className="flex-1 overflow-auto p-6 bg-[var(--color-background)] bg-opacity-50 backdrop-blur-sm">
+        <main id="main-content" className="flex-1 overflow-auto bg-[var(--color-background)] bg-opacity-50 p-6 backdrop-blur-sm">
           <Outlet />
         </main>
       </div>
