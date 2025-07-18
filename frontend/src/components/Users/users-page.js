@@ -208,19 +208,62 @@ const UsersPage = () => {
   const handleCreateUser = async e => {
     e.preventDefault();
 
+    // Validate required fields
     if (!formData.email) {
-      toast.error(t('validation.required'));
+      toast.error(t('validation.emailRequired'));
       return;
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      toast.error(t('auth.passwordsDoNotMatch'));
+    // Validate email format
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error(t('validation.invalidEmail'));
       return;
     }
 
-    if (formData.password.length < 6) {
-      toast.error(t('auth.passwordRequirements'));
+    // Validate name fields
+    if (formData.firstName && formData.firstName.length < 2) {
+      toast.error(t('validation.firstNameLength'));
       return;
+    }
+
+    if (formData.lastName && formData.lastName.length < 2) {
+      toast.error(t('validation.lastNameLength'));
+      return;
+    }
+
+    // Validate phone format if provided
+    if (formData.phone && !/^[+]?[0-9\s-()]{7,}$/.test(formData.phone)) {
+      toast.error(t('validation.invalidPhone'));
+      return;
+    }
+
+    // Password validation for new users
+    if (modalMode === 'create') {
+      if (!formData.password) {
+        toast.error(t('validation.passwordRequired'));
+        return;
+      }
+
+      if (formData.password !== formData.confirmPassword) {
+        toast.error(t('auth.passwordsDoNotMatch'));
+        return;
+      }
+
+      // Password strength validation
+      if (formData.password.length < 6) {
+        toast.error(t('auth.passwordRequirements'));
+        return;
+      }
+
+      // Check for at least one number and one letter
+      const hasNumber = /\d/.test(formData.password);
+      const hasLetter = /[a-zA-Z]/.test(formData.password);
+      
+      if (!hasNumber || !hasLetter) {
+        toast.error(t('auth.passwordComplexity'));
+        return;
+      }
     }
 
     try {
@@ -263,8 +306,33 @@ const UsersPage = () => {
   const handleUpdateUser = async e => {
     e.preventDefault();
 
+    // Validate required fields
     if (!formData.email) {
-      toast.error(t('validation.required'));
+      toast.error(t('validation.emailRequired'));
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error(t('validation.invalidEmail'));
+      return;
+    }
+
+    // Validate name fields
+    if (formData.firstName && formData.firstName.length < 2) {
+      toast.error(t('validation.firstNameLength'));
+      return;
+    }
+
+    if (formData.lastName && formData.lastName.length < 2) {
+      toast.error(t('validation.lastNameLength'));
+      return;
+    }
+
+    // Validate phone format if provided
+    if (formData.phone && !/^[+]?[0-9\s-()]{7,}$/.test(formData.phone)) {
+      toast.error(t('validation.invalidPhone'));
       return;
     }
 
@@ -312,13 +380,34 @@ const UsersPage = () => {
   const handleChangePassword = async e => {
     e.preventDefault();
 
+    // Validate password fields
+    if (!passwordData.currentPassword) {
+      toast.error(t('validation.currentPasswordRequired'));
+      return;
+    }
+
+    if (!passwordData.newPassword) {
+      toast.error(t('validation.newPasswordRequired'));
+      return;
+    }
+
     if (passwordData.newPassword !== passwordData.confirmPassword) {
       toast.error(t('auth.passwordsDoNotMatch'));
       return;
     }
 
+    // Password strength validation
     if (passwordData.newPassword.length < 6) {
       toast.error(t('auth.passwordRequirements'));
+      return;
+    }
+
+    // Check for at least one number and one letter
+    const hasNumber = /\d/.test(passwordData.newPassword);
+    const hasLetter = /[a-zA-Z]/.test(passwordData.newPassword);
+    
+    if (!hasNumber || !hasLetter) {
+      toast.error(t('auth.passwordComplexity'));
       return;
     }
 
@@ -818,7 +907,11 @@ const UsersPage = () => {
                       value={formData.email}
                       onChange={e => handleFormChange('email', e.target.value)}
                       required
+                      placeholder="user@example.com"
+                      pattern="^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$"
+                      title={t('validation.invalidEmail')}
                     />
+                    <small className="text-xs text-muted-foreground">{t('validation.validEmailRequired')}</small>
                   </div>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium dark:text-gray-200'>{t('role')}</label>
@@ -843,6 +936,8 @@ const UsersPage = () => {
                       onChange={e =>
                         handleFormChange('firstName', e.target.value)
                       }
+                      minLength="2"
+                      title={t('validation.firstNameLength')}
                     />
                   </div>
                   <div className='space-y-2'>
@@ -853,6 +948,8 @@ const UsersPage = () => {
                       onChange={e =>
                         handleFormChange('lastName', e.target.value)
                       }
+                      minLength="2"
+                      title={t('validation.lastNameLength')}
                     />
                   </div>
                 </div>
@@ -863,7 +960,11 @@ const UsersPage = () => {
                     type='tel'
                     value={formData.phone}
                     onChange={e => handleFormChange('phone', e.target.value)}
+                    pattern="^[+]?[0-9\s-()]{7,}$"
+                    title={t('validation.invalidPhone')}
+                    placeholder="+1 (555) 123-4567"
                   />
+                  <small className="text-xs text-muted-foreground">{t('validation.phoneFormat')}</small>
                 </div>
               </div>
 
@@ -881,7 +982,12 @@ const UsersPage = () => {
                         }
                         required
                         minLength={6}
+                        pattern="^(?=.*[0-9])(?=.*[a-zA-Z]).{6,}$"
+                        title={t('auth.passwordComplexity')}
                       />
+                      <small className="text-xs text-muted-foreground">
+                        {t('validation.passwordRequirements')}
+                      </small>
                     </div>
                     <div className='space-y-2'>
                       <label className='text-sm font-medium dark:text-gray-200'>
@@ -1044,7 +1150,12 @@ const UsersPage = () => {
                         }
                         required
                         minLength={6}
+                        pattern="^(?=.*[0-9])(?=.*[a-zA-Z]).{6,}$"
+                        title={t('auth.passwordComplexity')}
                       />
+                      <small className="text-xs text-muted-foreground">
+                        {t('validation.passwordRequirements')}
+                      </small>
                     </div>
                     <div className='space-y-2'>
                       <label className='text-sm font-medium dark:text-gray-200'>{t('confirmPassword')} *</label>

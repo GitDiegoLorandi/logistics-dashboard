@@ -372,38 +372,56 @@ const DeliverersPage = () => {
     }
 
     // Validate required fields
-    if (!formData.name || !formData.email) {
-      console.log('Missing required fields: name or email');
-      toast.error('Name and email are required');
+    if (!formData.name) {
+      toast.error(t('validation.nameRequired'));
+      return;
+    }
+
+    if (!formData.email) {
+      toast.error(t('validation.emailRequired'));
       return;
     }
 
     // Validate name length
     if (formData.name.length < 2) {
-      console.log('Name too short');
-      toast.error('Name must be at least 2 characters');
+      toast.error(t('validation.nameLength'));
       return;
     }
 
     // Validate email format
     const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
     if (!emailRegex.test(formData.email)) {
-      console.log('Invalid email format');
-      toast.error('Please provide a valid email address');
+      toast.error(t('validation.invalidEmail'));
       return;
     }
 
     // Validate phone number format if provided
-    if (formData.phone && !/^[+]?[1-9][\d]{0,15}$/.test(formData.phone)) {
-      console.log('Invalid phone format');
-      toast.error('Please provide a valid phone number');
+    if (formData.phone && !/^[+]?[0-9\s-()]{7,}$/.test(formData.phone)) {
+      toast.error(t('validation.invalidPhone'));
       return;
     }
 
     // Validate vehicleType is selected
     if (!formData.vehicleType) {
-      console.log('No vehicle type selected');
-      toast.error('Please select a vehicle type');
+      toast.error(t('validation.vehicleTypeRequired'));
+      return;
+    }
+
+    // Validate license number format if provided
+    if (formData.licenseNumber && !/^[A-Za-z0-9-]{5,}$/.test(formData.licenseNumber)) {
+      toast.error(t('validation.invalidLicenseNumber'));
+      return;
+    }
+
+    // Validate emergency contact phone if emergency contact name is provided
+    if (formData.emergencyContact.name && !formData.emergencyContact.phone) {
+      toast.error(t('validation.emergencyContactPhoneRequired'));
+      return;
+    }
+
+    // Validate emergency contact phone format if provided
+    if (formData.emergencyContact.phone && !/^[+]?[0-9\s-()]{7,}$/.test(formData.emergencyContact.phone)) {
+      toast.error(t('validation.invalidEmergencyPhone'));
       return;
     }
 
@@ -937,7 +955,10 @@ const DeliverersPage = () => {
                       onChange={e => handleFormChange('name', e.target.value)}
                       required
                       className='w-full'
+                      minLength="2"
+                      title={t('validation.nameLength')}
                     />
+                    <small className="text-xs text-muted-foreground">{t('validation.required')}</small>
                   </div>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('email')}</label>
@@ -947,7 +968,11 @@ const DeliverersPage = () => {
                       onChange={e => handleFormChange('email', e.target.value)}
                       required
                       className='w-full'
+                      pattern="^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$"
+                      title={t('validation.invalidEmail')}
+                      placeholder="deliverer@example.com"
                     />
+                    <small className="text-xs text-muted-foreground">{t('validation.required')}</small>
                   </div>
                 </div>
 
@@ -959,7 +984,11 @@ const DeliverersPage = () => {
                       value={formData.phone}
                       onChange={e => handleFormChange('phone', e.target.value)}
                       className='w-full'
+                      pattern="^[+]?[0-9\s-()]{7,}$"
+                      title={t('validation.invalidPhone')}
+                      placeholder="+1 (555) 123-4567"
                     />
+                    <small className="text-xs text-muted-foreground">{t('validation.phoneFormat')}</small>
                   </div>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('status')}</label>
@@ -995,6 +1024,7 @@ const DeliverersPage = () => {
                       <option value='Truck'>{t('vehicles.truck')}</option>
                       <option value='Bicycle'>{t('vehicles.bicycle')}</option>
                     </Select>
+                    <small className="text-xs text-muted-foreground">{t('validation.required')}</small>
                   </div>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('licenseNumber')}</label>
@@ -1003,7 +1033,11 @@ const DeliverersPage = () => {
                       value={formData.licenseNumber}
                       onChange={e => handleFormChange('licenseNumber', e.target.value)}
                       className='w-full'
+                      pattern="^[A-Za-z0-9-]{5,}$"
+                      title={t('validation.invalidLicenseNumber')}
+                      placeholder="DL12345678"
                     />
+                    <small className="text-xs text-muted-foreground">{t('validation.licenseFormat')}</small>
                   </div>
                 </div>
               </div>
@@ -1079,7 +1113,11 @@ const DeliverersPage = () => {
                       value={formData.emergencyContact.phone}
                       onChange={e => handleFormChange('emergencyContact.phone', e.target.value)}
                       className='w-full'
+                      pattern="^[+]?[0-9\s-()]{7,}$"
+                      title={t('validation.invalidPhone')}
+                      placeholder="+1 (555) 123-4567"
                     />
+                    <small className="text-xs text-muted-foreground">{t('validation.phoneFormat')}</small>
                   </div>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium'>{t('relationship')}</label>
