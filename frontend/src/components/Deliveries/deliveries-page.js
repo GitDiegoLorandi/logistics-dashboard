@@ -866,7 +866,7 @@ const DeliveriesPage = () => {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70'>
-          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-card p-6 shadow-xl dark:bg-gray-800 dark:text-white'>
+          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6 text-black shadow-xl dark:bg-gray-800 dark:text-white'>
             <div className='mb-4 flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-700'>
               <h3 className='text-xl font-semibold'>
                 {modalMode === 'create'
@@ -1073,7 +1073,7 @@ const DeliveriesPage = () => {
       {/* View Modal */}
       {showViewModal && selectedDelivery && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70'>
-          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-card p-6 shadow-xl dark:bg-gray-800 dark:text-white'>
+          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6 text-black shadow-xl dark:bg-gray-800 dark:text-white'>
             <div className='mb-4 flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-700'>
               <h3 className='text-xl font-semibold'>Delivery Details</h3>
               <button

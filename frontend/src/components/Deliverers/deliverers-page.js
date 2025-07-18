@@ -925,7 +925,7 @@ const DeliverersPage = () => {
       {showModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70'>
           {console.log('Rendering modal')}
-          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-card p-6 shadow-xl dark:bg-gray-800 dark:text-white'>
+          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6 text-black shadow-xl dark:bg-gray-800 dark:text-white'>
             <div className='mb-4 flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-700'>
               <h3 className='text-xl font-semibold'>
                 {modalMode === 'create'
@@ -1164,7 +1164,7 @@ const DeliverersPage = () => {
       {/* View Details Modal */}
       {showViewModal && selectedDeliverer && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70'>
-          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-card p-6 shadow-xl dark:bg-gray-800 dark:text-white'>
+          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6 text-black shadow-xl dark:bg-gray-800 dark:text-white'>
             <div className='mb-4 flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-700'>
               <h3 className='text-xl font-semibold'>{t('delivererDetails')}</h3>
               <button
@@ -1294,7 +1294,7 @@ const DeliverersPage = () => {
       {/* Statistics Modal */}
       {showStatsModal && selectedDeliverer && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70'>
-          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-card p-6 shadow-xl dark:bg-gray-800 dark:text-white'>
+          <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6 text-black shadow-xl dark:bg-gray-800 dark:text-white'>
             <div className='mb-4 flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-700'>
               <h3 className='text-xl font-semibold'>{t('performanceStats', { name: selectedDeliverer.name })}</h3>
               <button
@@ -1379,7 +1379,7 @@ const DeliverersPage = () => {
       {/* Assign Delivery Modal */}
       {showAssignModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70'>
-          <div className='max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-card p-6 shadow-xl dark:bg-gray-800 dark:text-white'>
+          <div className='max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg bg-white p-6 text-black shadow-xl dark:bg-gray-800 dark:text-white'>
             <div className='mb-4 flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-700'>
               <h3 className='text-xl font-semibold'>{t('assignDeliveryTo', { name: selectedDeliverer?.name })}</h3>
               <button

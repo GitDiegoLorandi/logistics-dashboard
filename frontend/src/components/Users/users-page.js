@@ -876,7 +876,7 @@ const UsersPage = () => {
       {/* Create/Edit User Modal */}
       <Dialog open={showModal} onOpenChange={setShowModal}>
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4'>
-          <div className='w-full max-w-lg rounded-lg bg-card shadow-lg dark:bg-gray-800 dark:text-white'>
+          <div className='w-full max-w-lg rounded-lg bg-white text-black shadow-lg dark:bg-gray-800 dark:text-white'>
             <div className='flex items-center justify-between border-b border-gray-200 p-6 dark:border-gray-700'>
                               <h2 className='text-xl font-semibold'>
                 {modalMode === 'create' ? t('newUser') : t('editUser')}
@@ -1028,7 +1028,7 @@ const UsersPage = () => {
       {showViewModal && selectedUser && (
         <Dialog open={showViewModal} onOpenChange={setShowViewModal}>
           <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4'>
-            <div className='w-full max-w-lg rounded-lg bg-card shadow-lg dark:bg-gray-800 dark:text-white'>
+            <div className='w-full max-w-lg rounded-lg bg-white text-black shadow-lg dark:bg-gray-800 dark:text-white'>
               <div className='flex items-center justify-between border-b border-gray-200 p-6 dark:border-gray-700'>
                 <h2 className='text-xl font-semibold'>{t('userDetails')}</h2>
                 <Button
@@ -1112,7 +1112,7 @@ const UsersPage = () => {
       {showPasswordModal && (
         <Dialog open={showPasswordModal} onOpenChange={setShowPasswordModal}>
           <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4'>
-            <div className='w-full max-w-lg rounded-lg bg-card shadow-lg dark:bg-gray-800 dark:text-white'>
+            <div className='w-full max-w-lg rounded-lg bg-white text-black shadow-lg dark:bg-gray-800 dark:text-white'>
               <div className='flex items-center justify-between border-b border-gray-200 p-6 dark:border-gray-700'>
                 <h2 className='text-xl font-semibold'>{t('changePassword')}</h2>
                 <Button
