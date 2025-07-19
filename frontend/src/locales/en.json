@@ -86,6 +86,7 @@
     "noAccount": "Don't have an account?",
     "hasAccount": "Already have an account?",
     "passwordRequirements": "Password must be at least 8 characters long",
+    "passwordComplexity": "Password must be at least 6 characters long, including at least one number",
     "login": {
       "subtitle": "Sign in to your account",
       "email": "Email Address",
@@ -481,6 +482,9 @@
       }
     }
   },
+  "validation": {
+    "required": "This field is required"
+  },
   "jobs": {
     "title": "Background Jobs",
     "subtitle": "Manage and monitor automated system tasks",
@@ -502,6 +506,7 @@
     "failed": "Failed",
     "completed": "Completed",
     "noResult": "No result",
+    "noJobRuns": "No job runs found",
     "startTime": "Start Time",
     "endTime": "End Time",
     "duration": "Duration",
@@ -589,6 +594,18 @@
     "passwordChanged": "Password changed successfully",
     "currentPassword": "Current Password",
     "newPassword": "New Password",
-    "changePassword": "Change Password"
+    "changePassword": "Change Password",
+    "validation": {
+      "invalidEmail": "Please enter a valid email",
+      "validEmailRequired": "A valid email address is required",
+      "firstNameLength": "First name must be at least 2 characters",
+      "lastNameLength": "Last name must be at least 2 characters",
+      "invalidPhone": "Invalid phone number",
+      "phoneFormat": "Use format: +1 (555) 123-4567",
+      "passwordRequirements": "Password must be at least 6 characters long, including at least one number"
+    },
+    "auth": {
+      "passwordComplexity": "Password must be at least 6 characters long, including at least one number"
+    }
   }
 }

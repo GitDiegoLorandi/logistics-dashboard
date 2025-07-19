@@ -118,7 +118,8 @@
     "noAccount": "Não tem uma conta?",
     "hasAccount": "Já tem uma conta?",
     "passwordRequirements": "A senha deve ter pelo menos 8 caracteres",
-    "passwordsDoNotMatch": "As senhas não coincidem"
+    "passwordsDoNotMatch": "As senhas não coincidem",
+    "passwordComplexity": "A senha deve ter pelo menos 6 caracteres, incluindo pelo menos um número"
   },
   "navigation": {
     "dashboard": "Painel",
@@ -150,6 +151,9 @@
     "viewAll": "Ver tudo",
     "performance": "Desempenho",
     "onTime": "Taxa de entrega no prazo",
+    "onTimeRate": "Taxa de pontualidade",
+    "activeDeliverers": "Entregadores ativos",
+    "userActivity": "Atividade de usuários",
     "lastSevenDays": "Últimos 7 dias",
     "currentStatus": "Status atual",
     "noDataAvailable": "Dados não disponíveis",
@@ -158,11 +162,13 @@
     "dataLoadingError": "Erro ao carregar dados do painel",
     "noTrendDataAvailable": "Dados de tendência não disponíveis",
     "noStatusDataAvailable": "Dados de status não disponíveis",
+    "noChartData": "Sem dados para exibir no gráfico",
     "chartLabels": {
       "dailyDeliveryTrends": "Tendências diárias de entregas concluídas",
       "statusDistribution": "Distribuição atual de status de entregas",
       "completedVsPending": "Gráfico de linha mostrando entregas concluídas vs pendentes",
-      "statusBreakdown": "Gráfico de pizza mostrando distribuição de status de entregas"
+      "statusBreakdown": "Gráfico de pizza mostrando distribuição de status de entregas",
+      "deliveryStatusBreakdown": "Gráfico de distribuição de status das entregas"
     },
     "tour": {
       "welcome": "Bem-vindo ao seu painel de logística! Aqui você pode monitorar todas as suas operações de entrega.",
@@ -390,7 +396,19 @@
     "passwordChanged": "Senha alterada com sucesso",
     "currentPassword": "Senha Atual",
     "newPassword": "Nova Senha",
-    "changePassword": "Alterar Senha"
+    "changePassword": "Alterar Senha",
+    "validation": {
+      "invalidEmail": "Por favor, insira um email válido",
+      "validEmailRequired": "Um endereço de email válido é necessário",
+      "firstNameLength": "O nome deve ter pelo menos 2 caracteres",
+      "lastNameLength": "O sobrenome deve ter pelo menos 2 caracteres",
+      "invalidPhone": "Número de telefone inválido",
+      "phoneFormat": "Use o formato: +1 (555) 123-4567",
+      "passwordRequirements": "A senha deve ter pelo menos 6 caracteres, incluindo pelo menos um número"
+    },
+    "auth": {
+      "passwordComplexity": "A senha deve ter pelo menos 6 caracteres, incluindo pelo menos um número"
+    }
   },
   "analytics": {
     "title": "Análises",
@@ -523,6 +541,7 @@
     "failed": "Falha",
     "completed": "Concluído",
     "noResult": "Sem resultado",
+    "noJobRuns": "Nenhuma execução de tarefa encontrada",
     "startTime": "Hora de início",
     "endTime": "Hora de término",
     "duration": "Duração",
@@ -633,7 +652,14 @@
     }
   },
   "validation": {
-    "required": "Este campo é obrigatório"
+    "required": "Este campo é obrigatório",
+    "invalidEmail": "Por favor, insira um email válido",
+    "validEmailRequired": "Um endereço de email válido é necessário",
+    "firstNameLength": "O nome deve ter pelo menos 2 caracteres",
+    "lastNameLength": "O sobrenome deve ter pelo menos 2 caracteres",
+    "invalidPhone": "Número de telefone inválido",
+    "phoneFormat": "Use o formato: +1 (555) 123-4567",
+    "passwordRequirements": "A senha deve ter pelo menos 6 caracteres, incluindo pelo menos um número"
   },
   "actions": {
     "search": "Pesquisar",
