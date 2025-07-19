@@ -245,33 +245,45 @@ export const delivererAPI = {
   getById: id => api.get(`/deliverers/${id}`),
   create: async (data) => {
     try {
-      console.log('API: Creating deliverer with data:', data);
+      console.log('[delivererAPI.create] Starting create deliverer call');
+      console.log('[delivererAPI.create] Data to send:', JSON.stringify(data, null, 2));
       
       // Check if auth token exists
       const token = localStorage.getItem('authToken');
       if (!token) {
-        console.error('No authentication token found');
+        console.error('[delivererAPI.create] No authentication token found');
         throw new Error('Authentication required. Please log in.');
       }
-      console.log('API: Auth token found, length:', token.length);
+      console.log('[delivererAPI.create] Auth token found, first 15 chars:', token.substring(0, 15) + '...');
+      
+      // Debug current user role
+      try {
+        const userData = localStorage.getItem('user');
+        if (userData) {
+          const parsedUser = JSON.parse(userData);
+          console.log('[delivererAPI.create] Current user role:', parsedUser.role);
+        }
+      } catch (e) {
+        console.warn('[delivererAPI.create] Could not determine user role:', e);
+      }
       
       // Log the request details
-      console.log('API: Making POST request to /deliverers');
-      console.log('API: Request headers will include Authorization: Bearer [token]');
+      console.log('[delivererAPI.create] Making POST request to /deliverers');
       
       // Make the API call with detailed logging
-      console.log('API: About to make axios POST request');
       try {
+        console.log('[delivererAPI.create] About to make axios POST request');
         const response = await api.post('/deliverers', data);
-        console.log('API: Create deliverer response:', response);
+        console.log('[delivererAPI.create] Create deliverer response:', response);
         return response;
       } catch (axiosError) {
-        console.error('API: Axios error during POST request:', axiosError);
+        console.error('[delivererAPI.create] Axios error during POST request:', axiosError);
+        console.error('[delivererAPI.create] Response data if available:', axiosError.response?.data);
         throw axiosError;
       }
     } catch (error) {
-      console.error('Error in delivererAPI.create:', error);
-      console.error('Error details:', {
+      console.error('[delivererAPI.create] Error in delivererAPI.create:', error);
+      console.error('[delivererAPI.create] Error details:', {
         message: error.message,
         status: error.status,
         data: error.data,
