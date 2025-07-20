@@ -390,59 +390,59 @@ const DeliverersPage = () => {
 
     try {
       // Validate required fields with fallback error messages
-      if (!formData.name) {
+    if (!formData.name) {
         console.log('Validation failed: Name is required');
         toast.error(t('validation.nameRequired', { fallback: 'Name is required' }));
-        return;
-      }
+      return;
+    }
 
-      if (!formData.email) {
+    if (!formData.email) {
         console.log('Validation failed: Email is required');
         toast.error(t('validation.emailRequired', { fallback: 'Email is required' }));
-        return;
-      }
+      return;
+    }
 
-      // Validate name length
-      if (formData.name.length < 2) {
+    // Validate name length
+    if (formData.name.length < 2) {
         console.log('Validation failed: Name too short');
         toast.error(t('validation.nameLength', { fallback: 'Name must be at least 2 characters' }));
-        return;
-      }
+      return;
+    }
 
-      // Validate email format
-      const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-      if (!emailRegex.test(formData.email)) {
+    // Validate email format
+    const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+    if (!emailRegex.test(formData.email)) {
         console.log('Validation failed: Invalid email format');
         toast.error(t('validation.invalidEmail', { fallback: 'Invalid email format' }));
-        return;
-      }
+      return;
+    }
 
-      // Validate phone number format if provided
-      if (formData.phone && !/^[+]?[0-9\s-()]{7,}$/.test(formData.phone)) {
+    // Validate phone number format if provided
+    if (formData.phone && !/^[+]?[0-9\s-()]{7,}$/.test(formData.phone)) {
         console.log('Validation failed: Invalid phone format');
         toast.error(t('validation.invalidPhone', { fallback: 'Invalid phone number format' }));
-        return;
-      }
+      return;
+    }
 
       // Validate vehicleType is selected - simplified check to get past this validation
-      if (!formData.vehicleType) {
+    if (!formData.vehicleType) {
         console.log('Validation failed: Vehicle type required');
         toast.error('Please select a vehicle type');
-        return;
-      }
+      return;
+    }
 
       // Validate license number format if provided - relaxed validation
       if (formData.licenseNumber && formData.licenseNumber.length < 3) {
         console.log('Validation failed: License number too short');
         toast.error('License number should be at least 3 characters');
-        return;
-      }
+      return;
+    }
 
       console.log('All validations passed, attempting to create/update deliverer');
-      
-      // Set loading state
-      setLoading(true);
-      console.log('Form data to be submitted:', formData);
+
+    // Set loading state
+    setLoading(true);
+    console.log('Form data to be submitted:', formData);
 
       if (modalMode === 'create') {
         console.log('Creating new deliverer');
