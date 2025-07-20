@@ -11,7 +11,7 @@
     "test:assignment": "npm --prefix backend run test:assignment",
     "start:frontend": "npm --prefix frontend start",
     "start:backend": "npm --prefix backend start",
-    "prepare": "husky",
+    "postinstall": "[ -z \"$CI\" ] && [ -z \"$RENDER\" ] && husky || echo \"Skipping husky installation on CI/Render\"",
     "install-deps": "npm install && npm --prefix backend run install-deps",
     "lint": "eslint . --ext .js,.jsx",
     "lint:fix": "eslint . --ext .js,.jsx --fix",
