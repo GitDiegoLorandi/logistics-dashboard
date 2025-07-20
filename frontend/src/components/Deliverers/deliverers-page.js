@@ -26,15 +26,15 @@ import {
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { delivererAPI } from '../../services/api';
-import LoadingSpinner from '../ui/loading-spinner';
-import ErrorMessage from '../ui/error-message';
-import AddressAutocomplete from '../ui/address-autocomplete';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Select } from '../ui/select';
-import { Card, CardContent } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Table, TableHeader as THead, TableRow as TR, TableHead as TH, TableBody as TBody, TableCell as TD } from '../ui/table';
+import LoadingSpinner from '../UI/loading-spinner';
+import ErrorMessage from '../UI/error-message';
+import AddressAutocomplete from '../UI/address-autocomplete';
+import { Button } from '../UI/button';
+import { Input } from '../UI/input';
+import { Select } from '../UI/select';
+import { Card, CardContent } from '../UI/card';
+import { Badge } from '../UI/badge';
+import { Table, TableHeader as THead, TableRow as TR, TableHead as TH, TableBody as TBody, TableCell as TD } from '../UI/table';
 import PropTypes from 'prop-types';
 
 // Fallback data for development/demo purposes

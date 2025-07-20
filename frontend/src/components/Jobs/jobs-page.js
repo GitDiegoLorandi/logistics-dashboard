@@ -17,10 +17,10 @@ import {
 import { jobsAPI } from '../../services/api';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
-import { Button } from '../ui/button';
-import { Card, CardContent } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Grid, GridItem } from '../ui/grid';
+import { Button } from '../UI/button';
+import { Card, CardContent } from '../UI/card';
+import { Badge } from '../UI/badge';
+import { Grid, GridItem } from '../UI/grid';
 
 const JobsPage = () => {
   const { t } = useTranslation(['jobs', 'common']);

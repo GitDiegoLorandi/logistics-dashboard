@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { authAPI } from '../services/api';
 import { toast } from 'react-toastify';
-import { Button } from './ui/button';
+import { Button } from './UI/button';
 import { cn } from '../lib/utils';
 import { Eye, EyeOff, Lock, Mail, Package } from 'lucide-react';
-import LanguageSwitcher from './ui/language-switcher';
+import LanguageSwitcher from './UI/language-switcher';
 
 const Login = () => {
   const { t } = useTranslation(['auth', 'common']);

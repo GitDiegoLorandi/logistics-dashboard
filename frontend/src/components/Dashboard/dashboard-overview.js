@@ -15,10 +15,10 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { deliveryAPI, userAPI, delivererAPI } from '../../services/api';
-import ResponsiveChartCard from '../ui/data-visualization/charts/responsive-chart-card';
-import { LineChart, PieChart } from '../ui/data-visualization/charts';
-import { Button } from '../ui/button';
-import { Card, CardHeader, CardContent } from '../ui/card';
+import ResponsiveChartCard from '../UI/data-visualization/charts/responsive-chart-card';
+import { LineChart, PieChart } from '../UI/data-visualization/charts';
+import { Button } from '../UI/button';
+import { Card, CardHeader, CardContent } from '../UI/card';
 
 /**
  * Dashboard overview component

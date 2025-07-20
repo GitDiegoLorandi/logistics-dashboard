@@ -21,4 +21,4 @@ export const JobsPage = lazy(() => import('./Jobs/jobs-page'));
 export const SettingsPage = lazy(() => import('./Settings/settings-page'));
 
 // UI Components
-export const CommandPalette = lazy(() => import('./ui/command-palette')); 
+export const CommandPaletteComponent = lazy(() => import('./UI/command-palette').then(module => ({ default: module.CommandPalette }))); 

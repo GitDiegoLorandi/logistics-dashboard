@@ -15,9 +15,9 @@ import {
   Edit,
   Trash2,
 } from 'lucide-react';
-import { Table, TableHeader as THead, TableRow as TR, TableHead as TH, TableBody as TBody, TableCell as TD } from '../ui/table';
-import { Badge } from '../ui/badge';
-import { Button } from '../ui/button';
+import { Table, TableHeader as THead, TableRow as TR, TableHead as TH, TableBody as TBody, TableCell as TD } from '../UI/table';
+import { Badge } from '../UI/badge';
+import { Button } from '../UI/button';
 
 /**
  * DeliveriesTable component for displaying a list of deliveries

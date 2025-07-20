@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Package, Mail, Lock, User, Eye, EyeOff, ArrowLeft } from 'lucide-react';
-import { Button } from './ui/button';
+import { Button } from './UI/button';
 import { cn } from '../lib/utils';
 
 const Register = () => {

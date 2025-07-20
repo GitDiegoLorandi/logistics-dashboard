@@ -16,7 +16,7 @@ import {
 } from './components/lazy-components';
 import { useTranslation } from 'react-i18next';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { SkipLink } from './components/ui/a11y';
+import { SkipLink } from './components/UI/a11y';
 import './styles/theme.css';
 
 // Loading fallback component

@@ -21,15 +21,15 @@ import {
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
 import { userAPI, authAPI } from '../../services/api';
-import LoadingSpinner from '../ui/loading-spinner';
-import ErrorMessage from '../ui/error-message';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Select } from '../ui/select';
-import { Card, CardContent } from '../ui/card';
-import { Badge } from '../ui/badge';
-import { Table, TableHeader as THead, TableRow as TR, TableHead as TH, TableBody as TBody, TableCell as TD } from '../ui/table';
-import { Dialog } from '../ui/dialog';
+import LoadingSpinner from '../UI/loading-spinner';
+import ErrorMessage from '../UI/error-message';
+import { Button } from '../UI/button';
+import { Input } from '../UI/input';
+import { Select } from '../UI/select';
+import { Card, CardHeader, CardContent } from '../UI/card';
+import { Badge } from '../UI/badge';
+import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '../UI/table';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '../UI/dialog';
 
 // Fallback data for development/demo purposes
 const fallbackUsers = [
@@ -697,20 +697,20 @@ const UsersPage = () => {
       {/* Users Table */}
       <Card className='mb-6 overflow-hidden'>
         <Table>
-          <THead>
-            <TR className='bg-muted/50'>
-              <TH>{t('user', { ns: 'common' })}</TH>
-              <TH>{t('contact', { ns: 'common' })}</TH>
-              <TH>{t('role', { ns: 'common' })}</TH>
-              <TH>{t('status', { ns: 'common' })}</TH>
-              <TH>{t('created', { ns: 'common' })}</TH>
-              <TH className='text-right'>{t('actionsHeader', { ns: 'common' })}</TH>
-            </TR>
-          </THead>
-          <TBody>
+          <TableHeader>
+            <TableRow className='bg-muted/50'>
+              <TableHead>{t('user', { ns: 'common' })}</TableHead>
+              <TableHead>{t('contact', { ns: 'common' })}</TableHead>
+              <TableHead>{t('role', { ns: 'common' })}</TableHead>
+              <TableHead>{t('status', { ns: 'common' })}</TableHead>
+              <TableHead>{t('created', { ns: 'common' })}</TableHead>
+              <TableHead className='text-right'>{t('actionsHeader', { ns: 'common' })}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {users.map(user => (
-              <TR key={user._id}>
-                <TD>
+              <TableRow key={user._id}>
+                <TableCell>
                   <div className='flex flex-col'>
                     <span className='font-medium'>
                       {user.firstName && user.lastName
@@ -721,8 +721,8 @@ const UsersPage = () => {
                       {user.email}
                     </span>
                   </div>
-                </TD>
-                <TD>
+                </TableCell>
+                <TableCell>
                   <div className='flex flex-col'>
                     <div className='flex items-center gap-1 text-sm'>
                       <Mail className='h-3 w-3 text-muted-foreground' />
@@ -735,8 +735,8 @@ const UsersPage = () => {
                       </div>
                     )}
                   </div>
-                </TD>
-                <TD>
+                </TableCell>
+                <TableCell>
                   {user._id === currentUser?._id ? (
                     getRoleBadge(user.role)
                   ) : (
@@ -751,8 +751,8 @@ const UsersPage = () => {
                       <option value='deliverer'>{t('users.deliverer')}</option>
                     </Select>
                   )}
-                </TD>
-                <TD>
+                </TableCell>
+                <TableCell>
                   <Badge
                     variant={user.isActive ? 'success' : 'destructive'}
                     className='flex items-center gap-1'
@@ -769,14 +769,14 @@ const UsersPage = () => {
                       </>
                     )}
                   </Badge>
-                </TD>
-                <TD>
+                </TableCell>
+                <TableCell>
                   <div className='flex items-center gap-1 text-sm'>
                     <Calendar className='h-3 w-3 text-muted-foreground' />
                     {new Date(user.createdAt).toLocaleDateString()}
                   </div>
-                </TD>
-                <TD>
+                </TableCell>
+                <TableCell>
                   <div className='flex items-center justify-end gap-2'>
                     <Button
                       variant='ghost'
@@ -816,10 +816,10 @@ const UsersPage = () => {
                       </>
                     )}
                   </div>
-                </TD>
-              </TR>
+                </TableCell>
+              </TableRow>
             ))}
-          </TBody>
+          </TableBody>
         </Table>
 
         {users.length === 0 && !loading && (
