@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Link } from 'react-router-dom';
 import './index.css';
 import {
   Login,
@@ -34,9 +34,9 @@ const NotFoundPage = () => {
     <div className="flex min-h-screen flex-col items-center justify-center">
       <h1 className="mb-4 text-4xl font-bold">{t('notFound.title')}</h1>
       <p className="mb-8">{t('notFound.message')}</p>
-      <a href="/dashboard" className="text-[var(--color-primary)] hover:underline">
+      <Link to="/dashboard" className="text-[var(--color-primary)] hover:underline">
         {t('notFound.returnToDashboard')}
-      </a>
+      </Link>
     </div>
   );
 };
@@ -44,7 +44,7 @@ const NotFoundPage = () => {
 function App() {
   return (
     <ThemeProvider>
-      <Router>
+      <Router basename="/logistics-dashboard">
         <SkipLink targetId="main-content" />
         <Suspense fallback={<LoadingFallback />}>
           <Routes>
