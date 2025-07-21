@@ -41,6 +41,7 @@ app.use(
       config.FRONTEND_URL,
       'http://localhost:3000',
       'http://localhost:3001',
+      'https://gitdiegolorandi.github.io',
       /localhost:\d+$/, // Allow any localhost port
     ],
     credentials: true,
