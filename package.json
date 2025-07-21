@@ -2,7 +2,7 @@
   "name": "logistics-dashboard",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "backend/src/server.js",
   "scripts": {
     "test": "npm run test:frontend && npm run test:backend",
     "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
