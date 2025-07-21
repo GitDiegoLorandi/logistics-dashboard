@@ -251,6 +251,8 @@ export const userAPI = {
   changePassword: data => api.put('/users/change-password', data),
   deactivate: id => api.put(`/users/${id}/deactivate`),
   delete: id => api.delete(`/users/${id}`),
+  // Add the create method for admin user creation
+  create: userData => api.post('/users', userData),
 };
 
 

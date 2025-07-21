@@ -12,6 +12,7 @@ const {
   deactivateUser,
   deleteUser,
 } = require('../controllers/userController');
+const User = require('../models/userModel'); // Corrected import for User model
 
 const router = express.Router();
 
@@ -29,6 +30,103 @@ const handleValidationErrors = (req, res, next) => {
 
 // Get All Users (Admin Only)
 router.get('/', authMiddleware, roleMiddleware(['admin']), getAllUsers);
+
+// Create User (Admin Only)
+router.post(
+  '/',
+  authMiddleware,
+  roleMiddleware(['admin']),
+  [
+    body('email')
+      .isEmail()
+      .withMessage('Please provide a valid email')
+      .normalizeEmail(),
+    body('password')
+      .isLength({ min: 6 })
+      .withMessage('Password must be at least 6 characters long'),
+    body('role')
+      .optional()
+      .isIn(['user', 'admin'])
+      .withMessage("Role must be either 'user' or 'admin'"),
+    body('firstName')
+      .optional()
+      .isLength({ min: 2, max: 50 })
+      .withMessage('First name must be between 2 and 50 characters'),
+    body('lastName')
+      .optional()
+      .isLength({ min: 2, max: 50 })
+      .withMessage('Last name must be between 2 and 50 characters'),
+    body('phone')
+      .optional()
+      .matches(/^[+]?[1-9][\d]{0,15}$/)
+      .withMessage('Please provide a valid phone number'),
+  ],
+  handleValidationErrors,
+  async (req, res) => {
+    const { email, password, role, firstName, lastName, phone } = req.body;
+
+    try {
+      console.log('Admin creating new user:', email);
+
+      // Check if user already exists
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res
+          .status(400)
+          .json({ message: 'User already exists with this email' });
+      }
+
+      // Create user (password will be hashed by the pre-save middleware)
+      const newUser = await User.create({
+        email,
+        password,
+        role: role || 'user',
+        firstName,
+        lastName,
+        phone,
+        // Add createdBy if needed
+        // createdBy: req.user.userId
+      });
+
+      console.log('User created by admin successfully:', newUser._id);
+
+      res.status(201).json({
+        message: 'User created successfully',
+        user: {
+          id: newUser._id,
+          email: newUser.email,
+          role: newUser.role,
+          firstName: newUser.firstName,
+          lastName: newUser.lastName,
+          phone: newUser.phone,
+        },
+      });
+    } catch (error) {
+      console.error('User creation error:', error);
+
+      if (error.code === 11000) {
+        return res
+          .status(400)
+          .json({ message: 'User already exists with this email' });
+      }
+
+      if (error.name === 'ValidationError') {
+        const messages = Object.values(error.errors).map(err => err.message);
+        return res
+          .status(400)
+          .json({ message: 'Validation error', errors: messages });
+      }
+
+      res.status(500).json({
+        message: 'Server error during user creation',
+        error:
+          process.env.NODE_ENV === 'development'
+            ? error.message
+            : 'Internal server error',
+      });
+    }
+  }
+);
 
 // Get Current User Profile
 router.get('/profile', authMiddleware, getUserProfile);
