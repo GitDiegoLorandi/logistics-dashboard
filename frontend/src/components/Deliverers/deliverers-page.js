@@ -491,7 +491,18 @@ const DeliverersPage = () => {
       fetchDeliverers();
     } catch (err) {
       console.error('Error deleting deliverer:', err);
-      toast.error(err.response?.data?.message || t('deleteError'));
+      
+      // Display proper error message based on API response structure
+      if (err.message && err.message.includes('active deliveries')) {
+        // Display the specific message about active deliveries
+        toast.error(err.message, { 
+          autoClose: 7000, // Keep the message longer
+          icon: () => <AlertTriangle className="text-amber-500" size={24} /> 
+        });
+      } else {
+        // Display generic error or other specific errors
+        toast.error(err.message || t('deleteError'));
+      }
     }
   };
 
