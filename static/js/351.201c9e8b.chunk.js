@@ -1,0 +1,2 @@
+"use strict";(self.webpackChunklogistics_dashboard_frontend=self.webpackChunklogistics_dashboard_frontend||[]).push([[351],{351:(e,t,s)=>{s.r(t),s.d(t,{default:()=>r});s(9643);var a=s(8256),o=s(6507);const r=e=>{let{children:t}=e;return localStorage.getItem("authToken")?t:(0,o.jsx)(a.C5,{to:"/login",replace:!0})}}}]);
+//# sourceMappingURL=351.201c9e8b.chunk.js.map
