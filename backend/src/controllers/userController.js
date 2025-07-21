@@ -343,6 +343,70 @@ const deleteUser = async (req, res) => {
   }
 };
 
+// Create User (Admin Only)
+const createUser = async (req, res) => {
+  try {
+    console.log('Admin creating user with data:', req.body);
+    
+    const { email, password, role, firstName, lastName, phone } = req.body;
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ email, isActive: true });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists with this email' });
+    }
+
+    // Create user (password will be hashed by the pre-save middleware)
+    const newUser = await User.create({
+      email,
+      password, // Don't hash here - let the model do it
+      role: role || 'user',
+      firstName,
+      lastName,
+      phone,
+      createdBy: req.user.userId, // Track which admin created this user
+    });
+
+    console.log('User created successfully by admin:', newUser._id);
+    
+    // Return the created user without sensitive data
+    res.status(201).json({
+      message: 'User created successfully',
+      user: {
+        id: newUser._id,
+        email: newUser.email,
+        role: newUser.role,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        phone: newUser.phone,
+      },
+    });
+  } catch (error) {
+    console.error('Error creating user:', error);
+
+    if (error.code === 11000) {
+      return res
+        .status(400)
+        .json({ message: 'User already exists with this email' });
+    }
+
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res
+        .status(400)
+        .json({ message: 'Validation error', errors: messages });
+    }
+
+    res.status(500).json({
+      message: 'Server error during user creation',
+      error:
+        process.env.NODE_ENV === 'development'
+          ? error.message
+          : 'Internal server error',
+    });
+  }
+};
+
 module.exports = {
   getAllUsers,
   getUserProfile,
@@ -352,4 +416,5 @@ module.exports = {
   changePassword,
   deactivateUser,
   deleteUser,
+  createUser, // Add the new function to the exports
 };
