@@ -11,6 +11,7 @@ const {
   changePassword,
   deactivateUser,
   deleteUser,
+  createUser, // Add the missing import
 } = require('../controllers/userController');
 const User = require('../models/userModel'); // Corrected import for User model
 
