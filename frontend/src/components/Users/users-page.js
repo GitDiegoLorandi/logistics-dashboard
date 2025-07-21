@@ -17,6 +17,7 @@ import {
   Crown,
   CheckCircle,
   Calendar,
+  AlertTriangle, // Added AlertTriangle
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useTranslation } from 'react-i18next';
@@ -82,6 +83,7 @@ const UsersPage = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [loadError, setLoadError] = useState(false); // Add loadError state
   const [selectedUser, setSelectedUser] = useState(null);
   const [currentUser, setCurrentUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -141,6 +143,7 @@ const UsersPage = () => {
   const fetchUsers = useCallback(async () => {
     try {
       setLoading(true);
+      setLoadError(false); // Reset load error
       const params = {
         page: currentPage,
         limit,
@@ -156,16 +159,17 @@ const UsersPage = () => {
     } catch (err) {
       console.error('Error fetching users:', err);
       setError('Failed to fetch users');
-      toast.error('Failed to fetch users. Using demo data instead.');
+      setLoadError(true); // Set load error
+      toast.error(t('users.fetchError', 'Failed to fetch users. Please try again later.'));
       
       // Use fallback data when API fails
-      setUsers(fallbackUsers);
+      setUsers(fallbackUsers || []);
       setTotalPages(1);
-      setTotalDocs(fallbackUsers.length);
+      setTotalDocs(fallbackUsers ? fallbackUsers.length : 0);
     } finally {
       setLoading(false);
     }
-  }, [currentPage, limit, roleFilter, searchTerm]);
+  }, [currentPage, limit, roleFilter, searchTerm, t]);
 
   // Effects
   useEffect(() => {
@@ -566,8 +570,27 @@ const UsersPage = () => {
   const userCount = users.filter(u => u.role === 'user').length;
   const activeCount = users.filter(u => u.isActive).length;
 
+  // Conditional rendering based on error state
   if (loading && users.length === 0) return <LoadingSpinner />;
-  if (error) return <ErrorMessage message={error} onRetry={fetchUsers} />;
+  
+  if (loadError) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center p-8 text-center">
+        <AlertTriangle className="mb-4 h-12 w-12 text-amber-500" />
+        <h2 className="mb-2 text-2xl font-bold">
+          {t('users.errorLoadingTitle', 'Failed to Load Users')}
+        </h2>
+        <p className="mb-6 max-w-md text-muted-foreground">
+          {t('users.errorLoadingDesc', 'There was a problem loading the users data. This could be due to a network issue or server problem.')}
+        </p>
+        <Button onClick={fetchUsers}>
+          {t('common.tryAgain', 'Try Again')}
+        </Button>
+      </div>
+    );
+  }
+
+  if (error && !loadError) return <ErrorMessage message={error} onRetry={fetchUsers} />;
 
   return (
     <div className='mx-auto max-w-7xl px-4 py-6'>
