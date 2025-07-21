@@ -2,7 +2,7 @@
   "name": "logistics-dashboard-frontend",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://yourusername.github.io/logistics-dashboard",
+  "homepage": "https://gitdiegolorandi.github.io/logistics-dashboard",
   "dependencies": {
     "@tanstack/react-table": "^8.21.3",
     "@testing-library/jest-dom": "^5.16.5",
