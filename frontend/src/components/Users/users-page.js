@@ -276,29 +276,28 @@ const UsersPage = () => {
         role: formData.role,
       };
 
-      await authAPI.register(userData);
+      // Use userAPI instead of authAPI for admin-created users
+      // This is critical because we need admin permissions for this action
+      // The authAPI.register endpoint might be restricted to creating only 'user' role accounts
+      const response = await userAPI.create(userData);
+      
+      console.log('User created successfully:', response);
       toast.success(t('users.createUserSuccess'));
       setShowModal(false);
       resetForm();
-      fetchUsers();
+      fetchUsers(); // Refresh the user list
     } catch (err) {
       console.error('Error creating user:', err);
-      toast.error(err.response?.data?.message || t('error'));
       
-      // For demo purposes, simulate successful creation with fallback data
-      if (!err.response?.data?.message?.includes('already exists')) {
-        const newUser = {
-          _id: `demo-${Date.now()}`,
-          ...formData,  // Use formData instead of userData
-          createdAt: new Date().toISOString(),
-          isActive: true
-        };
-        
-        setUsers(prev => [newUser, ...prev]);
-        setShowModal(false);
-        resetForm();
-        toast.success(t('users.createUserSuccess') + ' (Demo)');
+      // Show proper error message from API
+      if (err.message) {
+        toast.error(err.message);
+      } else {
+        toast.error(t('error'));
       }
+      
+      // Remove demo fallback - it causes confusion when users appear in UI but aren't in the database
+      // We'll let real database operations control the UI
     }
   };
 
