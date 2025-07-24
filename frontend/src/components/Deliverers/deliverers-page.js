@@ -116,11 +116,6 @@ const DeliverersPage = () => {
   const [selectedDelivery, setSelectedDelivery] = useState('');
   const [loadingDeliveries, setLoadingDeliveries] = useState(false);
 
-  // Log modal state changes
-  useEffect(() => {
-    console.log('showModal state changed:', showModal);
-  }, [showModal]);
-
   // Pagination & Filtering
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -219,7 +214,7 @@ const DeliverersPage = () => {
     try {
       setStatsLoading(true);
       const response = await delivererAPI.getStats(delivererId);
-      setDelivererStats(response); // Remove .data
+      setDelivererStats(response);
     } catch (err) {
       console.error('Error fetching deliverer stats:', err);
       toast.error('Failed to fetch deliverer statistics');
@@ -243,7 +238,7 @@ const DeliverersPage = () => {
     try {
       setLoadingDeliveries(true);
       const response = await delivererAPI.getAvailableDeliveries();
-      setAvailableDeliveries(response || []); // Remove .data
+      setAvailableDeliveries(response || []);
     } catch (err) {
       console.error('Error fetching available deliveries:', err);
       toast.error('Failed to fetch available deliveries');
@@ -445,17 +440,12 @@ const DeliverersPage = () => {
   // Handle Create/Edit Deliverer
   const handleSaveDeliverer = async e => {
     e.preventDefault();
-    console.log('handleSaveDeliverer called');
 
     // Check if user is admin
     if (!isAdmin) {
-      console.log('User is not admin, cannot create/edit deliverer');
       toast.error('You need admin privileges to create or edit deliverers');
       return;
     }
-
-    // Debug log all form data before validation
-    console.log('Form data before validation:', JSON.stringify(formData, null, 2));
 
     // Validate form fields
     const nameError = !formData.name || formData.name.length < 2;
@@ -476,26 +466,18 @@ const DeliverersPage = () => {
 
     // If there are validation errors, don't submit the form
     if (nameError || emailError || phoneError || vehicleTypeError || licenseNumberError) {
-      console.log('Validation failed');
       return;
     }
-
-    console.log('All validations passed, attempting to create/update deliverer');
 
     try {
       // Set loading state
       setLoading(true);
-      console.log('Form data to be submitted:', formData);
 
       if (modalMode === 'create') {
-        console.log('Creating new deliverer');
         const response = await delivererAPI.create(formData);
-        console.log('Create deliverer response:', response);
         toast.success('Deliverer created successfully');
       } else {
-        console.log('Updating deliverer:', selectedDeliverer._id);
         const response = await delivererAPI.update(selectedDeliverer._id, formData);
-        console.log('Update deliverer response:', response);
         toast.success('Deliverer updated successfully');
       }
 
@@ -591,11 +573,9 @@ const DeliverersPage = () => {
 
   // Handle Create New Deliverer
   const handleCreateDeliverer = () => {
-    console.log('handleCreateDeliverer called');
     resetForm();
     setModalMode('create');
     setShowModal(true);
-    console.log('Modal should be shown now, showModal set to:', true);
   };
 
   // Helper function to get status icon
@@ -685,7 +665,6 @@ const DeliverersPage = () => {
           </Button>
           <Button
             onClick={() => {
-              console.log('Create Deliverer button clicked');
               handleCreateDeliverer();
             }}
             size='sm'
@@ -943,7 +922,6 @@ const DeliverersPage = () => {
             {isAdmin && (
               <Button
                 onClick={() => {
-                  console.log('Empty state Create Deliverer button clicked');
                   handleCreateDeliverer();
                 }}
                 className='flex items-center gap-2'
@@ -992,7 +970,6 @@ const DeliverersPage = () => {
       {/* Create/Edit Modal */}
       {showModal && (
         <div className='fixed inset-0 z-50 flex items-center justify-center bg-black/70'>
-          {console.log('Rendering modal')}
           <div className='max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-lg bg-white p-6 text-black shadow-xl dark:bg-gray-800 dark:text-white'>
             <div className='mb-4 flex items-center justify-between border-b border-gray-200 pb-4 dark:border-gray-700'>
               <h3 className='text-xl font-semibold'>
@@ -1009,7 +986,6 @@ const DeliverersPage = () => {
             </div>
 
             <form onSubmit={(e) => {
-              console.log('Form submitted');
               handleSaveDeliverer(e);
             }} className='space-y-4'>
               <div className='space-y-4'>
@@ -1228,7 +1204,6 @@ const DeliverersPage = () => {
                   disabled={loading}
                   onClick={(e) => {
                     // Add an additional onClick handler as a backup
-                    console.log('Submit button clicked');
                     if (!loading) {
                       e.preventDefault();
                       handleSaveDeliverer(e);

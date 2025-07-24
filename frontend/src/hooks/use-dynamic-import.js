@@ -64,7 +64,7 @@ export function useDynamicImport(importFn, options = {}) {
           loaded: false
         });
       });
-  }, [importFn]); // Remove state.loaded and state.loading from deps, use functional setState instead
+  }, [importFn]);
   
   // Load immediately if specified
   useEffect(() => {

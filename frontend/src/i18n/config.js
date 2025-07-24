@@ -19,8 +19,6 @@ i18n
   .init({
     // Default language
     fallbackLng: 'en',
-    // Debug mode in development
-    debug: process.env.NODE_ENV === 'development',
     // Namespaces configuration
     ns: [
       'common', 

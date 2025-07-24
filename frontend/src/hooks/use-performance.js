@@ -167,7 +167,7 @@ const usePerformance = ({
         }
       }
     };
-  }, [isSupported]); // Remove getMarkName from dependencies, use ref instead
+  }, [isSupported]);
 
   return {
     startMeasure,

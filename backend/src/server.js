@@ -15,8 +15,16 @@ const deliveryRoutes = require('./routes/deliveryRoutes');
 const statisticsRoutes = require('./routes/statisticsRoutes');
 const backgroundJobRoutes = require('./routes/backgroundJobRoutes');
 
-console.log('✅ Environment validation passed');
+// Environment validation
+try {
+  validateEnvironment();
+  console.log('✅ Environment validation passed');
+} catch (error) {
+  console.error('❌ Environment validation failed:', error.message);
+  process.exit(1);
+}
 
+// Initialize Express app
 const app = express();
 const server = http.createServer(app);
 const PORT = config.PORT;

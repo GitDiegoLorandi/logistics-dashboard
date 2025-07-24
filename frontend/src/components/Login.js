@@ -66,18 +66,13 @@ const Login = () => {
     setErrors({});
 
     try {
-      console.log('Attempting login with email:', formData.email);
       const response = await authAPI.login(formData);
-      console.log('Login successful, response:', response);
-      console.log('User role from response:', response.user?.role);
 
       // Explicitly store token and user data in localStorage
       if (response.token) {
-        console.log('Storing auth token in localStorage');
         localStorage.setItem('authToken', response.token);
         
         if (response.user) {
-          console.log('Storing user data in localStorage:', response.user);
           localStorage.setItem('user', JSON.stringify(response.user));
         }
       } else {
@@ -87,7 +82,6 @@ const Login = () => {
       toast.success(t('login.welcome', { name: response.user?.name || response.user?.email || t('common.user') }));
       navigate('/dashboard');
     } catch (error) {
-      console.error('Login error:', error);
       let errorMessage = t('login.errors.generic');
 
       if (error.status) {

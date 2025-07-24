@@ -11,10 +11,9 @@ const ThemeToggle = ({ className = '' }) => {
       size="sm"
       onClick={toggleTheme}
       aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
-      className={`w-9 h-9 p-0 rounded-full ${className}`}
+      className={`h-9 w-9 rounded-full p-0 ${className}`}
     >
       {theme === 'dark' ? (
-        // Sun icon for dark mode (to switch to light)
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
           width="20" 
@@ -38,7 +37,6 @@ const ThemeToggle = ({ className = '' }) => {
           <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
         </svg>
       ) : (
-        // Moon icon for light mode (to switch to dark)
         <svg 
           xmlns="http://www.w3.org/2000/svg" 
           width="20" 

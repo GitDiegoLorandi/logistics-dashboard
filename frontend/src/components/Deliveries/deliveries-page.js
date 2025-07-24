@@ -212,20 +212,9 @@ const DeliveriesPage = () => {
       delivery.deliveryAddress?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Debug logs
-  useEffect(() => {
-    console.log('Deliveries state:', deliveries);
-    console.log('Filtered deliveries:', filteredDeliveries);
-    console.log('Search term:', searchTerm);
-    console.log('Status filter:', statusFilter);
-    console.log('Priority filter:', priorityFilter);
-    console.log('Deliverer filter:', delivererFilter);
-  }, [deliveries, filteredDeliveries, searchTerm, statusFilter, priorityFilter, delivererFilter]);
-
   // Handle Form Submission
   const handleSubmit = async e => {
     e.preventDefault();
-    console.log('Delivery form submission triggered');
     try {
       setLoading(true);
 
@@ -248,7 +237,6 @@ const DeliveriesPage = () => {
 
       // If there are validation errors, don't proceed
       if (hasCustomerError || hasAddressError || hasDateError) {
-        console.log('Validation errors detected');
         setLoading(false);
         return;
       }
@@ -298,21 +286,16 @@ const DeliveriesPage = () => {
               deliverer: formData.deliverer || undefined,
             };
 
-      console.log('Prepared submission data:', submissionData);
-
       // Store previous deliverer ID if we're editing
       const previousDelivererId =
         modalMode === 'edit' ? selectedDelivery.deliverer?._id : null;
 
       if (modalMode === 'create') {
-        console.log('Creating delivery with data:', submissionData);
         try {
           // Check if we have an auth token
           const token = localStorage.getItem('authToken');
-          console.log('Auth token exists:', !!token, token ? `Length: ${token.length}` : '');
           
           const response = await deliveryAPI.create(submissionData);
-          console.log('Created delivery:', response);
           toast.success('Delivery created successfully!');
           setShowModal(false);
           resetForm();
@@ -327,7 +310,6 @@ const DeliveriesPage = () => {
           
           if (err.data && err.data.errors && Array.isArray(err.data.errors)) {
             // Handle validation errors array
-            console.log('Validation errors from API:', err.data.errors);
             err.data.errors.forEach(error => {
               toast.error(`${error.field}: ${error.message}`);
             });
@@ -347,7 +329,6 @@ const DeliveriesPage = () => {
         }
       } else {
         // Handle edit mode
-        console.log('Updating delivery with data:', submissionData);
         try {
           await deliveryAPI.update(selectedDelivery._id, submissionData);
           toast.success('Delivery updated successfully!');
@@ -359,9 +340,6 @@ const DeliveriesPage = () => {
           ) {
             try {
               await delivererAPI.updateStatus(formData.deliverer, 'Busy');
-              console.log(
-                `Updated deliverer ${formData.deliverer} status to Busy`
-              );
             } catch (err) {
               console.error('Error updating deliverer status:', err);
             }
@@ -374,9 +352,6 @@ const DeliveriesPage = () => {
           ) {
             try {
               await delivererAPI.updateStatus(previousDelivererId, 'Available');
-              console.log(
-                `Updated deliverer ${previousDelivererId} status to Available`
-              );
             } catch (err) {
               console.error('Error updating deliverer status:', err);
             }
@@ -422,7 +397,6 @@ const DeliveriesPage = () => {
         return;
       }
       
-      console.log(`Deleting delivery with ID: ${deliveryId}`);
       await deliveryAPI.delete(deliveryId);
       toast.success('Delivery deleted successfully!');
       fetchDeliveries();
@@ -478,14 +452,11 @@ const DeliveriesPage = () => {
           : null;
 
       setLoading(true);
-      console.log(`Updating delivery ${deliveryId} status to ${backendStatus}`);
       const response = await deliveryAPI.updateStatus(deliveryId, backendStatus);
-      console.log('Status update response:', response);
       
       // If the delivery was marked as delivered and had a deliverer assigned,
       // the backend should have updated the deliverer status to "Available"
       if (backendStatus === 'Delivered' && delivererId) {
-        console.log(`Delivery marked as delivered. Deliverer ${delivererId} should be available now.`);
         toast.success(`Status updated to ${newStatus} and deliverer is now Available`);
       } else {
         toast.success(`Status updated to ${newStatus}`);

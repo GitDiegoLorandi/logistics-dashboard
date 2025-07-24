@@ -143,16 +143,11 @@ const UsersPage = () => {
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
-        const response = await userAPI.getProfile();
-        setCurrentUser(response); // Remove .data
+        const response = await userAPI.getCurrentUser();
+        setCurrentUser(response);
       } catch (err) {
         console.error('Error fetching current user:', err);
-        
-        // Use stored user data as fallback
-        const userData = localStorage.getItem('user');
-        if (userData) {
-          setCurrentUser(JSON.parse(userData));
-        }
+        setCurrentUser(null);
       }
     };
     fetchCurrentUser();
@@ -392,7 +387,6 @@ const UsersPage = () => {
       // The authAPI.register endpoint might be restricted to creating only 'user' role accounts
       const response = await userAPI.create(userData);
       
-      console.log('User created successfully:', response);
       toast.success(t('users.createUserSuccess'));
       setShowModal(false);
       resetForm();
@@ -407,8 +401,12 @@ const UsersPage = () => {
         toast.error(t('error'));
       }
       
-      // Remove demo fallback - it causes confusion when users appear in UI but aren't in the database
-      // We'll let real database operations control the UI
+      // For demo purposes, simulate successful user creation
+      if (process.env.REACT_APP_DEMO_MODE === 'true') {
+        setShowModal(false);
+        resetForm();
+        toast.success(t('users.createUserSuccess') + ' (Demo)');
+      }
     }
   };
 

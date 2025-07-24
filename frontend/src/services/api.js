@@ -17,11 +17,10 @@ const api = axios.create({
 // Request interceptor to add auth token
 api.interceptors.request.use(
   config => {
-    // Use standardized 'authToken' key
     const token = localStorage.getItem('authToken');
     if (token) {
-      // Remove excessive token logging
-      config.headers.Authorization = `Bearer ${token}`;
+      // Use standardized 'authToken' key
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
   },
