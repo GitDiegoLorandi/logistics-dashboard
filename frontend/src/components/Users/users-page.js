@@ -113,11 +113,30 @@ const UsersPage = () => {
     confirmPassword: '',
   });
 
+  // Validation state
+  const [validationErrors, setValidationErrors] = useState({
+    email: false,
+    firstName: false,
+    lastName: false,
+    phone: false,
+    password: false,
+    confirmPassword: false,
+    passwordMatch: false
+  });
+
   // Password Change State
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
+  });
+
+  // Password Change Validation State
+  const [passwordValidationErrors, setPasswordValidationErrors] = useState({
+    currentPassword: false,
+    newPassword: false,
+    confirmPassword: false,
+    passwordMatch: false
   });
 
   // Get current user info
@@ -178,12 +197,96 @@ const UsersPage = () => {
 
   // Handle Form Changes
   const handleFormChange = (field, value) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    // Update form data
+    const updatedFormData = { ...formData, [field]: value };
+    setFormData(updatedFormData);
+    
+    // Validate the field in real-time
+    if (field === 'email') {
+      const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+      setValidationErrors(prev => ({
+        ...prev,
+        email: !value.trim() || !emailRegex.test(value)
+      }));
+    }
+    else if (field === 'firstName') {
+      setValidationErrors(prev => ({
+        ...prev,
+        firstName: value.trim().length > 0 && value.trim().length < 2
+      }));
+    }
+    else if (field === 'lastName') {
+      setValidationErrors(prev => ({
+        ...prev,
+        lastName: value.trim().length > 0 && value.trim().length < 2
+      }));
+    }
+    else if (field === 'phone') {
+      if (value.trim()) {
+        const phoneRegex = /^[+]?[0-9\s-()]{7,}$/;
+        setValidationErrors(prev => ({
+          ...prev,
+          phone: !phoneRegex.test(value)
+        }));
+      } else {
+        setValidationErrors(prev => ({
+          ...prev,
+          phone: false
+        }));
+      }
+    }
+    else if (field === 'password') {
+      const hasNumber = /\d/.test(value);
+      const hasLetter = /[a-zA-Z]/.test(value);
+      const isLongEnough = value.length >= 6;
+      const isValid = value.trim() === '' || (isLongEnough && hasNumber && hasLetter);
+      
+      setValidationErrors(prev => ({
+        ...prev,
+        password: !isValid,
+        passwordMatch: updatedFormData.confirmPassword && value !== updatedFormData.confirmPassword
+      }));
+    }
+    else if (field === 'confirmPassword') {
+      setValidationErrors(prev => ({
+        ...prev,
+        confirmPassword: value.trim() !== '' && updatedFormData.password !== value,
+        passwordMatch: value.trim() !== '' && updatedFormData.password !== value
+      }));
+    }
   };
 
   // Handle Password Form Changes
   const handlePasswordChange = (field, value) => {
-    setPasswordData(prev => ({ ...prev, [field]: value }));
+    const updatedPasswordData = { ...passwordData, [field]: value };
+    setPasswordData(updatedPasswordData);
+    
+    // Validate the field
+    if (field === 'currentPassword') {
+      setPasswordValidationErrors(prev => ({
+        ...prev,
+        currentPassword: !value.trim()
+      }));
+    }
+    else if (field === 'newPassword') {
+      const hasNumber = /\d/.test(value);
+      const hasLetter = /[a-zA-Z]/.test(value);
+      const isLongEnough = value.length >= 6;
+      const isValid = value === '' || (isLongEnough && hasNumber && hasLetter);
+      
+      setPasswordValidationErrors(prev => ({
+        ...prev,
+        newPassword: !isValid,
+        passwordMatch: updatedPasswordData.confirmPassword && value !== updatedPasswordData.confirmPassword
+      }));
+    }
+    else if (field === 'confirmPassword') {
+      setPasswordValidationErrors(prev => ({
+        ...prev,
+        confirmPassword: !value.trim(),
+        passwordMatch: value !== updatedPasswordData.newPassword
+      }));
+    }
   };
 
   // Reset Form
@@ -197,6 +300,17 @@ const UsersPage = () => {
       password: '',
       confirmPassword: '',
     });
+    
+    // Also reset all validation errors
+    setValidationErrors({
+      email: false,
+      firstName: false,
+      lastName: false,
+      phone: false,
+      password: false,
+      confirmPassword: false,
+      passwordMatch: false
+    });
   };
 
   // Reset Password Form
@@ -206,68 +320,61 @@ const UsersPage = () => {
       newPassword: '',
       confirmPassword: '',
     });
+    
+    // Reset password validation errors
+    setPasswordValidationErrors({
+      currentPassword: false,
+      newPassword: false,
+      confirmPassword: false,
+      passwordMatch: false
+    });
   };
 
   // Handle Create User (Admin Registration)
   const handleCreateUser = async e => {
     e.preventDefault();
 
-    // Validate required fields
-    if (!formData.email) {
-      toast.error(t('validation.emailRequired'));
-      return;
-    }
-
-    // Validate email format
+    // Validate and update validation state
     const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast.error(t('validation.invalidEmail'));
-      return;
-    }
-
-    // Validate name fields
-    if (formData.firstName && formData.firstName.length < 2) {
-      toast.error(t('validation.firstNameLength'));
-      return;
-    }
-
-    if (formData.lastName && formData.lastName.length < 2) {
-      toast.error(t('validation.lastNameLength'));
-      return;
-    }
-
-    // Validate phone format if provided
-    if (formData.phone && !/^[+]?[0-9\s-()]{7,}$/.test(formData.phone)) {
-      toast.error(t('validation.invalidPhone'));
-      return;
-    }
-
+    const emailError = !formData.email || !emailRegex.test(formData.email);
+    
+    const firstNameError = formData.firstName && formData.firstName.length < 2;
+    const lastNameError = formData.lastName && formData.lastName.length < 2;
+    
+    const phoneError = formData.phone && !/^[+]?[0-9\s-()]{7,}$/.test(formData.phone);
+    
     // Password validation for new users
+    let passwordError = false;
+    let confirmPasswordError = false;
+    let passwordMatchError = false;
+    
     if (modalMode === 'create') {
-      if (!formData.password) {
-        toast.error(t('validation.passwordRequired'));
-        return;
-      }
-
-      if (formData.password !== formData.confirmPassword) {
-        toast.error(t('auth.passwordsDoNotMatch'));
-        return;
-      }
-
-      // Password strength validation
-      if (formData.password.length < 6) {
-        toast.error(t('auth.passwordRequirements'));
-        return;
-      }
-
+      passwordError = !formData.password || formData.password.length < 6;
+      
       // Check for at least one number and one letter
       const hasNumber = /\d/.test(formData.password);
       const hasLetter = /[a-zA-Z]/.test(formData.password);
+      passwordError = passwordError || !hasNumber || !hasLetter;
       
-      if (!hasNumber || !hasLetter) {
-        toast.error(t('auth.passwordComplexity'));
-        return;
-      }
+      confirmPasswordError = !formData.confirmPassword;
+      passwordMatchError = formData.password !== formData.confirmPassword;
+    }
+
+    // Update validation state
+    setValidationErrors({
+      email: emailError,
+      firstName: firstNameError,
+      lastName: lastNameError,
+      phone: phoneError,
+      password: passwordError,
+      confirmPassword: confirmPasswordError,
+      passwordMatch: passwordMatchError
+    });
+
+    // If there are validation errors, don't submit
+    if (emailError || firstNameError || lastNameError || phoneError || 
+        passwordError || confirmPasswordError || passwordMatchError) {
+      return;
     }
 
     try {
@@ -309,33 +416,26 @@ const UsersPage = () => {
   const handleUpdateUser = async e => {
     e.preventDefault();
 
-    // Validate required fields
-    if (!formData.email) {
-      toast.error(t('validation.emailRequired'));
-      return;
-    }
-
-    // Validate email format
+    // Validate and update validation state
     const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-    if (!emailRegex.test(formData.email)) {
-      toast.error(t('validation.invalidEmail'));
-      return;
-    }
+    const emailError = !formData.email || !emailRegex.test(formData.email);
+    
+    const firstNameError = formData.firstName && formData.firstName.length < 2;
+    const lastNameError = formData.lastName && formData.lastName.length < 2;
+    
+    const phoneError = formData.phone && !/^[+]?[0-9\s-()]{7,}$/.test(formData.phone);
 
-    // Validate name fields
-    if (formData.firstName && formData.firstName.length < 2) {
-      toast.error(t('validation.firstNameLength'));
-      return;
-    }
+    // Update validation state
+    setValidationErrors({
+      ...validationErrors,
+      email: emailError,
+      firstName: firstNameError,
+      lastName: lastNameError,
+      phone: phoneError
+    });
 
-    if (formData.lastName && formData.lastName.length < 2) {
-      toast.error(t('validation.lastNameLength'));
-      return;
-    }
-
-    // Validate phone format if provided
-    if (formData.phone && !/^[+]?[0-9\s-()]{7,}$/.test(formData.phone)) {
-      toast.error(t('validation.invalidPhone'));
+    // If there are validation errors, don't submit
+    if (emailError || firstNameError || lastNameError || phoneError) {
       return;
     }
 
@@ -383,34 +483,29 @@ const UsersPage = () => {
   const handleChangePassword = async e => {
     e.preventDefault();
 
-    // Validate password fields
-    if (!passwordData.currentPassword) {
-      toast.error(t('validation.currentPasswordRequired'));
-      return;
-    }
-
-    if (!passwordData.newPassword) {
-      toast.error(t('validation.newPasswordRequired'));
-      return;
-    }
-
-    if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error(t('auth.passwordsDoNotMatch'));
-      return;
-    }
-
-    // Password strength validation
-    if (passwordData.newPassword.length < 6) {
-      toast.error(t('auth.passwordRequirements'));
-      return;
-    }
-
-    // Check for at least one number and one letter
+    // Validate all password fields
+    const currentPasswordError = !passwordData.currentPassword.trim();
+    const newPasswordError = !passwordData.newPassword.trim() || passwordData.newPassword.length < 6;
+    
+    // Check password complexity
     const hasNumber = /\d/.test(passwordData.newPassword);
     const hasLetter = /[a-zA-Z]/.test(passwordData.newPassword);
+    const complexityError = newPasswordError || !hasNumber || !hasLetter;
     
-    if (!hasNumber || !hasLetter) {
-      toast.error(t('auth.passwordComplexity'));
+    // Check password match
+    const confirmPasswordError = !passwordData.confirmPassword.trim();
+    const passwordMatchError = passwordData.newPassword !== passwordData.confirmPassword;
+
+    // Update validation state
+    setPasswordValidationErrors({
+      currentPassword: currentPasswordError,
+      newPassword: complexityError,
+      confirmPassword: confirmPasswordError,
+      passwordMatch: passwordMatchError
+    });
+
+    // If there are validation errors, don't submit
+    if (currentPasswordError || complexityError || confirmPasswordError || passwordMatchError) {
       return;
     }
 
@@ -932,7 +1027,11 @@ const UsersPage = () => {
                       placeholder="user@example.com"
                       pattern="^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$"
                       title={t('validation.invalidEmail')}
+                      className={validationErrors.email ? 'border-red-500' : ''}
                     />
+                    {validationErrors.email && (
+                      <p className="text-xs text-red-500">{t('validation.invalidEmail')}</p>
+                    )}
                     <small className="text-xs text-muted-foreground">{t('validation.validEmailRequired')}</small>
                   </div>
                   <div className='space-y-2'>
@@ -940,12 +1039,16 @@ const UsersPage = () => {
                     <Select
                       value={formData.role}
                       onChange={e => handleFormChange('role', e.target.value)}
+                      className={validationErrors.role ? 'border-red-500' : ''}
                     >
                       <option value='user'>{t('user')}</option>
                       <option value='admin'>{t('admin')}</option>
                       <option value='manager'>{t('manager')}</option>
                       <option value='deliverer'>{t('deliverer')}</option>
                     </Select>
+                    {validationErrors.role && (
+                      <p className="text-xs text-red-500">{t('validation.roleRequired')}</p>
+                    )}
                   </div>
                 </div>
 
@@ -960,7 +1063,11 @@ const UsersPage = () => {
                       }
                       minLength="2"
                       title={t('validation.firstNameLength')}
+                      className={validationErrors.firstName ? 'border-red-500' : ''}
                     />
+                    {validationErrors.firstName && (
+                      <p className="text-xs text-red-500">{t('validation.firstNameLength')}</p>
+                    )}
                   </div>
                   <div className='space-y-2'>
                     <label className='text-sm font-medium dark:text-gray-200'>{t('lastName')}</label>
@@ -972,7 +1079,11 @@ const UsersPage = () => {
                       }
                       minLength="2"
                       title={t('validation.lastNameLength')}
+                      className={validationErrors.lastName ? 'border-red-500' : ''}
                     />
+                    {validationErrors.lastName && (
+                      <p className="text-xs text-red-500">{t('validation.lastNameLength')}</p>
+                    )}
                   </div>
                 </div>
 
@@ -985,7 +1096,11 @@ const UsersPage = () => {
                     pattern="^[+]?[0-9\s-()]{7,}$"
                     title={t('validation.invalidPhone')}
                     placeholder="+1 (555) 123-4567"
+                    className={validationErrors.phone ? 'border-red-500' : ''}
                   />
+                  {validationErrors.phone && (
+                    <p className="text-xs text-red-500">{t('validation.invalidPhone')}</p>
+                  )}
                   <small className="text-xs text-muted-foreground">{t('validation.phoneFormat')}</small>
                 </div>
               </div>
@@ -1006,7 +1121,11 @@ const UsersPage = () => {
                         minLength={6}
                         pattern="^(?=.*[0-9])(?=.*[a-zA-Z]).{6,}$"
                         title={t('auth.passwordComplexity')}
+                        className={validationErrors.password ? 'border-red-500' : ''}
                       />
+                      {validationErrors.password && (
+                        <p className="text-xs text-red-500">{t('auth.passwordComplexity')}</p>
+                      )}
                       <small className="text-xs text-muted-foreground">
                         {t('validation.passwordRequirements')}
                       </small>
@@ -1023,7 +1142,14 @@ const UsersPage = () => {
                         }
                         required
                         minLength={6}
+                        className={validationErrors.confirmPassword || validationErrors.passwordMatch ? 'border-red-500' : ''}
                       />
+                      {validationErrors.confirmPassword && (
+                        <p className="text-xs text-red-500">{t('auth.passwordsDoNotMatch')}</p>
+                      )}
+                      {validationErrors.passwordMatch && (
+                        <p className="text-xs text-red-500">{t('auth.passwordsDoNotMatch')}</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1037,7 +1163,7 @@ const UsersPage = () => {
                 >
                   {t('cancel', { ns: 'common' })}
                 </Button>
-                <Button type='submit'>
+                <Button type='submit' disabled={Object.values(validationErrors).some(Boolean)}>
                   {modalMode === 'create' ? t('addUser') : t('save', { ns: 'common' })}
                 </Button>
               </div>
@@ -1160,6 +1286,9 @@ const UsersPage = () => {
                       }
                       required
                     />
+                    {passwordValidationErrors.currentPassword && (
+                      <p className="text-xs text-red-500">{t('validation.currentPasswordRequired')}</p>
+                    )}
                   </div>
                   <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                     <div className='space-y-2'>
@@ -1178,6 +1307,9 @@ const UsersPage = () => {
                       <small className="text-xs text-muted-foreground">
                         {t('validation.passwordRequirements')}
                       </small>
+                      {passwordValidationErrors.newPassword && (
+                        <p className="text-xs text-red-500">{t('auth.passwordComplexity')}</p>
+                      )}
                     </div>
                     <div className='space-y-2'>
                       <label className='text-sm font-medium dark:text-gray-200'>{t('confirmPassword')} *</label>
@@ -1190,6 +1322,12 @@ const UsersPage = () => {
                         required
                         minLength={6}
                       />
+                      {passwordValidationErrors.confirmPassword && (
+                        <p className="text-xs text-red-500">{t('auth.passwordsDoNotMatch')}</p>
+                      )}
+                      {passwordValidationErrors.passwordMatch && (
+                        <p className="text-xs text-red-500">{t('auth.passwordsDoNotMatch')}</p>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -1202,7 +1340,7 @@ const UsersPage = () => {
                   >
                     {t('cancel', { ns: 'common' })}
                   </Button>
-                  <Button type='submit'>
+                  <Button type='submit' disabled={Object.values(passwordValidationErrors).some(Boolean)}>
                     {t('changePassword')}
                   </Button>
                 </div>
