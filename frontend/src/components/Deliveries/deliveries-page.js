@@ -784,6 +784,7 @@ const DeliveriesPage = () => {
             <Select
               value={statusFilter}
               onChange={e => setStatusFilter(e.target.value)}
+              className='w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white'
             >
               <option value=''>{t('filters.all')}</option>
               <option value='Pending'>{t('statuses.pending')}</option>
@@ -798,6 +799,7 @@ const DeliveriesPage = () => {
             <Select
               value={priorityFilter}
               onChange={e => setPriorityFilter(e.target.value)}
+              className='w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white'
             >
               <option value=''>{t('filters.all')}</option>
               <option value='Low'>{t('priorities.low')}</option>
@@ -812,6 +814,7 @@ const DeliveriesPage = () => {
             <Select
               value={delivererFilter}
               onChange={e => setDelivererFilter(e.target.value)}
+              className='w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white'
             >
               <option value=''>{t('filters.all')}</option>
               {deliverers.map(deliverer => (
@@ -1000,34 +1003,34 @@ const DeliveriesPage = () => {
                 {modalMode === 'edit' && (
                   <div className='space-y-2'>
                     <label className='text-sm font-medium dark:text-gray-200'>{t('status')}</label>
-                    <select
+                    <Select
                       value={formData.status}
                       onChange={e =>
                         setFormData({ ...formData, status: e.target.value })
                       }
-                      className='w-full rounded-md border border-input bg-background px-3 py-2 text-foreground dark:border-gray-600 dark:bg-gray-700'
+                      className='w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white'
                     >
                       <option value='PENDING'>{t('statuses.pending')}</option>
                       <option value='IN_TRANSIT'>{t('statuses.inTransit')}</option>
                       <option value='DELIVERED'>{t('statuses.delivered')}</option>
                       <option value='CANCELLED'>{t('statuses.cancelled')}</option>
-                    </select>
+                    </Select>
                   </div>
                 )}
                 <div className='space-y-2'>
                   <label className='text-sm font-medium dark:text-gray-200'>{t('priority')}</label>
-                                      <select
+                                      <Select
                       value={formData.priority}
                       onChange={e =>
                         setFormData({ ...formData, priority: e.target.value })
                       }
-                      className='w-full rounded-md border border-input bg-background px-3 py-2 text-foreground dark:border-gray-600 dark:bg-gray-700'
+                      className='w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white'
                   >
                     <option value='LOW'>{t('priorities.low')}</option>
                     <option value='MEDIUM'>{t('priorities.medium')}</option>
                     <option value='HIGH'>{t('priorities.high')}</option>
                     <option value='URGENT'>{t('priorities.urgent')}</option>
-                  </select>
+                  </Select>
                 </div>
               </div>
 
@@ -1052,12 +1055,12 @@ const DeliveriesPage = () => {
                 {userRole === 'admin' && (
                   <div className='space-y-2'>
                     <label className='text-sm font-medium dark:text-gray-200'>{t('deliverer')}</label>
-                    <select
+                    <Select
                       value={formData.deliverer}
                       onChange={e =>
                         setFormData({ ...formData, deliverer: e.target.value })
                       }
-                      className='w-full rounded-md border border-input bg-background px-3 py-2 text-foreground dark:border-gray-600 dark:bg-gray-700'
+                      className='w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white'
                     >
                       <option value=''>{t('unassigned')}</option>
                       {/* Filter to only show available deliverers */}
@@ -1068,7 +1071,7 @@ const DeliveriesPage = () => {
                             {deliverer.name} - {deliverer.email}
                           </option>
                         ))}
-                    </select>
+                    </Select>
                     {deliverers.filter(deliverer => deliverer.status === 'Available').length === 0 && (
                       <small className='text-xs text-warning'>
                         {t('common:noAvailableDeliverers')}
