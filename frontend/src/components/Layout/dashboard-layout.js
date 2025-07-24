@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, Outlet, useLocation } from 'react-router-dom';
+import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { 
   LucideMenu, 
   LucideX, 
@@ -26,6 +26,7 @@ const DashboardLayout = () => {
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const { t } = useTranslation('common');
   
   // Get current user from localStorage on mount
@@ -144,10 +145,12 @@ const DashboardLayout = () => {
   
   // Handle logout
   const handleLogout = () => {
-    // Clear token and redirect to login
+    // Clear token and user data
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
-    window.location.href = '/login';
+    
+    // Use React Router for navigation - this respects the basename configuration
+    navigate('/login');
   };
   
   // Get user role text for display
