@@ -1073,7 +1073,7 @@ const DeliverersPage = () => {
                       value={formData.status}
                       onChange={e => handleFormChange('status', e.target.value)}
                       required
-                      className='w-full'
+                      className='w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white'
                     >
                       <option value="Available">{t('statuses.available')}</option>
                       <option value="Busy">{t('statuses.busy')}</option>
@@ -1091,7 +1091,7 @@ const DeliverersPage = () => {
                     <Select
                       value={formData.vehicleType}
                       onChange={e => handleFormChange('vehicleType', e.target.value)}
-                      className={`w-full ${validationErrors.vehicleType ? 'border-red-500' : ''}`}
+                      className={`w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white ${validationErrors.vehicleType ? 'border-red-500' : ''}`}
                       required
                     >
                       <option value=''>{t('selectVehicleType')}</option>
