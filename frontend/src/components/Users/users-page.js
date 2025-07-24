@@ -770,6 +770,7 @@ const UsersPage = () => {
             <Select
               value={roleFilter}
               onChange={e => setRoleFilter(e.target.value)}
+              className='w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white'
             >
               <option value=''>{t('allRoles')}</option>
               <option value='admin'>{t('admin')}</option>
@@ -860,7 +861,7 @@ const UsersPage = () => {
                     <Select
                       value={user.role}
                       onChange={e => handleRoleChange(user._id, e.target.value)}
-                      className='w-32'
+                      className='w-32 dark:border-gray-700 dark:bg-gray-800 dark:text-white'
                     >
                       <option value='user'>{t('users.user')}</option>
                       <option value='admin'>{t('users.admin')}</option>
@@ -1039,7 +1040,7 @@ const UsersPage = () => {
                     <Select
                       value={formData.role}
                       onChange={e => handleFormChange('role', e.target.value)}
-                      className={validationErrors.role ? 'border-red-500' : ''}
+                      className={`w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white ${validationErrors.role ? 'border-red-500' : ''}`}
                     >
                       <option value='user'>{t('user')}</option>
                       <option value='admin'>{t('admin')}</option>
