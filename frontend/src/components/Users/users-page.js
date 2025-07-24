@@ -369,6 +369,25 @@ const UsersPage = () => {
     // If there are validation errors, don't submit
     if (emailError || firstNameError || lastNameError || phoneError || 
         passwordError || confirmPasswordError || passwordMatchError) {
+      // Show error toast with summary of validation errors
+      let errorMessage = t('validation.pleaseCorrectErrors');
+      
+      // Add specific validation errors
+      if (emailError) errorMessage += `\n- ${t('validation.emailInvalid')}`;
+      if (firstNameError) errorMessage += `\n- ${t('validation.firstNameInvalid')}`;
+      if (lastNameError) errorMessage += `\n- ${t('validation.lastNameInvalid')}`;
+      if (phoneError) errorMessage += `\n- ${t('validation.phoneInvalid')}`;
+      
+      if (modalMode === 'create') {
+        if (passwordError) errorMessage += `\n- ${t('validation.passwordInvalid')}`;
+        if (confirmPasswordError) errorMessage += `\n- ${t('validation.confirmPasswordRequired')}`;
+        if (passwordMatchError) errorMessage += `\n- ${t('validation.passwordsDoNotMatch')}`;
+      }
+      
+      toast.error(errorMessage, { 
+        autoClose: 5000, 
+        style: { whiteSpace: 'pre-line' } 
+      });
       return;
     }
 
@@ -434,6 +453,19 @@ const UsersPage = () => {
 
     // If there are validation errors, don't submit
     if (emailError || firstNameError || lastNameError || phoneError) {
+      // Show error toast with summary of validation errors
+      let errorMessage = t('validation.pleaseCorrectErrors');
+      
+      // Add specific validation errors
+      if (emailError) errorMessage += `\n- ${t('validation.emailInvalid')}`;
+      if (firstNameError) errorMessage += `\n- ${t('validation.firstNameInvalid')}`;
+      if (lastNameError) errorMessage += `\n- ${t('validation.lastNameInvalid')}`;
+      if (phoneError) errorMessage += `\n- ${t('validation.phoneInvalid')}`;
+      
+      toast.error(errorMessage, { 
+        autoClose: 5000, 
+        style: { whiteSpace: 'pre-line' } 
+      });
       return;
     }
 
@@ -504,6 +536,19 @@ const UsersPage = () => {
 
     // If there are validation errors, don't submit
     if (currentPasswordError || complexityError || confirmPasswordError || passwordMatchError) {
+      // Show error toast with summary of validation errors
+      let errorMessage = t('validation.pleaseCorrectErrors');
+      
+      // Add specific validation errors
+      if (currentPasswordError) errorMessage += `\n- ${t('validation.currentPasswordRequired')}`;
+      if (complexityError) errorMessage += `\n- ${t('validation.passwordRequirements')}`;
+      if (confirmPasswordError) errorMessage += `\n- ${t('validation.confirmPasswordRequired')}`;
+      if (passwordMatchError) errorMessage += `\n- ${t('validation.passwordsDoNotMatch')}`;
+      
+      toast.error(errorMessage, { 
+        autoClose: 5000, 
+        style: { whiteSpace: 'pre-line' } 
+      });
       return;
     }
 

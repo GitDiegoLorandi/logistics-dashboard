@@ -369,7 +369,7 @@ const DeliverersPage = () => {
       else if (field === 'phone') {
         // Only validate if a phone number is provided
         if (value) {
-          const phoneRegex = /^[+]?[0-9\s-()]{7,}$/;
+          const phoneRegex = /^[+]?[0-9\s\-()+]{7,}$/;
           setValidationErrors(prev => ({
             ...prev,
             phone: !phoneRegex.test(value)
@@ -443,7 +443,15 @@ const DeliverersPage = () => {
 
     // Check if user is admin
     if (!isAdmin) {
-      toast.error('You need admin privileges to create or edit deliverers');
+      toast.error('You need admin privileges to create or edit deliverers', {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      setShowModal(false); // Close the modal to prevent further attempts
       return;
     }
 
@@ -451,7 +459,7 @@ const DeliverersPage = () => {
     const nameError = !formData.name || formData.name.length < 2;
     const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
     const emailError = !formData.email || !emailRegex.test(formData.email);
-    const phoneError = formData.phone ? !/^[+]?[0-9\s-()]{7,}$/.test(formData.phone) : false;
+    const phoneError = formData.phone ? !/^[+]?[0-9\s\-()+]{7,}$/.test(formData.phone) : false;
     const vehicleTypeError = !formData.vehicleType;
     const licenseNumberError = formData.licenseNumber && formData.licenseNumber.length < 3;
 
@@ -466,6 +474,20 @@ const DeliverersPage = () => {
 
     // If there are validation errors, don't submit the form
     if (nameError || emailError || phoneError || vehicleTypeError || licenseNumberError) {
+      // Show error toast with summary of validation errors
+      let errorMessage = t('validation.pleaseCorrectErrors');
+      
+      // Add specific validation errors
+      if (nameError) errorMessage += `\n- ${t('validation.nameRequired')}`;
+      if (emailError) errorMessage += `\n- ${t('validation.emailInvalid')}`;
+      if (phoneError) errorMessage += `\n- ${t('validation.phoneInvalid')}`;
+      if (vehicleTypeError) errorMessage += `\n- ${t('validation.vehicleTypeRequired')}`;
+      if (licenseNumberError) errorMessage += `\n- ${t('validation.licenseInvalid')}`;
+      
+      toast.error(errorMessage, { 
+        autoClose: 5000, 
+        style: { whiteSpace: 'pre-line' } 
+      });
       return;
     }
 
@@ -663,16 +685,36 @@ const DeliverersPage = () => {
             />
             {t('common:refresh')}
           </Button>
-          <Button
-            onClick={() => {
-              handleCreateDeliverer();
-            }}
-            size='sm'
-            className='flex items-center gap-2'
-          >
-            <Plus className='h-4 w-4' />
-            {t('newDeliverer')}
-          </Button>
+          {isAdmin ? (
+            <Button
+              onClick={() => {
+                handleCreateDeliverer();
+              }}
+              size='sm'
+              className='flex items-center gap-2'
+            >
+              <Plus className='h-4 w-4' />
+              {t('newDeliverer')}
+            </Button>
+          ) : (
+            <Button
+              onClick={() => {
+                toast.error('You need admin privileges to create or edit deliverers', {
+                  position: "top-center",
+                  autoClose: 5000,
+                  hideProgressBar: false,
+                  closeOnClick: true,
+                  pauseOnHover: true,
+                  draggable: true,
+                });
+              }}
+              size='sm'
+              className='flex items-center gap-2'
+            >
+              <Plus className='h-4 w-4' />
+              {t('newDeliverer')}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -1034,7 +1076,7 @@ const DeliverersPage = () => {
                       value={formData.phone}
                       onChange={e => handleFormChange('phone', e.target.value)}
                       className={`w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white ${validationErrors.phone ? 'border-red-500' : ''}`}
-                      pattern="^[+]?[0-9\s-()]{7,}$"
+                      pattern="^[+]?[0-9\s\-()+]{7,}$"
                       title={t('validation.invalidPhone')}
                       placeholder="+1 (555) 123-4567"
                     />
@@ -1172,7 +1214,7 @@ const DeliverersPage = () => {
                       value={formData.emergencyContact.phone}
                       onChange={e => handleFormChange('emergencyContact.phone', e.target.value)}
                       className='w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white'
-                      pattern="^[+]?[0-9\s-()]{7,}$"
+                      pattern="^[+]?[0-9\s\-()+]{7,}$"
                       title={t('validation.invalidPhone')}
                       placeholder="+1 (555) 123-4567"
                     />
