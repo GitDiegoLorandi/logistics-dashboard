@@ -155,6 +155,15 @@ const DeliverersPage = () => {
     },
   });
 
+  // Validation state
+  const [validationErrors, setValidationErrors] = useState({
+    name: false,
+    email: false,
+    phone: false,
+    vehicleType: false,
+    licenseNumber: false
+  });
+
   // Performance stats state
   const [delivererStats, setDelivererStats] = useState(null);
   const [statsLoading, setStatsLoading] = useState(false);
@@ -335,6 +344,7 @@ const DeliverersPage = () => {
 
   // Handle Form Changes
   const handleFormChange = (field, value) => {
+    // Update form data
     if (field.includes('.')) {
       const [parent, child] = field.split('.');
       setFormData(prev => ({
@@ -346,6 +356,56 @@ const DeliverersPage = () => {
       }));
     } else {
       setFormData(prev => ({ ...prev, [field]: value }));
+      
+      // Validate field
+      if (field === 'name') {
+        setValidationErrors(prev => ({
+          ...prev,
+          name: !value.trim() || value.length < 2
+        }));
+      } 
+      else if (field === 'email') {
+        const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+        setValidationErrors(prev => ({
+          ...prev,
+          email: !value.trim() || !emailRegex.test(value)
+        }));
+      } 
+      else if (field === 'phone') {
+        // Only validate if a phone number is provided
+        if (value) {
+          const phoneRegex = /^[+]?[0-9\s-()]{7,}$/;
+          setValidationErrors(prev => ({
+            ...prev,
+            phone: !phoneRegex.test(value)
+          }));
+        } else {
+          setValidationErrors(prev => ({
+            ...prev,
+            phone: false
+          }));
+        }
+      } 
+      else if (field === 'vehicleType') {
+        setValidationErrors(prev => ({
+          ...prev,
+          vehicleType: !value
+        }));
+      } 
+      else if (field === 'licenseNumber') {
+        // Only validate if a license number is provided
+        if (value) {
+          setValidationErrors(prev => ({
+            ...prev,
+            licenseNumber: value.length < 3
+          }));
+        } else {
+          setValidationErrors(prev => ({
+            ...prev,
+            licenseNumber: false
+          }));
+        }
+      }
     }
   };
 
@@ -371,6 +431,15 @@ const DeliverersPage = () => {
         relationship: '',
       },
     });
+    
+    // Reset validation errors
+    setValidationErrors({
+      name: false,
+      email: false,
+      phone: false,
+      vehicleType: false,
+      licenseNumber: false
+    });
   };
 
   // Handle Create/Edit Deliverer
@@ -388,61 +457,35 @@ const DeliverersPage = () => {
     // Debug log all form data before validation
     console.log('Form data before validation:', JSON.stringify(formData, null, 2));
 
-    try {
-      // Validate required fields with fallback error messages
-    if (!formData.name) {
-        console.log('Validation failed: Name is required');
-        toast.error(t('validation.nameRequired', { fallback: 'Name is required' }));
-      return;
-    }
-
-    if (!formData.email) {
-        console.log('Validation failed: Email is required');
-        toast.error(t('validation.emailRequired', { fallback: 'Email is required' }));
-      return;
-    }
-
-    // Validate name length
-    if (formData.name.length < 2) {
-        console.log('Validation failed: Name too short');
-        toast.error(t('validation.nameLength', { fallback: 'Name must be at least 2 characters' }));
-      return;
-    }
-
-    // Validate email format
+    // Validate form fields
+    const nameError = !formData.name || formData.name.length < 2;
     const emailRegex = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
-    if (!emailRegex.test(formData.email)) {
-        console.log('Validation failed: Invalid email format');
-        toast.error(t('validation.invalidEmail', { fallback: 'Invalid email format' }));
+    const emailError = !formData.email || !emailRegex.test(formData.email);
+    const phoneError = formData.phone ? !/^[+]?[0-9\s-()]{7,}$/.test(formData.phone) : false;
+    const vehicleTypeError = !formData.vehicleType;
+    const licenseNumberError = formData.licenseNumber && formData.licenseNumber.length < 3;
+
+    // Update validation state
+    setValidationErrors({
+      name: nameError,
+      email: emailError,
+      phone: phoneError,
+      vehicleType: vehicleTypeError,
+      licenseNumber: licenseNumberError
+    });
+
+    // If there are validation errors, don't submit the form
+    if (nameError || emailError || phoneError || vehicleTypeError || licenseNumberError) {
+      console.log('Validation failed');
       return;
     }
 
-    // Validate phone number format if provided
-    if (formData.phone && !/^[+]?[0-9\s-()]{7,}$/.test(formData.phone)) {
-        console.log('Validation failed: Invalid phone format');
-        toast.error(t('validation.invalidPhone', { fallback: 'Invalid phone number format' }));
-      return;
-    }
+    console.log('All validations passed, attempting to create/update deliverer');
 
-      // Validate vehicleType is selected - simplified check to get past this validation
-    if (!formData.vehicleType) {
-        console.log('Validation failed: Vehicle type required');
-        toast.error('Please select a vehicle type');
-      return;
-    }
-
-      // Validate license number format if provided - relaxed validation
-      if (formData.licenseNumber && formData.licenseNumber.length < 3) {
-        console.log('Validation failed: License number too short');
-        toast.error('License number should be at least 3 characters');
-      return;
-    }
-
-      console.log('All validations passed, attempting to create/update deliverer');
-
-    // Set loading state
-    setLoading(true);
-    console.log('Form data to be submitted:', formData);
+    try {
+      // Set loading state
+      setLoading(true);
+      console.log('Form data to be submitted:', formData);
 
       if (modalMode === 'create') {
         console.log('Creating new deliverer');
@@ -979,10 +1022,13 @@ const DeliverersPage = () => {
                       value={formData.name}
                       onChange={e => handleFormChange('name', e.target.value)}
                       required
-                      className='w-full'
+                      className={`w-full ${validationErrors.name ? 'border-red-500' : ''}`}
                       minLength="2"
                       title={t('validation.nameLength')}
                     />
+                    {validationErrors.name && (
+                      <p className="text-sm text-red-500">{t('validation.nameRequired', { fallback: 'Name is required and must be at least 2 characters' })}</p>
+                    )}
                     <small className="text-xs text-muted-foreground">{t('validation.required')}</small>
                   </div>
                   <div className='space-y-2'>
@@ -992,11 +1038,14 @@ const DeliverersPage = () => {
                       value={formData.email}
                       onChange={e => handleFormChange('email', e.target.value)}
                       required
-                      className='w-full'
+                      className={`w-full ${validationErrors.email ? 'border-red-500' : ''}`}
                       pattern="^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$"
                       title={t('validation.invalidEmail')}
                       placeholder="deliverer@example.com"
                     />
+                    {validationErrors.email && (
+                      <p className="text-sm text-red-500">{t('validation.invalidEmail', { fallback: 'Please enter a valid email address' })}</p>
+                    )}
                     <small className="text-xs text-muted-foreground">{t('validation.required')}</small>
                   </div>
                 </div>
@@ -1008,11 +1057,14 @@ const DeliverersPage = () => {
                       type='tel'
                       value={formData.phone}
                       onChange={e => handleFormChange('phone', e.target.value)}
-                      className='w-full'
+                      className={`w-full ${validationErrors.phone ? 'border-red-500' : ''}`}
                       pattern="^[+]?[0-9\s-()]{7,}$"
                       title={t('validation.invalidPhone')}
                       placeholder="+1 (555) 123-4567"
                     />
+                    {validationErrors.phone && (
+                      <p className="text-sm text-red-500">{t('validation.invalidPhone', { fallback: 'Please enter a valid phone number' })}</p>
+                    )}
                     <small className="text-xs text-muted-foreground">{t('validation.phoneFormat')}</small>
                   </div>
                   <div className='space-y-2'>
@@ -1039,7 +1091,7 @@ const DeliverersPage = () => {
                     <Select
                       value={formData.vehicleType}
                       onChange={e => handleFormChange('vehicleType', e.target.value)}
-                      className='w-full'
+                      className={`w-full ${validationErrors.vehicleType ? 'border-red-500' : ''}`}
                       required
                     >
                       <option value=''>{t('selectVehicleType')}</option>
@@ -1049,6 +1101,9 @@ const DeliverersPage = () => {
                       <option value='Truck'>{t('vehicles.truck')}</option>
                       <option value='Bicycle'>{t('vehicles.bicycle')}</option>
                     </Select>
+                    {validationErrors.vehicleType && (
+                      <p className="text-sm text-red-500">{t('validation.vehicleTypeRequired', { fallback: 'Please select a vehicle type' })}</p>
+                    )}
                     <small className="text-xs text-muted-foreground">{t('validation.required')}</small>
                   </div>
                   <div className='space-y-2'>
@@ -1057,11 +1112,14 @@ const DeliverersPage = () => {
                       type='text'
                       value={formData.licenseNumber}
                       onChange={e => handleFormChange('licenseNumber', e.target.value)}
-                      className='w-full'
+                      className={`w-full ${validationErrors.licenseNumber ? 'border-red-500' : ''}`}
                       pattern="^[A-Za-z0-9-]{5,}$"
                       title={t('validation.invalidLicenseNumber')}
                       placeholder="DL12345678"
                     />
+                    {validationErrors.licenseNumber && (
+                      <p className="text-sm text-red-500">{t('validation.invalidLicenseNumber', { fallback: 'License number should be at least 3 characters' })}</p>
+                    )}
                     <small className="text-xs text-muted-foreground">{t('validation.licenseFormat')}</small>
                   </div>
                 </div>
