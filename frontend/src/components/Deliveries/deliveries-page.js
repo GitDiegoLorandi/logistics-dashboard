@@ -129,6 +129,13 @@ const DeliveriesPage = () => {
     notes: '',
     deliverer: '',
   });
+  
+  // Form validation state
+  const [validationErrors, setValidationErrors] = useState({
+    customer: false,
+    deliveryAddress: false,
+    estimatedDeliveryDate: false
+  });
 
   // Get user role from localStorage
   const [userRole, setUserRole] = useState('user');
@@ -222,29 +229,26 @@ const DeliveriesPage = () => {
     try {
       setLoading(true);
 
-      // Validate required fields
-      if (!formData.customer.trim()) {
-        console.log('Validation error: Customer name is required');
-        toast.error('Customer name is required');
-        setLoading(false);
-        return;
-      }
-
-      if (!formData.deliveryAddress.trim()) {
-        console.log('Validation error: Delivery address is required');
-        toast.error('Delivery address is required');
-        setLoading(false);
-        return;
-      }
-
+      // Check validation errors
+      const hasCustomerError = !formData.customer.trim();
+      const hasAddressError = !formData.deliveryAddress.trim();
+      
       // Validate estimated delivery date
       const estimatedDate = new Date(formData.estimatedDeliveryDate);
       const today = new Date();
       today.setHours(0, 0, 0, 0); // Reset time to start of day for comparison
+      const hasDateError = estimatedDate < today;
 
-      if (estimatedDate < today) {
-        console.log('Validation error: Estimated delivery date must be in the future');
-        toast.error('Estimated delivery date must be in the future');
+      // Update validation state
+      setValidationErrors({
+        customer: hasCustomerError,
+        deliveryAddress: hasAddressError,
+        estimatedDeliveryDate: hasDateError
+      });
+
+      // If there are validation errors, don't proceed
+      if (hasCustomerError || hasAddressError || hasDateError) {
+        console.log('Validation errors detected');
         setLoading(false);
         return;
       }
@@ -513,6 +517,34 @@ const DeliveriesPage = () => {
     }
   };
 
+  // Handle form field changes with validation
+  const handleFormChange = (field, value) => {
+    // Update form data
+    const updatedFormData = { ...formData, [field]: value };
+    setFormData(updatedFormData);
+    
+    // Update validation for the changed field
+    if (field === 'customer') {
+      setValidationErrors({
+        ...validationErrors,
+        customer: !value.trim()
+      });
+    } else if (field === 'deliveryAddress') {
+      setValidationErrors({
+        ...validationErrors,
+        deliveryAddress: !value.trim()
+      });
+    } else if (field === 'estimatedDeliveryDate') {
+      const date = new Date(value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      setValidationErrors({
+        ...validationErrors,
+        estimatedDeliveryDate: date < today
+      });
+    }
+  };
+
   // Modal Handlers
   const openCreateModal = () => {
     setModalMode('create');
@@ -586,6 +618,14 @@ const DeliveriesPage = () => {
       notes: '',
       deliverer: '',
     });
+    
+    // Reset validation errors
+    setValidationErrors({
+      customer: false,
+      deliveryAddress: false,
+      estimatedDeliveryDate: false
+    });
+    
     setSelectedDelivery(null);
   };
 
@@ -904,12 +944,15 @@ const DeliveriesPage = () => {
                       type='text'
                       value={formData.customer}
                       onChange={e =>
-                        setFormData({ ...formData, customer: e.target.value })
+                        handleFormChange('customer', e.target.value)
                       }
                       required
                       placeholder={t('customerPlaceholder')}
-                      className='w-full rounded-md border border-input bg-background px-3 py-2 text-foreground dark:border-gray-600 dark:bg-gray-700'
+                      className={`w-full rounded-md border ${validationErrors.customer ? 'border-red-500' : 'border-input'} bg-background px-3 py-2 text-foreground dark:border-gray-600 dark:bg-gray-700`}
                     />
+                    {validationErrors.customer && (
+                      <p className="text-sm text-red-500">{t('validation.required', { fallback: 'Customer name is required' })}</p>
+                    )}
                   </div>
                 </div>
               )}
@@ -921,25 +964,32 @@ const DeliveriesPage = () => {
                     type='text'
                     value={formData.customer}
                     onChange={e =>
-                      setFormData({ ...formData, customer: e.target.value })
+                      handleFormChange('customer', e.target.value)
                     }
                     required
                     placeholder={t('customerPlaceholder')}
-                    className='w-full rounded-md border border-input bg-background px-3 py-2 text-foreground dark:border-gray-600 dark:bg-gray-700'
+                    className={`w-full rounded-md border ${validationErrors.customer ? 'border-red-500' : 'border-input'} bg-background px-3 py-2 text-foreground dark:border-gray-600 dark:bg-gray-700`}
                   />
+                  {validationErrors.customer && (
+                    <p className="text-sm text-red-500">{t('validation.required', { fallback: 'Customer name is required' })}</p>
+                  )}
                 </div>
               )}
 
               <div className='space-y-2'>
-                <label className='text-sm font-medium dark:text-gray-200'>{t('destination')}</label>
+                <label className='text-sm font-medium dark:text-gray-200'>{t('destination')} *</label>
                 <AddressAutocomplete
                   value={formData.deliveryAddress}
                   onChange={address =>
-                    setFormData({ ...formData, deliveryAddress: address })
+                    handleFormChange('deliveryAddress', address)
                   }
                   placeholder={t('destinationPlaceholder')}
                   disabled={loading}
+                  className={validationErrors.deliveryAddress ? 'border-red-500' : ''}
                 />
+                {validationErrors.deliveryAddress && (
+                  <p className="text-sm text-red-500">{t('validation.required', { fallback: 'Delivery address is required' })}</p>
+                )}
                 <small className='text-xs text-muted-foreground'>
                   {t('deliverers:startTypingForSuggestions')}
                 </small>
@@ -988,15 +1038,15 @@ const DeliveriesPage = () => {
                       type='date'
                       value={formData.estimatedDeliveryDate}
                       onChange={e =>
-                        setFormData({
-                          ...formData,
-                          estimatedDeliveryDate: e.target.value,
-                        })
+                        handleFormChange('estimatedDeliveryDate', e.target.value)
                       }
                       min={new Date().toISOString().split('T')[0]} // Set minimum date to today
                       required
-                      className='w-full rounded-md border border-input bg-background px-3 py-2 text-foreground dark:border-gray-600 dark:bg-gray-700'
+                      className={`w-full rounded-md border ${validationErrors.estimatedDeliveryDate ? 'border-red-500' : 'border-input'} bg-background px-3 py-2 text-foreground dark:border-gray-600 dark:bg-gray-700`}
                   />
+                  {validationErrors.estimatedDeliveryDate && (
+                    <p className="text-sm text-red-500">{t('validation.futureDateRequired', { fallback: 'Date must be in the future' })}</p>
+                  )}
                   <small className='text-xs text-muted-foreground'>{t('common:mustBeFutureDate')}</small>
                 </div>
                 {userRole === 'admin' && (
