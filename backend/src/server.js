@@ -3,7 +3,7 @@ const http = require('http');
 const cors = require('cors');
 const connectDB = require('./config/db');
 const config = require('./config');
-const { displayEnvInfo } = require('./config/envValidation');
+const { displayEnvInfo, validateEnv } = require('./config/envValidation');
 const {
   configureSecurityMiddleware,
 } = require('./middleware/securityMiddleware');
@@ -17,7 +17,7 @@ const backgroundJobRoutes = require('./routes/backgroundJobRoutes');
 
 // Environment validation
 try {
-  validateEnvironment();
+  validateEnv();
   console.log('✅ Environment validation passed');
 } catch (error) {
   console.error('❌ Environment validation failed:', error.message);
