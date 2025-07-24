@@ -322,14 +322,14 @@ const DeliverersPage = () => {
           parsedUser.isAdmin === true;
         
         console.log('Is admin?', hasAdminRole);
-        setIsAdmin(true); // Force admin access for now to allow create/edit functionality
+        setIsAdmin(hasAdminRole); // Use the actual role instead of forcing admin access
       } catch (error) {
         console.error('Error parsing user data:', error);
-        setIsAdmin(true); // Force admin access for now
+        setIsAdmin(false); // Default to non-admin if there's an error
       }
     } else {
       console.warn('No user data found in localStorage');
-      setIsAdmin(true); // Force admin access for now
+      setIsAdmin(false); // Default to non-admin if no user data found
     }
   };
 
