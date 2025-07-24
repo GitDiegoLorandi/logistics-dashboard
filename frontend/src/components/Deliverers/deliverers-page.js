@@ -1016,13 +1016,13 @@ const DeliverersPage = () => {
                 <h4 className='text-lg font-medium dark:text-gray-200'>{t('basicInfo')}</h4>
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('name')}</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>{t('name')}</label>
                     <Input
                       type='text'
                       value={formData.name}
                       onChange={e => handleFormChange('name', e.target.value)}
                       required
-                      className={`w-full ${validationErrors.name ? 'border-red-500' : ''}`}
+                      className={`w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white ${validationErrors.name ? 'border-red-500' : ''}`}
                       minLength="2"
                       title={t('validation.nameLength')}
                     />
@@ -1032,13 +1032,13 @@ const DeliverersPage = () => {
                     <small className="text-xs text-muted-foreground">{t('validation.required')}</small>
                   </div>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('email')}</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>{t('email')}</label>
                     <Input
                       type='email'
                       value={formData.email}
                       onChange={e => handleFormChange('email', e.target.value)}
                       required
-                      className={`w-full ${validationErrors.email ? 'border-red-500' : ''}`}
+                      className={`w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white ${validationErrors.email ? 'border-red-500' : ''}`}
                       pattern="^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$"
                       title={t('validation.invalidEmail')}
                       placeholder="deliverer@example.com"
@@ -1052,12 +1052,12 @@ const DeliverersPage = () => {
 
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('phone')}</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>{t('phone')}</label>
                     <Input
                       type='tel'
                       value={formData.phone}
                       onChange={e => handleFormChange('phone', e.target.value)}
-                      className={`w-full ${validationErrors.phone ? 'border-red-500' : ''}`}
+                      className={`w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white ${validationErrors.phone ? 'border-red-500' : ''}`}
                       pattern="^[+]?[0-9\s-()]{7,}$"
                       title={t('validation.invalidPhone')}
                       placeholder="+1 (555) 123-4567"
@@ -1068,7 +1068,7 @@ const DeliverersPage = () => {
                     <small className="text-xs text-muted-foreground">{t('validation.phoneFormat')}</small>
                   </div>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('status')}</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>{t('status')}</label>
                     <Select
                       value={formData.status}
                       onChange={e => handleFormChange('status', e.target.value)}
@@ -1084,10 +1084,10 @@ const DeliverersPage = () => {
               </div>
 
               <div className='space-y-4'>
-                <h4 className='text-lg font-medium'>{t('vehicleInfo')}</h4>
+                <h4 className='text-lg font-medium dark:text-gray-200'>{t('vehicleInfo')}</h4>
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('vehicleType')}</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>{t('vehicleType')}</label>
                     <Select
                       value={formData.vehicleType}
                       onChange={e => handleFormChange('vehicleType', e.target.value)}
@@ -1107,12 +1107,12 @@ const DeliverersPage = () => {
                     <small className="text-xs text-muted-foreground">{t('validation.required')}</small>
                   </div>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('licenseNumber')}</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>{t('licenseNumber')}</label>
                     <Input
                       type='text'
                       value={formData.licenseNumber}
                       onChange={e => handleFormChange('licenseNumber', e.target.value)}
-                      className={`w-full ${validationErrors.licenseNumber ? 'border-red-500' : ''}`}
+                      className={`w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white ${validationErrors.licenseNumber ? 'border-red-500' : ''}`}
                       pattern="^[A-Za-z0-9-]{5,}$"
                       title={t('validation.invalidLicenseNumber')}
                       placeholder="DL12345678"
@@ -1126,9 +1126,9 @@ const DeliverersPage = () => {
               </div>
 
               <div className='space-y-4'>
-                <h4 className='text-lg font-medium'>{t('address')}</h4>
+                <h4 className='text-lg font-medium dark:text-gray-200'>{t('address')}</h4>
                 <div className='space-y-2'>
-                  <label className='text-sm font-medium'>{t('address')}</label>
+                  <label className='text-sm font-medium dark:text-gray-200'>{t('address')}</label>
                   <AddressAutocomplete
                     value={formData.address.street}
                     onChange={address => handleFormChange('address.street', address)}
@@ -1148,54 +1148,54 @@ const DeliverersPage = () => {
                 </div>
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('city')}</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>{t('city')}</label>
                     <Input
                       type='text'
                       value={formData.address.city}
                       onChange={e => handleFormChange('address.city', e.target.value)}
-                      className='w-full'
+                      className='w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white'
                     />
                   </div>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('state')}</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>{t('state')}</label>
                     <Input
                       type='text'
                       value={formData.address.state}
                       onChange={e => handleFormChange('address.state', e.target.value)}
-                      className='w-full'
+                      className='w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white'
                     />
                   </div>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('zipCode')}</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>{t('zipCode')}</label>
                     <Input
                       type='text'
                       value={formData.address.zipCode}
                       onChange={e => handleFormChange('address.zipCode', e.target.value)}
-                      className='w-full'
+                      className='w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white'
                     />
                   </div>
                 </div>
               </div>
 
               <div className='space-y-4'>
-                <h4 className='text-lg font-medium'>{t('emergencyContact')}</h4>
+                <h4 className='text-lg font-medium dark:text-gray-200'>{t('emergencyContact')}</h4>
                 <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('name')}</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>{t('name')}</label>
                     <Input
                       type='text'
                       value={formData.emergencyContact.name}
                       onChange={e => handleFormChange('emergencyContact.name', e.target.value)}
-                      className='w-full'
+                      className='w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white'
                     />
                   </div>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('phone')}</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>{t('phone')}</label>
                     <Input
                       type='tel'
                       value={formData.emergencyContact.phone}
                       onChange={e => handleFormChange('emergencyContact.phone', e.target.value)}
-                      className='w-full'
+                      className='w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white'
                       pattern="^[+]?[0-9\s-()]{7,}$"
                       title={t('validation.invalidPhone')}
                       placeholder="+1 (555) 123-4567"
@@ -1203,13 +1203,13 @@ const DeliverersPage = () => {
                     <small className="text-xs text-muted-foreground">{t('validation.phoneFormat')}</small>
                   </div>
                   <div className='space-y-2'>
-                    <label className='text-sm font-medium'>{t('relationship')}</label>
+                    <label className='text-sm font-medium dark:text-gray-200'>{t('relationship')}</label>
                     <Input
                       type='text'
                       value={formData.emergencyContact.relationship}
                       onChange={e => handleFormChange('emergencyContact.relationship', e.target.value)}
                       placeholder={t('emergencyRelationshipPlaceholder')}
-                      className='w-full'
+                      className='w-full dark:border-gray-700 dark:bg-gray-800 dark:text-white'
                     />
                   </div>
                 </div>
