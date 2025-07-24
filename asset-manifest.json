@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/logistics-dashboard/static/css/main.5ed60bc7.css",
-    "main.js": "/logistics-dashboard/static/js/main.711d0352.js",
+    "main.js": "/logistics-dashboard/static/js/main.a33db8cf.js",
     "static/js/976.11bca19b.chunk.js": "/logistics-dashboard/static/js/976.11bca19b.chunk.js",
     "static/js/748.87716a45.chunk.js": "/logistics-dashboard/static/js/748.87716a45.chunk.js",
     "static/js/351.201c9e8b.chunk.js": "/logistics-dashboard/static/js/351.201c9e8b.chunk.js",
@@ -12,8 +12,8 @@
     "static/js/707.304e3362.chunk.js": "/logistics-dashboard/static/js/707.304e3362.chunk.js",
     "static/js/337.f0ddc521.chunk.js": "/logistics-dashboard/static/js/337.f0ddc521.chunk.js",
     "static/js/867.15193d54.chunk.js": "/logistics-dashboard/static/js/867.15193d54.chunk.js",
-    "static/js/784.6f7888ad.chunk.js": "/logistics-dashboard/static/js/784.6f7888ad.chunk.js",
-    "static/js/946.87485361.chunk.js": "/logistics-dashboard/static/js/946.87485361.chunk.js",
+    "static/js/784.9e24e9b2.chunk.js": "/logistics-dashboard/static/js/784.9e24e9b2.chunk.js",
+    "static/js/946.76940bd8.chunk.js": "/logistics-dashboard/static/js/946.76940bd8.chunk.js",
     "static/js/873.3f9d7cdf.chunk.js": "/logistics-dashboard/static/js/873.3f9d7cdf.chunk.js",
     "static/js/552.d0b24a36.chunk.js": "/logistics-dashboard/static/js/552.d0b24a36.chunk.js",
     "static/js/769.0408140d.chunk.js": "/logistics-dashboard/static/js/769.0408140d.chunk.js",
@@ -30,7 +30,7 @@
     "index.html": "/logistics-dashboard/index.html",
     "static/media/getFetch.cjs": "/logistics-dashboard/static/media/getFetch.7a7a1c81840c96d5a3ea.cjs",
     "main.5ed60bc7.css.map": "/logistics-dashboard/static/css/main.5ed60bc7.css.map",
-    "main.711d0352.js.map": "/logistics-dashboard/static/js/main.711d0352.js.map",
+    "main.a33db8cf.js.map": "/logistics-dashboard/static/js/main.a33db8cf.js.map",
     "976.11bca19b.chunk.js.map": "/logistics-dashboard/static/js/976.11bca19b.chunk.js.map",
     "748.87716a45.chunk.js.map": "/logistics-dashboard/static/js/748.87716a45.chunk.js.map",
     "351.201c9e8b.chunk.js.map": "/logistics-dashboard/static/js/351.201c9e8b.chunk.js.map",
@@ -41,8 +41,8 @@
     "707.304e3362.chunk.js.map": "/logistics-dashboard/static/js/707.304e3362.chunk.js.map",
     "337.f0ddc521.chunk.js.map": "/logistics-dashboard/static/js/337.f0ddc521.chunk.js.map",
     "867.15193d54.chunk.js.map": "/logistics-dashboard/static/js/867.15193d54.chunk.js.map",
-    "784.6f7888ad.chunk.js.map": "/logistics-dashboard/static/js/784.6f7888ad.chunk.js.map",
-    "946.87485361.chunk.js.map": "/logistics-dashboard/static/js/946.87485361.chunk.js.map",
+    "784.9e24e9b2.chunk.js.map": "/logistics-dashboard/static/js/784.9e24e9b2.chunk.js.map",
+    "946.76940bd8.chunk.js.map": "/logistics-dashboard/static/js/946.76940bd8.chunk.js.map",
     "873.3f9d7cdf.chunk.js.map": "/logistics-dashboard/static/js/873.3f9d7cdf.chunk.js.map",
     "552.d0b24a36.chunk.js.map": "/logistics-dashboard/static/js/552.d0b24a36.chunk.js.map",
     "769.0408140d.chunk.js.map": "/logistics-dashboard/static/js/769.0408140d.chunk.js.map",
@@ -59,6 +59,6 @@
   },
   "entrypoints": [
     "static/css/main.5ed60bc7.css",
-    "static/js/main.711d0352.js"
+    "static/js/main.a33db8cf.js"
   ]
 }
